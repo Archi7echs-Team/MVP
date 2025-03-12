@@ -27,25 +27,13 @@ class UploadControllerTest {
     private CsvFileReader csvFileReader;
 
     @Test
-    void shouldReturnOkStatus() throws Exception {
+    void testUploadCsv_Ok() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "sample.csv", "text/csv", "data".getBytes());
-        when(csvFileReader.parseCsv(any())).thenReturn(new Object());
-
         mockMvc.perform(multipart("/api/uploadCsv").file(file))
                 .andExpect(status().isOk())
                 .andExpect(content().string("File uploaded successfully."));
     }
-
-    @Test
-    void testUploadCsv_ValidFile() throws Exception {
-        MockMultipartFile file = new MockMultipartFile("file", "test.csv", "text/csv", "test data".getBytes());
-        when(csvFileReader.parseCsv(any())).thenReturn(new Object());
-
-        mockMvc.perform(multipart("/api/uploadCsv").file(file))
-                .andExpect(status().isOk())
-                .andExpect(content().string("File uploaded successfully."));
-    }
-
+    
     @Test
     void testUploadCsv_EmptyFile() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "test.csv", "text/csv", new byte[0]);
