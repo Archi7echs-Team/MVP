@@ -1,9 +1,8 @@
 <script>
-    import TextEditor from '../components/TextEditor.svelte';
-  </script>
+    import App from '$lib/components/App.svelte';
+</script>
   
-  <main>
-    <h1>Editor di Testo</h1>
-    <TextEditor />
-  </main>
+<main>
+  <App />
+</main>
   
