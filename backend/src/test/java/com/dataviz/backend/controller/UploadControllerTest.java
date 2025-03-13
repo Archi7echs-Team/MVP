@@ -1,6 +1,7 @@
 package com.dataviz.backend.controller;
 
 import com.dataviz.backend.exception.GlobalExceptionHandler;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,6 +21,7 @@ class UploadControllerTest {
     private MockMvc mockMvc;
 
     @Test
+    @DisplayName("Test all'endpoint /api/uploadCsv con un file CSV valido")
     void testUploadCsv_Ok() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "sample.csv", "text/csv", "data".getBytes());
         mockMvc.perform(multipart("/api/uploadCsv").file(file))
@@ -28,6 +30,7 @@ class UploadControllerTest {
     }
 
     @Test
+    @DisplayName("Test all'endpoint /api/uploadCsv con un file CSV vuoto")
     void testUploadCsv_EmptyFile() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "test.csv", "text/csv", new byte[0]);
 
@@ -36,6 +39,7 @@ class UploadControllerTest {
     }
 
     @Test
+    @DisplayName("Test all'endpoint /api/uploadCsv con un file non CSV")
     void testUploadCsv_InvalidFileType() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "data".getBytes());
 
@@ -45,6 +49,7 @@ class UploadControllerTest {
     }
 
     @Test
+    @DisplayName("Test all'endpoint /api/uploadCsv con un file CSV troppo grande")
     void testUploadCsv_FileTooBig() throws Exception {
         byte[] largeContent = new byte[(int) (11L * 1024L * 1024L)];
         MockMultipartFile file = new MockMultipartFile("file", "large.csv", "text/csv", largeContent);
