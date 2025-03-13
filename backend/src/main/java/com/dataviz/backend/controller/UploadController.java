@@ -2,7 +2,7 @@ package com.dataviz.backend.controller;
 
 import com.dataviz.backend.exception.FileTooBigException;
 import com.dataviz.backend.exception.InvalidCsvException;
-import com.dataviz.backend.model.Coordinate;
+import com.dataviz.backend.model.MatrixData;
 import com.dataviz.backend.service.CsvFileReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +39,7 @@ public class UploadController {
             throw new FileTooBigException("File exceeds 10MB limit.");
         }
 
-        List<Coordinate> coordinates = csvFileReader.parseCsv(file);
+        MatrixData csvParsed = csvFileReader.parseCsv(file);
         return ResponseEntity.ok("File uploaded and parsed successfully.");
     }
 }
