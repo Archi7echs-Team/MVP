@@ -18,7 +18,8 @@ import java.util.List;
 
 @Service
 public class DefaultCsvFileReader implements CsvFileReader {
-
+    private static final int MAX_COLS_ROWS = 300;
+    private static final int MAX_NUM_DATA = 1000;
     /**
      * Legge un CSV strutturato come in figura:
      *   - A1 vuoto (o ignorato)
@@ -40,20 +41,18 @@ public class DefaultCsvFileReader implements CsvFileReader {
     @Override
     public MatrixData parseCsv(MultipartFile file) throws InvalidCsvException {
         List<List<String>> table = readCsvAsTable(file);
-        int maxColsRows = 300;
-        int maxNumData = 1000;
         // Estrae le xLabels dalla prima riga (ignorando il primo campo, A1)
         List<String> xLabels = getXLabels(table);
         // Controlla che non ci siano più di 'maxVal' colonne X
-        if (xLabels.size() > maxColsRows) {
-            throw new InvalidCsvException("Troppe colonne X. Massimo 300 colonne.");
+        if (xLabels.size() > MAX_COLS_ROWS) {
+            throw new InvalidCsvException("Troppe colonne X. Massimo" + MAX_COLS_ROWS + "colonne.");
         }
         int zCount = table.size() - 1;
-        if (zCount > maxColsRows) {
-            throw new InvalidCsvException("Troppe righe Z. Massimo 300 righe.");
+        if (zCount > MAX_COLS_ROWS) {
+            throw new InvalidCsvException("Troppe righe Z. Massimo" + MAX_COLS_ROWS + "righe.");
         }
-        if (xLabels.size() * zCount > maxNumData) {
-            throw new InvalidCsvException("Troppi dati nel file. Massimo 1000 valori.");
+        if (xLabels.size() * zCount > MAX_NUM_DATA) {
+            throw new InvalidCsvException("Troppi dati nel file. Massimo" + MAX_NUM_DATA + "valori.");
         }
         // Prepara le strutture per Z e Y
         List<String> zLabels = new ArrayList<>();
