@@ -23,10 +23,19 @@ class UploadControllerTest {
     @Test
     @DisplayName("Test all'endpoint /api/uploadCsv con un file CSV valido")
     void testUploadCsv_Ok() throws Exception {
-        MockMultipartFile file = new MockMultipartFile("file", "sample.csv", "text/csv", "data".getBytes());
+        String csvData = ",X1,X2\n" + "LabelZ,1.23,4.56";
+        MockMultipartFile file = new MockMultipartFile("file", "sample.csv", "text/csv", csvData.getBytes());
         mockMvc.perform(multipart("/api/uploadCsv").file(file))
-                .andExpect(status().isOk())
-                .andExpect(content().string("File uploaded and parsed successfully."));
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Test all'endpoint /api/uploadCsv con un file CSV non valido")
+    void testUploadCsv_NotOk() throws Exception {
+        String csvData = ",X1\n" + "LabelZ,1.23,4.56";
+        MockMultipartFile file = new MockMultipartFile("file", "sample.csv", "text/csv", csvData.getBytes());
+        mockMvc.perform(multipart("/api/uploadCsv").file(file))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
