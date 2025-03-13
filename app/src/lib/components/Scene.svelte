@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { T } from '@threlte/core'
-  import { OrbitControls } from '@threlte/extras'
+  import { T } from '@threlte/core';
+  import { OrbitControls } from '@threlte/extras';
   import Chart from './Chart.svelte';
 </script>
 
