@@ -2,6 +2,7 @@ package com.dataviz.backend.controller;
 
 import com.dataviz.backend.exception.FileTooBigException;
 import com.dataviz.backend.exception.InvalidCsvException;
+import com.dataviz.backend.model.Coordinate;
 import com.dataviz.backend.service.CsvFileReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -24,7 +26,7 @@ public class UploadController {
     }
 
     @PostMapping("/uploadCsv")
-    public ResponseEntity<String> uploadCsv(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadCsv(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             throw new InvalidCsvException("File is empty.");
         }
@@ -37,9 +39,7 @@ public class UploadController {
             throw new FileTooBigException("File exceeds 10MB limit.");
         }
 
-        //da capire che oggetto ritorna la funzione parseCsv
-        Object parsedData = csvFileReader.parseCsv(file);
-
-        return ResponseEntity.ok("File uploaded successfully.");
+        List<Coordinate> coordinates = csvFileReader.parseCsv(file);
+        return ResponseEntity.ok("File uploaded and parsed successfully.");
     }
 }

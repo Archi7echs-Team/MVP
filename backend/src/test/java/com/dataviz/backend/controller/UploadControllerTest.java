@@ -24,7 +24,7 @@ class UploadControllerTest {
         MockMultipartFile file = new MockMultipartFile("file", "sample.csv", "text/csv", "data".getBytes());
         mockMvc.perform(multipart("/api/uploadCsv").file(file))
                 .andExpect(status().isOk())
-                .andExpect(content().string("File uploaded successfully."));
+                .andExpect(content().string("File uploaded and parsed successfully."));
     }
 
     @Test
