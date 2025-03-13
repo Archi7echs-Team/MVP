@@ -21,7 +21,7 @@
   
   <T.Group>
     <!-- Grid Plane (Under the Bars) -->
-    <T.Mesh position={[rows*spacing/2 - spacing/2, -0.1, cols*spacing/2 - spacing/2]}  rotation={[-Math.PI / 2, 0, 0]}>
+    <T.Mesh position={[rows*spacing/2 - spacing/2, 0 , cols*spacing/2 - spacing/2]}  rotation={[-Math.PI / 2, 0, 0]}>
         <T.PlaneGeometry args={[cols * spacing, rows * spacing]} />
         <T.MeshStandardMaterial color="gray" />
       </T.Mesh>
@@ -31,7 +31,7 @@
     {#each data as row, rowIndex}
       {#each row as value, colIndex}
         <Bar 
-          position={[
+          coordinates={[
             rowIndex * spacing, // X
             value / max * 2.5, // Y
             colIndex * spacing // Z
