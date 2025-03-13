@@ -40,10 +40,21 @@ public class DefaultCsvFileReader implements CsvFileReader {
     @Override
     public MatrixData parseCsv(MultipartFile file) throws InvalidCsvException {
         List<List<String>> table = readCsvAsTable(file);
-
+        int maxColsRows = 300;
+        int maxNumData = 1000;
         // Estrae le xLabels dalla prima riga (ignorando il primo campo, A1)
         List<String> xLabels = getXLabels(table);
-
+        // Controlla che non ci siano più di 'maxVal' colonne X
+        if (xLabels.size() > maxColsRows) {
+            throw new InvalidCsvException("Troppe colonne X. Massimo 300 colonne.");
+        }
+        int zCount = table.size() - 1;
+        if (zCount > maxColsRows) {
+            throw new InvalidCsvException("Troppe righe Z. Massimo 300 righe.");
+        }
+        if (xLabels.size() * zCount > maxNumData) {
+            throw new InvalidCsvException("Troppi dati nel file. Massimo 1000 valori.");
+        }
         // Prepara le strutture per Z e Y
         List<String> zLabels = new ArrayList<>();
         double[][] yValues = new double[table.size() - 1][xLabels.size()];
@@ -59,13 +70,13 @@ public class DefaultCsvFileReader implements CsvFileReader {
             // La prima colonna è la label Z
             String zLabel = row.get(0);
             zLabels.add(zLabel);
-
             // Le colonne successive sono i valori Y, da convertire in double
             for (int colIndex = 1; colIndex < row.size(); colIndex++) {
                 String cellValue = row.get(colIndex);
                 try {
                     double val = Double.parseDouble(cellValue);
                     yValues[rowIndex - 1][colIndex - 1] = val;
+
                 } catch (NumberFormatException e) {
                     throw new InvalidCsvException(String.format(
                             "Valore non numerico alla riga %d, colonna %d: '%s'",

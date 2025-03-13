@@ -340,4 +340,64 @@ class DefaultCsvFileReaderTest {
             System.out.println("testParseCsv_NonNumericValue completato.");
         }
     }
+
+    @Test
+    @DisplayName("")
+    void testParseCsv_TooManyXLabels() {
+        // Costruisce 302 colonne totali
+        StringBuilder header = new StringBuilder(",");
+        for (int i = 1; i <= 301; i++) {
+            header.append("X").append(i).append(i < 301 ? "," : "");
+        }
+        StringBuilder row = new StringBuilder("Z1");
+        for (int i = 1; i <= 301; i++) {
+            row.append(",1.0");
+        }
+        String csvData = header + "\n" + row;
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "too-many-x.csv", "text/csv", csvData.getBytes()
+        );
+
+        assertThrows(InvalidCsvException.class, () -> fileReader.parseCsv(file));
+    }
+
+    @Test
+    @DisplayName("CSV con troppe righe (più di 300)")
+    void testParseCsv_TooManyZLabels() {
+        StringBuilder csvData = new StringBuilder(",X\n");
+        // 301 righe Z
+        for (int i = 1; i <= 301; i++) {
+            csvData.append("Z").append(i).append(",1.0\n");
+        }
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "too-many-z.csv", "text/csv", csvData.toString().getBytes()
+        );
+
+        assertThrows(InvalidCsvException.class, () -> fileReader.parseCsv(file));
+    }
+
+    @Test
+    @DisplayName("CSV con troppi dati (più di 1000)")
+    void testParseCsv_TooManyTotalDataPoints() {
+        StringBuilder header = new StringBuilder(",");
+        for (int i = 1; i <= 20; i++) {
+            header.append("X").append(i).append(i < 20 ? "," : "");
+        }
+        StringBuilder csvData = new StringBuilder(header).append("\n");
+        for (int row = 1; row <= 51; row++) {
+            csvData.append("Z").append(row);
+            for (int col = 1; col <= 20; col++) {
+                csvData.append(",1.0");
+            }
+            csvData.append("\n");
+        }
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "too-many-points.csv", "text/csv", csvData.toString().getBytes()
+        );
+
+        assertThrows(InvalidCsvException.class, () -> fileReader.parseCsv(file));
+    }
 }
