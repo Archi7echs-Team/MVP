@@ -3,6 +3,7 @@ package com.dataviz.backend.service.impl;
 import com.dataviz.backend.config.DataProprieties;
 import com.dataviz.backend.exception.FileTooBigException;
 import com.dataviz.backend.exception.InvalidCsvException;
+import com.dataviz.backend.exception.TooMuchDataException;
 import com.dataviz.backend.model.MatrixData;
 import com.dataviz.backend.service.CsvFileReader;
 import org.apache.commons.csv.CSVFormat;
@@ -71,7 +72,7 @@ public class DefaultCsvFileReader implements CsvFileReader {
             throw new InvalidCsvException("Troppe righe Z. Massimo" + properties.getMaxColsRows() + "righe.");
         }
         if (xLabels.size() * zCount > properties.getMaxNumData()) {
-            throw new InvalidCsvException("Troppi dati nel file. Massimo" + properties.getMaxNumData() + "valori.");
+            throw new TooMuchDataException("Troppi dati nel file. Massimo" + properties.getMaxNumData() + "valori.");
         }
         // Prepara le strutture per Z e Y
         List<String> zLabels = new ArrayList<>();

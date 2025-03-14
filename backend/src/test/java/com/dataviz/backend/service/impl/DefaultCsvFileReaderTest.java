@@ -2,6 +2,7 @@ package com.dataviz.backend.service.impl;
 
 import com.dataviz.backend.controller.BackendApplication;
 import com.dataviz.backend.exception.InvalidCsvException;
+import com.dataviz.backend.exception.TooMuchDataException;
 import com.dataviz.backend.model.MatrixData;
 import com.dataviz.backend.service.CsvFileReader;
 import org.junit.jupiter.api.DisplayName;
@@ -407,6 +408,6 @@ class DefaultCsvFileReaderTest {
                 "file", "too-many-points.csv", "text/csv", csvData.toString().getBytes()
         );
 
-        assertThrows(InvalidCsvException.class, () -> fileReader.parseCsv(file));
+        assertThrows(TooMuchDataException.class, () -> fileReader.parseCsv(file));
     }
 }
