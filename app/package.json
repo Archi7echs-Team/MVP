@@ -40,6 +40,7 @@
 		"@threlte/extras": "^9.0.2",
 		"@types/three": "^0.174.0",
 		"3DataVisualization": "file:",
+		"svelte-tweakpane-ui": "^1.5.5",
 		"three": "^0.174.0"
 	}
 }
