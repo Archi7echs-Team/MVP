@@ -1,20 +1,29 @@
 package com.dataviz.backend.service.impl;
 
+import com.dataviz.backend.controller.BackendApplication;
 import com.dataviz.backend.exception.InvalidCsvException;
 import com.dataviz.backend.model.MatrixData;
+import com.dataviz.backend.service.CsvFileReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = BackendApplication.class)
 @DisplayName("Test per DefaultCsvFileReader")
 class DefaultCsvFileReaderTest {
 
-    private final DefaultCsvFileReader fileReader = new DefaultCsvFileReader();
+    @Autowired
+    private CsvFileReader fileReader;
 
     @Nested
     @DisplayName("Test di successo (CSV corretto)")

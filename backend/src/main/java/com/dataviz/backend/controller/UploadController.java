@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class UploadController {
 
-    private static final long MAX_FILE_SIZE = 10L * 1024L * 1024L; // 10MB
+
     private final CsvFileReader csvFileReader;
 
     @Autowired
@@ -27,18 +27,6 @@ public class UploadController {
 
     @PostMapping("/uploadCsv")
     public ResponseEntity<?> uploadCsv(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            throw new InvalidCsvException("File is empty.");
-        }
-
-        if (!"text/csv".equalsIgnoreCase(file.getContentType())) {
-            throw new InvalidCsvException("Invalid file type. Only .csv is allowed.");
-        }
-
-        if (file.getSize() > MAX_FILE_SIZE) {
-            throw new FileTooBigException("File exceeds 10MB limit.");
-        }
-
         MatrixData csvParsed = csvFileReader.parseCsv(file);
         return ResponseEntity.ok("File uploaded and parsed successfully.");
     }
