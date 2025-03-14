@@ -25,8 +25,8 @@ public class DataProprieties {
         this.maxNumData = maxNumData;
     }
 
-    public int getMaxFileSize() {
-        return maxNumData;
+    public long getMaxFileSize() {
+        return maxFileSize;
     }
 
     public void setMaxFileSize(long maxFileSize) {
