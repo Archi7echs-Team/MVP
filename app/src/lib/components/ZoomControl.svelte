@@ -1,6 +1,6 @@
 <script lang="ts">
   import { useThrelte } from '@threlte/core';
-	import { Button, Pane, Slider } from 'svelte-tweakpane-ui';
+	import { Button, Pane, ThemeUtils  } from 'svelte-tweakpane-ui';
 	import { Vector3 } from 'three';
 
   let zoomValue = 5;
@@ -35,7 +35,7 @@
   }
 </script>
 
-<Pane title="3D Dataviz" position="fixed">
+<Pane title="3D Dataviz" position="fixed" theme={ThemeUtils.presets.light}>
   <Button
     label="Resetta"
     title="Reset"
