@@ -1,7 +1,7 @@
 <script>
     import { T } from '@threlte/core';
     import Bar from './Bar.svelte';
-    import { Grid } from '@threlte/extras'
+    import { Grid } from '@threlte/extras';
 
     // Example 2D grid of values
     export let data = [

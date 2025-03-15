@@ -1,45 +1,56 @@
 <script lang="ts">
-    import { useThrelte } from '@threlte/core';
+  import { useThrelte } from '@threlte/core';
+	import { Button, Pane, Slider } from 'svelte-tweakpane-ui';
+	import { Vector3 } from 'three';
 
-    let zoomValue = 5;
-    const { camera } = useThrelte();
+  let zoomValue = 5;
+  const zoomStep = 2; // Quanto zoomare per ogni click
+  const defaultPosition = new Vector3(10, 5, 10);
 
-    $: if (camera?.current) {
-      camera.current.position.z = zoomValue;
+  const { camera } = useThrelte();
+
+  function zoomIn() {
+    zoomValue -= zoomStep;
+    updateCamera(zoomStep);
+  }
+
+  function zoomOut() {
+    zoomValue += zoomStep;
+    updateCamera(-zoomStep);
+  }
+
+  function updateCamera(step: number) {
+      if (camera?.current) {
+        const direction = new Vector3();
+          camera.current.getWorldDirection(direction); // Ottiene la direzione attuale della camera
+          direction.multiplyScalar(step); // Scala il vettore di zoomStep
+          camera.current.position.add(direction);
+      }
+  }
+
+  function resetPosition() {
+    if (camera?.current) {
+      camera.current.position.copy(defaultPosition);
     }
-  </script>
+  }
+</script>
+
+<Pane title="3D Dataviz" position="fixed">
+  <Button
+    label="Resetta"
+    title="Reset"
+    on:click={resetPosition}
+  />
   
-  <div class="zoom-control">
-    <label for="zoom-slider">Zoom</label>
-    <input
-      id="zoom-slider"
-      type="range"
-      min="1"
-      max="20"
-      step="0.1"
-      bind:value={zoomValue} />
-    <span>{zoomValue}</span>
-  </div>
+  <Button
+    label="Zoom In"
+    title="+"
+    on:click={zoomIn}
+  />
   
-  <style>
-    .zoom-control {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: rgba(255, 255, 255, 0.8);
-      padding: 10px;
-      border-radius: 5px;
-      z-index: 1000; /* Assicura che sia visibile sopra la scena */
-      font-family: sans-serif;
-      color: #333;
-    }
-    
-    label {
-      margin-right: 5px;
-    }
-    
-    input[type="range"] {
-      vertical-align: middle;
-    }
-  </style>
-  
+  <Button
+    label="Zoom Out"
+    title="-"
+    on:click={zoomOut}
+  />
+</Pane>

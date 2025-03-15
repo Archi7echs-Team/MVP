@@ -2,7 +2,8 @@
   import { T, useThrelte } from '@threlte/core';
   import { interactivity, Text } from '@threlte/extras';
   import { onMount, onDestroy } from 'svelte';
-
+  import * as THREE from 'three';
+  
   let {coordinates, height} = $props();
   let over = $state(false)
   let camQuat = $state<[number, number, number, number]>([0, 0, 0, 1]);
@@ -32,11 +33,11 @@
 
 </script>
 
-<T.Mesh 
+<T.Mesh
 position={coordinates as [number, number, number]} 
 scale={[1, height, 1]} 
-onpointerover={(e: PointerEvent) => { e.stopPropagation(); over = true; }}  
-onpointerout={(e: PointerEvent) => { e.stopPropagation(); over = false;}}
+onpointerenter={(e: PointerEvent) => { e.stopPropagation(); over = true; }}
+onpointerout={(e: PointerEvent) => { e.stopPropagation(); over = false; }}
 >
 <T.BoxGeometry args={[1, 1, 1]} />
 <T.MeshStandardMaterial color={`hsl(${((coordinates[2] + 360) * 30) % 360}, 80%, 60%)`} />
