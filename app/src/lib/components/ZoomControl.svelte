@@ -35,7 +35,7 @@
   }
 </script>
 
-<Pane title="3D Dataviz" position="fixed" theme={ThemeUtils.presets.light}>
+<Pane title="3Dataviz" position="fixed" theme={ThemeUtils.presets.light}>
   <Button
     label="Resetta"
     title="Reset"
