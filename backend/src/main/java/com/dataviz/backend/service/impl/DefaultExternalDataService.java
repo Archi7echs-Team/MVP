@@ -7,6 +7,8 @@ import com.dataviz.backend.model.MatrixData;
 import com.dataviz.backend.service.ExternalDataService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -34,32 +36,39 @@ public class DefaultExternalDataService implements ExternalDataService {
     public String fetchData() {
         try {
             ResponseEntity<String> response = restTemplate.getForEntity(properties.getUrl(), String.class);
+            HttpStatus statusCode = (HttpStatus) response.getStatusCode();
+            MediaType contentType = response.getHeaders().getContentType();
             String responseBody = response.getBody();
             System.out.println(responseBody);
-            validateData(responseBody);
-            return response.getBody();
+            if (statusCode.is2xxSuccessful()) {
+                if (MediaType.APPLICATION_JSON.includes(contentType)) {
+                    validateData(responseBody);
+                    // TODO: Creare un sistema che prenda il JSON e lo porti in formato Matrix Data
+                    return responseBody;
+                } else {
+                    throw new NetworkErrorException("Unsupported content type: " + contentType);
+                }
+            } else if (statusCode.is4xxClientError()) {
+                throw new NetworkErrorException("Client error: " + statusCode + " - " + responseBody);
+            } else if (statusCode.is5xxServerError()) {
+                throw new NetworkErrorException("Server error: " + statusCode + " - " + responseBody);
+            }
         } catch (ResourceAccessException ex) {
-            if (ex.getCause() instanceof SocketTimeoutException) { // Controlla se l'eccezione è dovuta a un timeout
-                throw new APITimeoutException("Request timed out after 5 seconds.");
+            if (ex.getCause() instanceof SocketTimeoutException) {
+                throw new APITimeoutException("Request timed out after " + properties.getTimeout() + " milliseconds.");
             }
         } catch (HttpClientErrorException e) {
-            // Handle degli errori lato client (4xx)
-            System.err.println("Client error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
             throw new NetworkErrorException("Client error occurred while fetching data from external API.");
         } catch (HttpServerErrorException e) {
-            // Handle degli errori lato server (5xx)
-            System.err.println("Server error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
             throw new NetworkErrorException("Server error occurred while fetching data from external API.");
         } catch (Exception e) {
-            // Handle di altri errori come quelli di network
-            System.err.println("Error: " + e.getMessage());
             throw new NetworkErrorException("An error occurred while fetching data from external API.");
         }
         return "";
     }
-
+    // TODO: inserire qui la logica di validazione dei dati e nel caso lanciare un'eccezione specifica
     private void validateData(String data) throws Exception {
         JsonNode jsonNode = objectMapper.readTree(data);
-        // TODO: inserire qui la logica di validazione dei dati e nel caso lanciare un'eccezione specifica
+
     }
 }
