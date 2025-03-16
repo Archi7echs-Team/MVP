@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 @RestController
-@ComponentScan(basePackages = "com.dataviz.backend.service.impl") //altrimenti
+@ComponentScan(basePackages = "com.dataviz.backend")
 public class BackendApplication {
 
     public static void main(String[] args) {
