@@ -16,6 +16,7 @@ import java.util.Set;
 @Service
 public class DefaultCoordinateService implements CoordinateService {
 
+
     private final CoordinateRepository coordinateRepository;
 
     public DefaultCoordinateService(CoordinateRepository coordinateRepository) {
