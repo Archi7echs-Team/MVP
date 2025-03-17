@@ -1,27 +1,51 @@
 services:
+
   db:
-    image: postgres:15
+    image: postgres:17
     container_name: database
     environment:
-      POSTGRES_USER: architechs
-      POSTGRES_PASSWORD: password_super_sicura
-      POSTGRES_DB: coordinateDB
+      - POSTGRES_USER=architechs
+      - POSTGRES_PASSWORD=password_super_sicura
+      - POSTGRES_DB=coordinateDB
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-data.sql:/docker-entrypoint-initdb.d/init-data.sql
 
+  build:
+    image: maven:3.9.9-eclipse-temurin-23-alpine
+    container_name: builder
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/coordinateDB
+      SPRING_DATASOURCE_USERNAME: architechs
+      SPRING_DATASOURCE_PASSWORD: password_super_sicura
+    command: >
+      sh -c "
+        echo 'Running tests...';
+        mvn clean test && echo 'Tests PASSED! Building JAR...'
+      "
+
+  # APPLICAZIONE (Spring Boot runtime)
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: app-backend
     depends_on:
       - db
+      - build
     ports:
       - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/coordinateDB
       SPRING_DATASOURCE_USERNAME: architechs
       SPRING_DATASOURCE_PASSWORD: password_super_sicura
+
 volumes:
   postgres_data:
