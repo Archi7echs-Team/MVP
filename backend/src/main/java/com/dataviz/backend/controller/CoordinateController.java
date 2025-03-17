@@ -12,8 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/coordinates")
 public class CoordinateController {
 
+    private final CoordinateService coordinateService;
+
     @Autowired
-    private CoordinateService coordinateService;
+    public CoordinateController(CoordinateService coordinateService) {
+        this.coordinateService = coordinateService;
+    }
 
     @GetMapping
     public MatrixData getMatrixData(@RequestParam(required = false, defaultValue = "LARGE") String datasetType) {

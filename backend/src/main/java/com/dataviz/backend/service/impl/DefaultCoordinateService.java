@@ -16,8 +16,11 @@ import java.util.Set;
 @Service
 public class DefaultCoordinateService implements CoordinateService {
 
-    @Autowired
-    private CoordinateRepository coordinateRepository;
+    private final CoordinateRepository coordinateRepository;
+
+    public DefaultCoordinateService(CoordinateRepository coordinateRepository) {
+        this.coordinateRepository = coordinateRepository;
+    }
 
     @Transactional(readOnly = true)
     @Override
