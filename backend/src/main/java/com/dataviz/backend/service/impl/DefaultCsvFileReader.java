@@ -26,8 +26,6 @@ public class DefaultCsvFileReader implements CsvFileReader {
     public DefaultCsvFileReader(DataProprieties properties) {
         this.properties = properties;
     }
-    private static final int MAX_COLS_ROWS = 300;
-    private static final int MAX_NUM_DATA = 1000;
     /**
      * Legge un CSV strutturato come in figura:
      *   - A1 vuoto (o ignorato)

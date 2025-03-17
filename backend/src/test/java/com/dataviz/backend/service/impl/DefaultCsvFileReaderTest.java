@@ -6,7 +6,6 @@ import com.dataviz.backend.exception.TooMuchDataException;
 import com.dataviz.backend.model.MatrixData;
 import com.dataviz.backend.service.CsvFileReader;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +18,16 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = BackendApplication.class)
+@SpringBootTest(
+        classes = BackendApplication.class,
+        properties = {"spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration","spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration"}
+)
 @DisplayName("Test per DefaultCsvFileReader")
 class DefaultCsvFileReaderTest {
 
     @Autowired
     private CsvFileReader fileReader;
 
-    @Nested
-    @DisplayName("Test di successo (CSV corretto)")
-    class SuccessTests {
 
         @Test
         @DisplayName("CSV valido con più righe e colonne: estrazione corretta di X, Z e Y")
@@ -247,11 +246,6 @@ class DefaultCsvFileReaderTest {
 
             System.out.println("testParseCsv_TrimSpaces completato.");
         }
-    }
-
-    @Nested
-    @DisplayName("Test di fallimento (CSV non valido)")
-    class FailureTests {
 
         @Test
         @DisplayName("CSV con meno di 2 righe totali (manca header o dati)")
@@ -349,7 +343,7 @@ class DefaultCsvFileReaderTest {
                     "Deve indicare che il valore non è numerico");
             System.out.println("testParseCsv_NonNumericValue completato.");
         }
-    }
+
 
     @Test
     @DisplayName("")
