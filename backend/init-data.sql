@@ -1,13 +1,20 @@
--- init-data.sql
+-- Creiamo il tipo ENUM per dataset_type
+DO $$ BEGIN
+CREATE TYPE dataset_level AS ENUM ('SMALL', 'MEDIUM', 'LARGE');
+EXCEPTION
+   WHEN duplicate_object THEN null;
+END $$;
 
+-- Creiamo la tabella usando ENUM invece di TEXT
 CREATE TABLE IF NOT EXISTS coordinates (
                                            id SERIAL PRIMARY KEY,
                                            x_label TEXT NOT NULL,
                                            z_label TEXT NOT NULL,
                                            y_value DOUBLE PRECISION NOT NULL,
-                                           dataset_type TEXT NOT NULL
+                                           dataset_type dataset_level NOT NULL
 );
 
+-- Inseriamo i dati con ENUM
 INSERT INTO coordinates (x_label, z_label, y_value, dataset_type) VALUES
                                                                       ('Vicenza', 'Mele', 1.0, 'SMALL'),
                                                                       ('Vicenza', 'Pere', 3.0, 'SMALL'),
