@@ -50,7 +50,6 @@ public class DefaultCoordinateService implements CoordinateService {
             int xIndex = xLabels.indexOf(row.getXLabel());
             yValues[zIndex][xIndex] = row.getYValue();
         }
-
         return new MatrixData(xLabels, zLabels, yValues);
     }
 }

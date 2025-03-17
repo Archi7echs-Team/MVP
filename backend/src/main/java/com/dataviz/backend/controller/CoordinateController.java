@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/coordinates")
+@RequestMapping("/api")
 public class CoordinateController {
 
     private final CoordinateService coordinateService;
@@ -19,7 +19,7 @@ public class CoordinateController {
         this.coordinateService = coordinateService;
     }
 
-    @GetMapping
+    @GetMapping("/coordinates")
     public MatrixData getMatrixData(@RequestParam(required = false, defaultValue = "LARGE") String datasetType) {
         // Esempio: http://localhost:8080/api/coordinates?datasetType=SMALL
         return coordinateService.getCoordinates(datasetType);
