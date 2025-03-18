@@ -13,13 +13,17 @@
     [2, 5, 7, 4, 8],
     [3, 2, 4, 1, 5],
     [1, 3, 2, 6, 4]
-  ] } = $props();
+  ], controlTarget } = $props();
 
   let max = Math.max(...data.flat()) || 1; // Normalize heights
 
   let spacing = 1.2; // Space between bars
   let rows = data.length;
   let cols = data[0].length;
+  let centre = [rows*spacing/2 - spacing/2, 0 , cols*spacing/2 - spacing/2];
+  controlTarget(centre);
+  console.log(camera);
+  console.log(renderer);
 
 
   onMount(() => {
