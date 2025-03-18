@@ -3,5 +3,5 @@ package com.dataviz.backend.service;
 import com.dataviz.backend.model.MatrixData;
 
 public interface ExternalDataService {
-    String fetchData();
+    MatrixData fetchData();
 }

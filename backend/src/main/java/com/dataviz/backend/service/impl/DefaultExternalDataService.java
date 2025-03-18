@@ -17,6 +17,9 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @Service
 public class DefaultExternalDataService implements ExternalDataService {
@@ -33,7 +36,7 @@ public class DefaultExternalDataService implements ExternalDataService {
     // TODO: Sistema di logging per capire cosa è successo durante gli errori ad esempio ?
     // TODO: Deve restituire un MatrixData così che dal lato frontend si possa fare il parsing dei dati
     @Override
-    public String fetchData() {
+    public MatrixData fetchData() {
         try {
             ResponseEntity<String> response = restTemplate.getForEntity(properties.getUrl(), String.class);
             HttpStatus statusCode = (HttpStatus) response.getStatusCode();
@@ -43,20 +46,16 @@ public class DefaultExternalDataService implements ExternalDataService {
             if (statusCode.is2xxSuccessful()) {
                 if (MediaType.APPLICATION_JSON.includes(contentType)) {
                     validateData(responseBody);
-                    // TODO: Creare un sistema che prenda il JSON e lo porti in formato Matrix Data
-                    return responseBody;
+                    return parseJsonToMatrixData(responseBody);
                 } else {
                     throw new NetworkErrorException("Unsupported content type: " + contentType);
                 }
-            } else if (statusCode.is4xxClientError()) {
-                throw new NetworkErrorException("Client error: " + statusCode + " - " + responseBody);
-            } else if (statusCode.is5xxServerError()) {
-                throw new NetworkErrorException("Server error: " + statusCode + " - " + responseBody);
             }
         } catch (ResourceAccessException ex) {
             if (ex.getCause() instanceof SocketTimeoutException) {
                 throw new APITimeoutException("Request timed out after " + properties.getTimeout() + " milliseconds.");
             }
+            throw new NetworkErrorException("An error occurred while fetching data from external API.");
         } catch (HttpClientErrorException e) {
             throw new NetworkErrorException("Client error occurred while fetching data from external API.");
         } catch (HttpServerErrorException e) {
@@ -64,11 +63,41 @@ public class DefaultExternalDataService implements ExternalDataService {
         } catch (Exception e) {
             throw new NetworkErrorException("An error occurred while fetching data from external API.");
         }
-        return "";
+        return new MatrixData(new ArrayList<>(), new ArrayList<>(), new double[0][0]);
     }
     // TODO: inserire qui la logica di validazione dei dati e nel caso lanciare un'eccezione specifica
     private void validateData(String data) throws Exception {
         JsonNode jsonNode = objectMapper.readTree(data);
 
+    }
+    private MatrixData parseJsonToMatrixData(String jsonResponse) throws Exception {
+        JsonNode root = objectMapper.readTree(jsonResponse);
+        JsonNode hourly = root.path("hourly");
+
+        // Estrarre etichette X (timestamp)
+        List<String> xLabels = new ArrayList<>();
+        hourly.path("time").forEach(node -> xLabels.add(node.asText()));
+
+        // Estrarre etichette Z (nomi dei parametri meteo)
+        List<String> zLabels = new ArrayList<>();
+        Iterator<String> fieldNames = hourly.fieldNames();
+        while (fieldNames.hasNext()) {
+            String fieldName = fieldNames.next();
+            if (!fieldName.equals("time")) { // Escludiamo la colonna tempo
+                zLabels.add(fieldName);
+            }
+        }
+
+        // Estrarre i valori Y come matrice [zLabels.size() x xLabels.size()]
+        double[][] yValues = new double[zLabels.size()][xLabels.size()];
+        for (int z = 0; z < zLabels.size(); z++) {
+            String key = zLabels.get(z);
+            JsonNode valuesArray = hourly.path(key);
+            for (int x = 0; x < xLabels.size(); x++) {
+                yValues[z][x] = valuesArray.get(x).asDouble();
+            }
+        }
+
+        return new MatrixData(xLabels, zLabels, yValues);
     }
 }
