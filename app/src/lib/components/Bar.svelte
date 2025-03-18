@@ -5,9 +5,10 @@
   import { Raycaster, Vector2 } from 'three';
   import * as THREE from 'three';
 
-  let { coordinates, height } = $props();
+  let { coordinates, height, currentCameraQuaternionArray } = $props();
   let over = $state(false);
-  let camQuat = $state<[number, number, number, number]>([0, 0, 0, 1]);
+  //let currentCameraQuaternionArray = $state<[number, number, number, number]>(new THREE.Quaternion().toArray());
+  
   let animationFrameId: number;
   const { camera, renderer, scene } = useThrelte();
 
@@ -17,28 +18,19 @@
   //riferimento al mesh della barra
   let mesh = $state<THREE.Mesh | undefined>(undefined);
 
-  interactivity();
-
+    interactivity({
+    filter: (hits, state) => {
+      // Only return the first hit
+      return hits.slice(0, 1)
+    }
+  })
+  
   onMount(() => {
-    const update = () => {
-      if (camera?.current) {
-        camQuat = [
-          camera.current.quaternion.x,
-          camera.current.quaternion.y,
-          camera.current.quaternion.z,
-          camera.current.quaternion.w
-        ];
-      }
-      animationFrameId = requestAnimationFrame(update);
-    };
-    update();
-
     //listener per il movimento del mouse
     renderer.domElement.addEventListener('pointermove', onPointerMove);
   });
 
   onDestroy(() => {
-    cancelAnimationFrame(animationFrameId);
     renderer.domElement.removeEventListener('pointermove', onPointerMove);
   });
 
@@ -78,6 +70,7 @@
     color="black"
     anchorX="center"
     anchorY="middle"
-    quaternion={camQuat}
-  />
+    quaternion={currentCameraQuaternionArray}
+    fontSize={0.2}
+    />
 {/if}

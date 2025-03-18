@@ -35,22 +35,21 @@
   }
 </script>
 
-<Pane title="3Dataviz" position="fixed" theme={ThemeUtils.presets.light}>
   <Button
-    label="Resetta"
-    title="Reset"
-    on:click={resetPosition}
+  label="Resetta"
+  title="Reset"
+  on:click={resetPosition}
   />
   
   <Button
-    label="Zoom In"
-    title="+"
-    on:click={zoomIn}
+  label="Zoom In"
+  title="+"
+  on:click={zoomIn}
   />
   
   <Button
-    label="Zoom Out"
-    title="-"
-    on:click={zoomOut}
+  label="Zoom Out"
+  title="-"
+  on:click={zoomOut}
   />
-</Pane>
+  
