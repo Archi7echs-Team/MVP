@@ -26,6 +26,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/coordinateDB
       SPRING_DATASOURCE_USERNAME: architechs
       SPRING_DATASOURCE_PASSWORD: password_super_sicura
+      TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
     command: >
       sh -c "
         echo 'Running tests...';
