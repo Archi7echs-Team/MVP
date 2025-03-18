@@ -343,7 +343,7 @@ class DefaultCsvFileReaderTest {
 
 
     @Test
-    @DisplayName("")
+    @DisplayName("CSV con troppe colonne (più di 300)")
     void testParseCsv_TooManyXLabels() {
         // Costruisce 302 colonne totali
         StringBuilder header = new StringBuilder(",");
