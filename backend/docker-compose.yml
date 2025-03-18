@@ -13,13 +13,14 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init-data.sql:/docker-entrypoint-initdb.d/init-data.sql
 
-  build:
+  test:
     image: maven:3.9.9-eclipse-temurin-23-alpine
-    container_name: builder
+    container_name: tester
     depends_on:
       - db
     volumes:
       - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock  # Concede accesso al daemon Docker
     working_dir: /app
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/coordinateDB
@@ -31,6 +32,7 @@ services:
         mvn clean test && echo 'Tests PASSED! Building JAR...'
       "
 
+
   # APPLICAZIONE (Spring Boot runtime)
   app:
     build:
@@ -39,7 +41,7 @@ services:
     container_name: app-backend
     depends_on:
       - db
-      - build
+      - test
     ports:
       - "8080:8080"
     environment:

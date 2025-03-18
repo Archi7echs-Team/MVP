@@ -14,7 +14,6 @@ public class CoordinateController {
 
     private final CoordinateService coordinateService;
 
-    @Autowired
     public CoordinateController(CoordinateService coordinateService) {
         this.coordinateService = coordinateService;
     }

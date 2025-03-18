@@ -8,9 +8,9 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-
 @Repository
 public interface CoordinateRepository extends JpaRepository<CoordinateEntity, Long> {
+
     @Query("SELECT c FROM CoordinateEntity c WHERE c.datasetType >= :type")
     List<CoordinateEntity> findAllByDatasetType(@Param("type") String type);
 }
