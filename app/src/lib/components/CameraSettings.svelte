@@ -5,7 +5,7 @@
 
   let zoomValue = 5;
   const zoomStep = 2; // Quanto zoomare per ogni click
-  const defaultPosition = new Vector3(10, 5, 10);
+  const defaultPosition = new Vector3(15, 7.5, 15);
 
   const { camera } = useThrelte();
 
