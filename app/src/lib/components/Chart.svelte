@@ -2,6 +2,8 @@
   import { T, useThrelte } from '@threlte/core';
   import Bar from './Bar.svelte';
   import { onMount, onDestroy } from 'svelte';
+  import minVal from './DataRange.svelte';
+  import maxVal from './DataRange.svelte';
   const { camera, renderer, scene } = useThrelte();
   let currentCameraQuaternionArray = $state<[number, number, number, number]>([0, 0, 0, 1]);
   let animationFrameId: number;
