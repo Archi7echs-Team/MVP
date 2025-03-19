@@ -1,24 +1,30 @@
 package com.dataviz.backend.service.impl;
 
+import com.dataviz.backend.controller.BackendApplication;
 import com.dataviz.backend.exception.InvalidCsvException;
+import com.dataviz.backend.exception.TooMuchDataException;
 import com.dataviz.backend.model.MatrixData;
+import com.dataviz.backend.service.CsvFileReader;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = BackendApplication.class)
 @DisplayName("Test per DefaultCsvFileReader")
 class DefaultCsvFileReaderTest {
 
-    private final DefaultCsvFileReader fileReader = new DefaultCsvFileReader();
+    @Autowired
+    private CsvFileReader fileReader;
 
-    @Nested
-    @DisplayName("Test di successo (CSV corretto)")
-    class SuccessTests {
 
         @Test
         @DisplayName("CSV valido con più righe e colonne: estrazione corretta di X, Z e Y")
@@ -237,11 +243,6 @@ class DefaultCsvFileReaderTest {
 
             System.out.println("testParseCsv_TrimSpaces completato.");
         }
-    }
-
-    @Nested
-    @DisplayName("Test di fallimento (CSV non valido)")
-    class FailureTests {
 
         @Test
         @DisplayName("CSV con meno di 2 righe totali (manca header o dati)")
@@ -339,10 +340,10 @@ class DefaultCsvFileReaderTest {
                     "Deve indicare che il valore non è numerico");
             System.out.println("testParseCsv_NonNumericValue completato.");
         }
-    }
+
 
     @Test
-    @DisplayName("")
+    @DisplayName("CSV con troppe colonne (più di 300)")
     void testParseCsv_TooManyXLabels() {
         // Costruisce 302 colonne totali
         StringBuilder header = new StringBuilder(",");
@@ -398,6 +399,6 @@ class DefaultCsvFileReaderTest {
                 "file", "too-many-points.csv", "text/csv", csvData.toString().getBytes()
         );
 
-        assertThrows(InvalidCsvException.class, () -> fileReader.parseCsv(file));
+        assertThrows(TooMuchDataException.class, () -> fileReader.parseCsv(file));
     }
 }

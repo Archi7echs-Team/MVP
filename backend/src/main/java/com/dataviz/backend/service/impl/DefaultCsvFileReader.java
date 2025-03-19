@@ -1,6 +1,9 @@
 package com.dataviz.backend.service.impl;
 
+import com.dataviz.backend.config.DataProprieties;
+import com.dataviz.backend.exception.FileTooBigException;
 import com.dataviz.backend.exception.InvalidCsvException;
+import com.dataviz.backend.exception.TooMuchDataException;
 import com.dataviz.backend.model.MatrixData;
 import com.dataviz.backend.service.CsvFileReader;
 import org.apache.commons.csv.CSVFormat;
@@ -18,8 +21,11 @@ import java.util.List;
 
 @Service
 public class DefaultCsvFileReader implements CsvFileReader {
-    private static final int MAX_COLS_ROWS = 300;
-    private static final int MAX_NUM_DATA = 1000;
+    private final DataProprieties properties;
+
+    public DefaultCsvFileReader(DataProprieties properties) {
+        this.properties = properties;
+    }
     /**
      * Legge un CSV strutturato come in figura:
      *   - A1 vuoto (o ignorato)
@@ -40,19 +46,31 @@ public class DefaultCsvFileReader implements CsvFileReader {
      */
     @Override
     public MatrixData parseCsv(MultipartFile file) throws InvalidCsvException {
+        if (file.isEmpty()) {
+            throw new InvalidCsvException("File is empty.");
+        }
+
+        if (!"text/csv".equalsIgnoreCase(file.getContentType())) {
+            throw new InvalidCsvException("Invalid file type. Only .csv is allowed.");
+        }
+
+        if (file.getSize() > properties.getMaxFileSize()) {
+            throw new FileTooBigException("File exceeds 10MB limit.");
+        }
+
         List<List<String>> table = readCsvAsTable(file);
         // Estrae le xLabels dalla prima riga (ignorando il primo campo, A1)
         List<String> xLabels = getXLabels(table);
         // Controlla che non ci siano più di 'maxVal' colonne X
-        if (xLabels.size() > MAX_COLS_ROWS) {
-            throw new InvalidCsvException("Troppe colonne X. Massimo" + MAX_COLS_ROWS + "colonne.");
+        if (xLabels.size() > properties.getMaxColsRows()) {
+            throw new InvalidCsvException("Troppe colonne X. Massimo" + properties.getMaxColsRows() + "colonne.");
         }
         int zCount = table.size() - 1;
-        if (zCount > MAX_COLS_ROWS) {
-            throw new InvalidCsvException("Troppe righe Z. Massimo" + MAX_COLS_ROWS + "righe.");
+        if (zCount > properties.getMaxColsRows()) {
+            throw new InvalidCsvException("Troppe righe Z. Massimo" + properties.getMaxColsRows() + "righe.");
         }
-        if (xLabels.size() * zCount > MAX_NUM_DATA) {
-            throw new InvalidCsvException("Troppi dati nel file. Massimo" + MAX_NUM_DATA + "valori.");
+        if (xLabels.size() * zCount > properties.getMaxNumData()) {
+            throw new TooMuchDataException("Troppi dati nel file. Massimo" + properties.getMaxNumData() + "valori.");
         }
         // Prepara le strutture per Z e Y
         List<String> zLabels = new ArrayList<>();
