@@ -68,12 +68,12 @@ class DefaultExternalDataServiceTest {
         MatrixData result = externalDataService.fetchData();
 
         assertNotNull(result);
-        assertEquals(List.of("2025-03-18T00:00", "2025-03-18T01:00"), result.getxLabels());
-        assertEquals(List.of("temperature_2m", "humidity"), result.getzLabels());
-        assertEquals(5.2, result.getyValues()[0][0]);
-        assertEquals(4.8, result.getyValues()[0][1]);
-        assertEquals(80, result.getyValues()[1][0]);
-        assertEquals(82, result.getyValues()[1][1]);
+        assertEquals(List.of("2025-03-18T00:00", "2025-03-18T01:00"), result.xLabels());
+        assertEquals(List.of("temperature_2m", "humidity"), result.zLabels());
+        assertEquals(5.2, result.yValues()[0][0]);
+        assertEquals(4.8, result.yValues()[0][1]);
+        assertEquals(80, result.yValues()[1][0]);
+        assertEquals(82, result.yValues()[1][1]);
     }
 
     @Test
@@ -152,8 +152,8 @@ class DefaultExternalDataServiceTest {
         MatrixData result = externalDataService.fetchData();
 
         assertNotNull(result);
-        assertTrue(result.getxLabels().isEmpty());
-        assertTrue(result.getzLabels().isEmpty());
-        assertEquals(0, result.getyValues().length);
+        assertTrue(result.xLabels().isEmpty());
+        assertTrue(result.zLabels().isEmpty());
+        assertEquals(0, result.yValues().length);
     }
 }

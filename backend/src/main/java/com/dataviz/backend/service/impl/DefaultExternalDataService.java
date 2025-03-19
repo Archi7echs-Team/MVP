@@ -4,6 +4,7 @@ import com.dataviz.backend.config.ExternalAPIProperties;
 import com.dataviz.backend.exception.APITimeoutException;
 import com.dataviz.backend.exception.NetworkErrorException;
 import com.dataviz.backend.model.MatrixData;
+import com.dataviz.backend.model.impl.MatrixDataImpl;
 import com.dataviz.backend.service.ExternalDataService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,7 +47,7 @@ public class DefaultExternalDataService implements ExternalDataService {
             if (statusCode.is2xxSuccessful()) {
                 if (MediaType.APPLICATION_JSON.includes(contentType)) {
                     validateData(responseBody);
-                    return parseJsonToMatrixData(responseBody);
+                    return parseData(responseBody);
                 } else {
                     throw new NetworkErrorException("Unsupported content type: " + contentType);
                 }
@@ -63,32 +64,26 @@ public class DefaultExternalDataService implements ExternalDataService {
         } catch (Exception e) {
             throw new NetworkErrorException("An error occurred while fetching data from external API.");
         }
-        return new MatrixData(new ArrayList<>(), new ArrayList<>(), new double[0][0]);
+        return new MatrixDataImpl(new ArrayList<>(), new ArrayList<>(), new double[0][0]);
     }
-    // TODO: inserire qui la logica di validazione dei dati e nel caso lanciare un'eccezione specifica
-    private void validateData(String data) throws Exception {
-        JsonNode jsonNode = objectMapper.readTree(data);
 
-    }
-    private MatrixData parseJsonToMatrixData(String jsonResponse) throws Exception {
+
+    private MatrixData parseData(String jsonResponse) throws Exception {
         JsonNode root = objectMapper.readTree(jsonResponse);
         JsonNode hourly = root.path("hourly");
 
-        // Estrarre etichette X (timestamp)
         List<String> xLabels = new ArrayList<>();
         hourly.path("time").forEach(node -> xLabels.add(node.asText()));
 
-        // Estrarre etichette Z (nomi dei parametri meteo)
         List<String> zLabels = new ArrayList<>();
         Iterator<String> fieldNames = hourly.fieldNames();
         while (fieldNames.hasNext()) {
             String fieldName = fieldNames.next();
-            if (!fieldName.equals("time")) { // Escludiamo la colonna tempo
+            if (!fieldName.equals("time")) {
                 zLabels.add(fieldName);
             }
         }
 
-        // Estrarre i valori Y come matrice [zLabels.size() x xLabels.size()]
         double[][] yValues = new double[zLabels.size()][xLabels.size()];
         for (int z = 0; z < zLabels.size(); z++) {
             String key = zLabels.get(z);
@@ -98,6 +93,12 @@ public class DefaultExternalDataService implements ExternalDataService {
             }
         }
 
-        return new MatrixData(xLabels, zLabels, yValues);
+        return new MatrixDataImpl(xLabels, zLabels, yValues);
+    }
+
+    // TODO: inserire qui la logica di validazione dei dati e nel caso lanciare un'eccezione specifica
+    private void validateData(String data) throws Exception {
+        JsonNode jsonNode = objectMapper.readTree(data);
+
     }
 }
