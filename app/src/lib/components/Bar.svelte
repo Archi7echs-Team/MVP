@@ -7,12 +7,20 @@
 
   import * as THREE from 'three';
 
-  let { coordinates, height, currentCameraQuaternionArray } = $props();
+  let { coordinates, height, currentCameraQuaternionArray, minVal, maxVal } = $props();
   
   const { scene } = useThrelte();
 
   //raycaster e variabili per il mouse
   const raycaster = new Raycaster();
+
+  
+  let opacity = $state((height >= minVal && height <= maxVal) ? 1 : 0.2);
+
+  $effect(() => {
+    opacity = (height >= minVal && height <= maxVal) ? 1 : 0.2;
+  });
+
   //riferimento al mesh della barra
   let mesh = $state<THREE.Mesh | undefined>(undefined);
   let hover = new Tween(0, {
@@ -45,7 +53,11 @@
   scale={[1, height, 1]}
 >
   <T.BoxGeometry args={[1, 1, 1]} />
-  <T.MeshStandardMaterial color={`hsl(${((coordinates[2] + 360) * 30) % 360}, 80%, 60%)`} />
+  <T.MeshStandardMaterial 
+    color={`hsl(${((coordinates[2] + 360) * 30) % 360}, 80%, 60%)`} 
+    transparent={true} 
+    opacity={opacity} 
+  />
 </T.Mesh>
 
 <Text

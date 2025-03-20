@@ -15,6 +15,7 @@
   let controlTarget = (newTarget: [number, number, number]) => {
     target = newTarget;
   }
+  let value = $props();
 </script>
 
   <!-- Camera e controlli -->
@@ -30,7 +31,7 @@
   <T.DirectionalLight castShadow position={[-5, 10, 5]} intensity={1} />
   
   <!-- Componente grafico -->
-  <Chart {data} {controlTarget}/>
+  <Chart {data} {value} {controlTarget}/>
   
 
 

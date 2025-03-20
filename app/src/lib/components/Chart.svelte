@@ -2,20 +2,20 @@
   import { T, useThrelte } from '@threlte/core';
   import Bar from './Bar.svelte';
   import { onMount, onDestroy } from 'svelte';
-  import minVal from './DataRange.svelte';
-  import maxVal from './DataRange.svelte';
   const { camera, renderer, scene } = useThrelte();
   let currentCameraQuaternionArray = $state<[number, number, number, number]>([0, 0, 0, 1]);
   let animationFrameId: number;
 
+  let{data, value, controlTarget} = $props(); 
+
   // Example 2D grid of values
-   let { data = [
+  { data = [
     [2, 3, 5, 2, 2],
     [1, 4, 6, 3, 1],
     [2, 5, 7, 4, 8],
     [3, 2, 4, 1, 5],
     [1, 3, 2, 6, 4]
-  ], controlTarget } = $props();
+  ], controlTarget };
 
   let max = Math.max(...data.flat()) || 1; // Normalize heights
 
@@ -44,6 +44,7 @@
     cancelAnimationFrame(animationFrameId);
   });
 
+ 
   </script>
   
   <T.Group>
@@ -65,6 +66,8 @@
           ]} 
           height={value / max * 5} 
           {currentCameraQuaternionArray}
+          minVal={value[0]}
+          maxVal={value[1]}  
         />
       {/each}
     {/each}
