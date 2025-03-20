@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Pane, ThemeUtils, TabGroup, TabPage, Text, Button } from 'svelte-tweakpane-ui';
+  import { Pane, ThemeUtils, TabGroup, TabPage } from 'svelte-tweakpane-ui';
   import CameraSettings from './CameraSettings.svelte';
   import DataSource from './DataSource.svelte';
   import DataRange from './DataRange.svelte';

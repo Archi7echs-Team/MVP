@@ -1,6 +1,7 @@
 <script lang="ts">
-    import { Button, Pane, IntervalSlider } from 'svelte-tweakpane-ui';
+    import {IntervalSlider } from 'svelte-tweakpane-ui';
     let {valMin, valMax, value = $bindable([valMin, valMax]) } = $props();
+ 
 
 </script>
 
