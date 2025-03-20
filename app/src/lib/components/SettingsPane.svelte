@@ -38,5 +38,3 @@
         </TabPage>
     </TabGroup>
 </Pane>
-
-<Scene {value} />

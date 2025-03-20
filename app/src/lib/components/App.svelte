@@ -18,7 +18,7 @@
 
 <div>
   <Canvas>
-    <SettingsPane {value}/>
+    <SettingsPane bind:value={value}/>
     <Scene {data} {value}/>
   </Canvas>
 </div>
