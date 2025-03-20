@@ -6,16 +6,6 @@
   ThemeUtils.setGlobalDefaultTheme(ThemeUtils.presets.standard);
 
   let {valMin, valMax, value = $bindable([valMin, valMax]) } = $props();
-
-  $effect(() => {
-    const a = value;
-    console.log("Intervallo aggiornato:", value);
-  });
-
-  // func to print value
-    function printValue() {
-        console.log("Value:", value);
-    }
 </script>
 
 
