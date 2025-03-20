@@ -1,14 +1,12 @@
 <script lang="ts">
-    import { Button, Pane, IntervalSlider, Text } from 'svelte-tweakpane-ui';
-    let { value = $bindable([0, 100]) } = $props();
+    import { Button, Pane, IntervalSlider } from 'svelte-tweakpane-ui';
+    let {valMin, valMax, value = $bindable([valMin, valMax]) } = $props();
 
 </script>
 
 <IntervalSlider
   bind:value={value}
-  min={0}
-  max={100}
+  min={valMin}
+  max={valMax}
   format={(v) => `${v.toFixed(0)}`}
 />
-<Text bind:value={value[0]} label="Min" />
-<Text bind:value={value[1]} label="Max" />

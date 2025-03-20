@@ -3,7 +3,7 @@
   import Scene from './Scene.svelte';
   import SettingsPane from './SettingsPane.svelte';
 
-  let value = $state([0, 100]);
+  
   let data = [
     [2, 3, 5, 2, 2],
     [1, 4, 6, 3, 1],
@@ -12,13 +12,16 @@
     [1, 3, 2, 6, 4]
   ];
 
+  const valMin = Math.min(...data.flat());
+  const valMax = Math.max(...data.flat());
 
+  let value = $state([valMin, valMax]);
 
 </script>
 
 <div>
   <Canvas>
-    <SettingsPane bind:value={value}/>
+    <SettingsPane valMin={valMin} valMax={valMax} bind:value={value}/>
     <Scene {data} {value}/>
   </Canvas>
 </div>

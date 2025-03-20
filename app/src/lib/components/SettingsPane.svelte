@@ -3,11 +3,9 @@
   import CameraSettings from './CameraSettings.svelte';
   import DataSource from './DataSource.svelte';
   import DataRange from './DataRange.svelte';
-  import Scene from './Scene.svelte';
-  import Prova from './Prova.svelte';
   ThemeUtils.setGlobalDefaultTheme(ThemeUtils.presets.standard);
 
-  let { value = $bindable([0, 100]) } = $props();
+  let {valMin, valMax, value = $bindable([valMin, valMax]) } = $props();
 
   $effect(() => {
     const a = value;
@@ -30,11 +28,7 @@
             <DataSource />
         </TabPage>
         <TabPage title="Data range">
-            <DataRange bind:value={value} />
-        </TabPage>
-        <TabPage title="Dati">
-            <Prova bind:value={value} />
-
+            <DataRange valMin={valMin} valMax={valMax} bind:value={value} />
         </TabPage>
     </TabGroup>
 </Pane>
