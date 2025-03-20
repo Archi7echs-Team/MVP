@@ -3,19 +3,12 @@
   import { OrbitControls, Gizmo} from '@threlte/extras';
   import Chart from './Chart.svelte';
   let autoRotate = false;
-  let data = [
-    [2, 3, 5, 2, 2],
-    [1, 4, 6, 3, 1],
-    [2, 5, 7, 4, 8],
-    [3, 2, 4, 1, 5],
-    [1, 3, 2, 6, 4]
-  ];
   // define function control target to target the camera to the center of the chart
   let target = $state<[number, number, number]>([0, 0, 0]);
   let controlTarget = (newTarget: [number, number, number]) => {
     target = newTarget;
   }
-  let value = $props();
+  let { value, data } = $props();
 </script>
 
   <!-- Camera e controlli -->

@@ -6,16 +6,15 @@
   let currentCameraQuaternionArray = $state<[number, number, number, number]>([0, 0, 0, 1]);
   let animationFrameId: number;
 
-  let{data, value, controlTarget} = $props(); 
-
-  // Example 2D grid of values
-  { data = [
+  let{data = [
     [2, 3, 5, 2, 2],
     [1, 4, 6, 3, 1],
     [2, 5, 7, 4, 8],
     [3, 2, 4, 1, 5],
     [1, 3, 2, 6, 4]
-  ], controlTarget };
+  ], value, controlTarget} = $props(); 
+
+  let vv = $derived(value);
 
   let max = Math.max(...data.flat()) || 1; // Normalize heights
 
@@ -61,13 +60,13 @@
         <Bar 
           coordinates={[
             rowIndex * spacing, // X
-            value / max * 2.5, // Y
+            value / 2, // Y
             colIndex * spacing // Z
           ]} 
-          height={value / max * 5} 
+          height={value} 
           {currentCameraQuaternionArray}
-          minVal={value[0]}
-          maxVal={value[1]}  
+          minVal={vv[0]}
+          maxVal={vv[1]}  
         />
       {/each}
     {/each}
