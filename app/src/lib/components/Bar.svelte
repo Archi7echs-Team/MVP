@@ -7,7 +7,7 @@
 
   import * as THREE from 'three';
 
-  let { coordinates, height, currentCameraQuaternionArray, minVal, maxVal } = $props();
+  let { coordinates, height, currentCameraQuaternionArray, minVal, maxVal, colorSelection } = $props();
   
   const { scene } = useThrelte();
 

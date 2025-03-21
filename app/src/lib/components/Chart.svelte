@@ -12,7 +12,7 @@
     [2, 5, 7, 4, 8],
     [3, 2, 4, 1, 5],
     [1, 3, 2, 6, 4]
-  ], value, controlTarget} = $props(); 
+  ], value, controlTarget, colorSelection} = $props(); 
 
   let vv = $derived(value);
 
@@ -57,6 +57,7 @@
     <!-- 3D Bars -->
     {#each data as row, rowIndex}
       {#each row as value, colIndex}
+        console.log("abc");
         <Bar 
           coordinates={[
             rowIndex * spacing, // X
@@ -67,6 +68,7 @@
           {currentCameraQuaternionArray}
           minVal={vv[0]}
           maxVal={vv[1]}  
+          colorSelection={colorSelection}
         />
       {/each}
     {/each}

@@ -3,9 +3,10 @@
   import CameraSettings from './CameraSettings.svelte';
   import DataSource from './DataSource.svelte';
   import DataRange from './DataRange.svelte';
+  import Color from './Color.svelte';
   ThemeUtils.setGlobalDefaultTheme(ThemeUtils.presets.standard);
 
-let { valMin, valMax, value = $bindable([valMin, valMax] as [number, number]) } = $props();
+  let { valMin, valMax, colorSelection=$bindable(), value = $bindable([valMin, valMax] as [number, number]) } = $props();
 </script>
 
 
@@ -19,6 +20,9 @@ let { valMin, valMax, value = $bindable([valMin, valMax] as [number, number]) } 
         </TabPage>
         <TabPage title="Data range">
             <DataRange valMin={valMin} valMax={valMax} bind:value={value} />
+        </TabPage>
+        <TabPage title="Color">
+            <Color bind:colorSelection={colorSelection} />
         </TabPage>
     </TabGroup>
 </Pane>

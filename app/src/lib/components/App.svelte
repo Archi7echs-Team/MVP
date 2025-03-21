@@ -16,13 +16,16 @@
   const valMax = Math.max(...data.flat());
 
   let value: [number, number] = [valMin, valMax];
+  let colorSelection: number = 1;
+
+  $: console.log('Modalità selezionata:', colorSelection);
 
 </script>
 
 <div>
   <Canvas>
-    <SettingsPane valMin={valMin} valMax={valMax} bind:value={value}/>
-    <Scene {data} {value}/>
+    <SettingsPane valMin={valMin} valMax={valMax} bind:colorSelection={colorSelection} bind:value={value}/>
+    <Scene {data} {value} {colorSelection}/>
   </Canvas>
 </div>
 
