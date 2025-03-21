@@ -7,5 +7,6 @@
   bind:value={value}
   min={valMin}
   max={valMax}
+  label="Visualization interval"
   format={(v) => `${v.toFixed(0)}`}
 />

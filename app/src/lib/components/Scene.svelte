@@ -12,7 +12,7 @@
 </script>
 
   <!-- Camera e controlli -->
-  <T.PerspectiveCamera position={[15, 7.5, 15]} makeDefault>
+  <T.PerspectiveCamera position={[15, 7.10, 15]} makeDefault>
     <OrbitControls enableDamping maxPolarAngle={1.55} {autoRotate} {target}>
       <Gizmo />
     </OrbitControls>

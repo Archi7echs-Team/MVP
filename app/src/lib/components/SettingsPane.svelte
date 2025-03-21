@@ -26,3 +26,9 @@
         </TabPage>
     </TabGroup>
 </Pane>
+
+<style>
+    :global(.tp-dfwv) { 
+      width: 25em !important;
+    }
+  </style>
