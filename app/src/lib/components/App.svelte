@@ -15,7 +15,7 @@
   const valMin = Math.min(...data.flat());
   const valMax = Math.max(...data.flat());
 
-  let value = $state([valMin, valMax]);
+  let value: [number, number] = [valMin, valMax];
 
 </script>
 

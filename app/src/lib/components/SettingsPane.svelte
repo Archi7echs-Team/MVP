@@ -5,7 +5,7 @@
   import DataRange from './DataRange.svelte';
   ThemeUtils.setGlobalDefaultTheme(ThemeUtils.presets.standard);
 
-  let {valMin, valMax, value = $bindable([valMin, valMax]) } = $props();
+let { valMin, valMax, value = $bindable([valMin, valMax] as [number, number]) } = $props();
 </script>
 
 
