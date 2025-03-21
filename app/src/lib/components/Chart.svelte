@@ -12,7 +12,7 @@
     [2, 5, 7, 4, 8],
     [3, 2, 4, 1, 5],
     [1, 3, 2, 6, 4]
-  ], value, controlTarget, colorSelection} = $props(); 
+  ], value, controlTarget, colorSelection, media, mediaFilter} = $props(); 
 
   let vv = $derived(value);
 
@@ -69,6 +69,8 @@
           minVal={vv[0]}
           maxVal={vv[1]}  
           colorSelection={colorSelection}
+          media={media}
+          mediaFilter={mediaFilter}
         />
       {/each}
     {/each}

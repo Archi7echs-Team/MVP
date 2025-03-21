@@ -1,5 +1,6 @@
 <script lang="ts">
     import { List, type ListOptions } from 'svelte-tweakpane-ui'
+    // variabile per la selezione del filtro colore
     let { colorSelection=$bindable()} = $props();
     const options: ListOptions<number> = {
       "righe": 1,

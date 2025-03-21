@@ -7,19 +7,31 @@
 
   import * as THREE from 'three';
 
-  let { coordinates, height, currentCameraQuaternionArray, minVal, maxVal, colorSelection } = $props();
+  let { coordinates, height, currentCameraQuaternionArray, minVal, maxVal, colorSelection, media, mediaFilter } = $props();
   
   const { scene } = useThrelte();
 
   //raycaster e variabili per il mouse
   const raycaster = new Raycaster();
 
-  
+  //opacità della barra
   let opacity = $state((height >= minVal && height <= maxVal) ? 1 : 0.2);
 
+  //controllo per opacizzazione
   $effect(() => {
-    opacity = (height >= minVal && height <= maxVal) ? 1 : 0.2;
-  });
+  //filtro per intervallo
+  let inRange = height >= minVal && height <= maxVal;
+  let passesFilter = true;
+
+  //controllo se filtro per media
+  if (mediaFilter === 1 && height > media) {
+    passesFilter = false;
+  } else if (mediaFilter === 2 && height < media) {
+    passesFilter = false;
+  }
+
+  opacity = (inRange && passesFilter) ? 1 : 0.2;
+});
 
   //riferimento al mesh della barra
   let mesh = $state<THREE.Mesh | undefined>(undefined);
@@ -37,7 +49,11 @@
     return 0;
   }
 
+  //applicazione filtro colorazione
   function getBarColor() {
+    //1 = colorazione per righe - coordinata di riferimento: z
+    //2 = colorazione per colonne - coordinata di riferimento: x
+    //3 = colorazione per valore - controllo altezza tramite coordinata y e normalizzazione dei dati
     if (colorSelection === 1) {
       return `hsl(${(coordinates[2] * 50) % 360}, 80%, 60%)`;
     } else if (colorSelection === 2) {
