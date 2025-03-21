@@ -16,9 +16,7 @@
   const valMax = Math.max(...data.flat());
 
   let value: [number, number] = [valMin, valMax];
-  let colorSelection: number = 1;
-
-  $: console.log('Modalità selezionata:', colorSelection);
+  let colorSelection: number = 2;
 
 </script>
 
