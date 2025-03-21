@@ -37,6 +37,19 @@
     return 0;
   }
 
+  function getBarColor() {
+    if (colorSelection === 1) {
+      return `hsl(${(coordinates[2] * 50) % 360}, 80%, 60%)`;
+    } else if (colorSelection === 2) {
+      return `hsl(${(coordinates[0] * 50) % 360}, 80%, 60%)`;
+    } else if (colorSelection === 3) {
+      let normalized = (height - minVal) / (maxVal - minVal || 1);
+      let hue = 240 - (normalized * 240);
+      return `hsl(${hue}, 80%, 50%)`;
+    }
+    return '#ffffff';
+  }
+
 </script>
 
 <T.Mesh
@@ -54,7 +67,7 @@
 >
   <T.BoxGeometry args={[1, 1, 1]} />
   <T.MeshStandardMaterial 
-    color={`hsl(${((coordinates[2] + 360) * 30) % 360}, 80%, 60%)`} 
+    color={getBarColor()}
     transparent={true} 
     opacity={opacity} 
   />
