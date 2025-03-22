@@ -6,26 +6,19 @@
   let currentCameraQuaternionArray = $state<[number, number, number, number]>([0, 0, 0, 1]);
   let animationFrameId: number;
 
-  let{data = [
+  let { data = [
     [2, 3, 5, 2, 2],
     [1, 4, 6, 3, 1],
     [2, 5, 7, 4, 8],
     [3, 2, 4, 1, 5],
     [1, 3, 2, 6, 4]
-  ], value, controlTarget, colorSelection, media, mediaFilter} = $props(); 
+  ], value, spacing, colorSelection, media, mediaFilter } = $props(); 
 
-  let vv = $derived(value);
 
   let max = Math.max(...data.flat()) || 1; // Normalize heights
 
-  let spacing = 1.2; // Space between bars
   let rows = data.length;
   let cols = data[0].length;
-  let centre = [rows*spacing/2 - spacing/2, 0 , cols*spacing/2 - spacing/2];
-  controlTarget(centre);
-  console.log(camera);
-  console.log(renderer);
-
 
   onMount(() => {
     const update = () => {
@@ -56,18 +49,18 @@
 
     <!-- 3D Bars -->
     {#each data as row, rowIndex}
-      {#each row as value, colIndex}
+      {#each row as height, colIndex}
         console.log("abc");
         <Bar 
           coordinates={[
             rowIndex * spacing, // X
-            value / 2, // Y
+            height / 2, // Y
             colIndex * spacing // Z
           ]} 
-          height={value} 
+          {height} 
           {currentCameraQuaternionArray}
-          minVal={vv[0]}
-          maxVal={vv[1]}  
+          minVal={value[0]}
+          maxVal={value[1]}  
           colorSelection={colorSelection}
           media={media}
           mediaFilter={mediaFilter}
