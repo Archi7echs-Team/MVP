@@ -17,13 +17,15 @@
 
   let value: [number, number] = [valMin, valMax];
   let colorSelection: number = 2;
+  
+  let avgEnabled = false;
 
 </script>
 
 <div>
   <Canvas>
-    <SettingsPane valMin={valMin} valMax={valMax} bind:colorSelection={colorSelection} bind:value={value}/>
-    <Scene {data} {value} {colorSelection}/>
+    <SettingsPane valMin={valMin} valMax={valMax} bind:colorSelection={colorSelection} bind:value={value} bind:avgEnabled={avgEnabled}/>
+    <Scene {data} {value} {colorSelection} {avgEnabled}/>
   </Canvas>
 </div>
 
