@@ -6,7 +6,7 @@
   import Color from './Color.svelte';
   ThemeUtils.setGlobalDefaultTheme(ThemeUtils.presets.standard);
 
-  let { resetTarget, defaultPosition, valMin, valMax, mediaFilter=$bindable() ,colorSelection=$bindable(), value = $bindable([valMin, valMax] as [number, number]) } = $props();
+  let { resetTarget, defaultPosition, valMin, valMax, mediaFilter=$bindable() ,colorSelection=$bindable(), rangeValue = $bindable([valMin, valMax] as [number, number]) } = $props();
 </script>
 
 
@@ -19,7 +19,7 @@
             <DataSource />
         </TabPage>
         <TabPage title="Data filter">
-            <DataRange {valMin} {valMax} bind:mediaFilter={mediaFilter} bind:value={value} />
+            <DataRange {valMin} {valMax} bind:mediaFilter={mediaFilter} bind:value={rangeValue} />
         </TabPage>
         <TabPage title="Color filter">
             <Color bind:colorSelection={colorSelection} />

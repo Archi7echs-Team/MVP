@@ -5,7 +5,7 @@
   let autoRotate = false;
   // define function control target to target the camera to the center of the chart
 
-  let { spacing, value, data, colorSelection, media, mediaFilter, target } = $props();
+  let { spacing, rangeValue, data, colorSelection, media, mediaFilter, target } = $props();
  
 </script>
 
@@ -22,7 +22,7 @@
   <T.DirectionalLight castShadow position={[-5, 10, 5]} intensity={1} />
   
   <!-- Componente grafico -->
-  <Chart {data} {value} {spacing} {colorSelection} {media} {mediaFilter} />
+  <Chart {data} {rangeValue} {spacing} {colorSelection} {media} {mediaFilter} />
   
 
 

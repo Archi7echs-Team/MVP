@@ -13,8 +13,8 @@
   ]);
 
   //calcolo valore massimo e minimo per filtro range visualizzazione dati --> passaggio di valori a SettingsPane
-  const valMin = Math.min(...data.flat());
-  const valMax = Math.max(...data.flat());
+  let valMin = $derived(Math.min(...data.flat()));
+  let valMax = $derived(Math.max(...data.flat()));
 
   //calcolo media per filtro media --> passaggio di valori a SettingsPane
   const allValues = data.flat();
@@ -24,7 +24,11 @@
   let mediaFilter = $state(0);
 
   //definizione di limite inferiore superiore per passaggio di valori a SettingsPane
-  let value: [number, number] = $state([valMin, valMax]);
+  let rangeValue: [number, number] = $state([0, 0]);
+
+  $effect(() => {
+    rangeValue = [valMin, valMax];
+  });
   let colorSelection: number = $state(2);
   let defaultPosition = new Vector3(15, 7.5, 15);
 
@@ -38,7 +42,7 @@
     max = Math.max(...data.flat()) || 1; // Normalize heights
     rows = data.length;
     cols = data[0].length;
-    target = ([rows*spacing/2 - spacing/2, (max-1)/2 , cols*spacing/2 - spacing/2]);
+    target = ([rows*spacing/2 - spacing/2, media , cols*spacing/2 - spacing/2]);
   });
   function resetTarget() {
     target = ([rows*spacing/2 - spacing/2, (max-1)/2 , cols*spacing/2 - spacing/2]);
@@ -47,8 +51,8 @@
 
 <div>
   <Canvas>
-    <SettingsPane {resetTarget} {defaultPosition} valMin={valMin} valMax={valMax} bind:mediaFilter={mediaFilter} bind:colorSelection={colorSelection} bind:value={value}/>
-    <Scene  {target} {spacing} {data} {value} {colorSelection} {media} {mediaFilter}/>
+    <SettingsPane {resetTarget} {defaultPosition} {valMin} {valMax} bind:mediaFilter={mediaFilter} bind:colorSelection={colorSelection} bind:rangeValue={rangeValue}/>
+    <Scene  {target} {spacing} {data} {rangeValue} {colorSelection} {media} {mediaFilter}/>
   </Canvas>
 </div>
 

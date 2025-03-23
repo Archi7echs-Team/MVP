@@ -12,7 +12,7 @@
     [2, 5, 7, 4, 8],
     [3, 2, 4, 1, 5],
     [1, 3, 2, 6, 4]
-  ], value, spacing, colorSelection, media, mediaFilter } = $props(); 
+  ], rangeValue, spacing, colorSelection, media, mediaFilter } = $props(); 
 
 
   let max = Math.max(...data.flat()) || 1; // Normalize heights
@@ -59,8 +59,8 @@
           ]} 
           {height} 
           {currentCameraQuaternionArray}
-          minVal={value[0]}
-          maxVal={value[1]}  
+          minVal={rangeValue[0]}
+          maxVal={rangeValue[1]}  
           colorSelection={colorSelection}
           media={media}
           mediaFilter={mediaFilter}
