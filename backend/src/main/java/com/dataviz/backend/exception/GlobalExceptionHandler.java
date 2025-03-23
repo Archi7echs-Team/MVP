@@ -17,4 +17,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleFileTooBigException(FileTooBigException ex) {
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(ex.getMessage());
     }
+
+    @ExceptionHandler(APITimeoutException.class)
+    public ResponseEntity<String> handleAPITimeoutException(APITimeoutException ex) {
+        return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(NetworkErrorException.class)
+    public ResponseEntity<String> handleNetworkErrorException(NetworkErrorException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
 }

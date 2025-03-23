@@ -52,7 +52,7 @@ class DefaultCsvFileReaderTest {
             System.out.println("Parsing completato. Risultato ottenuto:");
 
             // Verifica xLabels
-            List<String> xLabels = matrix.getxLabels();
+            List<String> xLabels = matrix.xLabels();
             System.out.println("xLabels: " + xLabels);
             assertEquals(3, xLabels.size());
             assertEquals("Vicenza", xLabels.get(0));
@@ -60,7 +60,7 @@ class DefaultCsvFileReaderTest {
             assertEquals("Venezia", xLabels.get(2));
 
             // Verifica zLabels
-            List<String> zLabels = matrix.getzLabels();
+            List<String> zLabels = matrix.zLabels();
             System.out.println("zLabels: " + zLabels);
             assertEquals(3, zLabels.size());
             assertEquals("Mele", zLabels.get(0));
@@ -68,7 +68,7 @@ class DefaultCsvFileReaderTest {
             assertEquals("Banane", zLabels.get(2));
 
             // Verifica yValues
-            double[][] yValues = matrix.getyValues();
+            double[][] yValues = matrix.yValues();
             System.out.println("yValues:");
             for (int i = 0; i < yValues.length; i++) {
                 System.out.print("[ ");
@@ -117,20 +117,20 @@ class DefaultCsvFileReaderTest {
             System.out.println("Parsing completato. Risultato ottenuto:");
 
             // Verifica xLabels
-            List<String> xLabels = matrix.getxLabels();
+            List<String> xLabels = matrix.xLabels();
             System.out.println("xLabels: " + xLabels);
             assertEquals(2, xLabels.size());
             assertEquals("X1", xLabels.get(0));
             assertEquals("X2", xLabels.get(1));
 
             // Verifica zLabels
-            List<String> zLabels = matrix.getzLabels();
+            List<String> zLabels = matrix.zLabels();
             System.out.println("zLabels: " + zLabels);
             assertEquals(1, zLabels.size());
             assertEquals("LabelZ", zLabels.get(0));
 
             // Verifica yValues
-            double[][] yValues = matrix.getyValues();
+            double[][] yValues = matrix.yValues();
             System.out.println("yValues: ");
             for (int i = 0; i < yValues.length; i++) {
                 System.out.print("[ ");
@@ -165,17 +165,17 @@ class DefaultCsvFileReaderTest {
             MatrixData matrix = fileReader.parseCsv(file);
             System.out.println("Parsing completato. Risultato ottenuto:");
 
-            List<String> xLabels = matrix.getxLabels();
+            List<String> xLabels = matrix.xLabels();
             System.out.println("xLabels: " + xLabels);
             assertEquals(1, xLabels.size());
             assertEquals("X", xLabels.get(0));
 
-            List<String> zLabels = matrix.getzLabels();
+            List<String> zLabels = matrix.zLabels();
             System.out.println("zLabels: " + zLabels);
             assertEquals(1, zLabels.size());
             assertEquals("Z", zLabels.get(0));
 
-            double[][] yValues = matrix.getyValues();
+            double[][] yValues = matrix.yValues();
             System.out.println("yValues:");
             for (int i = 0; i < yValues.length; i++) {
                 System.out.print("[ ");
@@ -211,21 +211,21 @@ class DefaultCsvFileReaderTest {
             System.out.println("Parsing completato. Risultato ottenuto:");
 
             // Controllo xLabels
-            List<String> xLabels = matrix.getxLabels();
+            List<String> xLabels = matrix.xLabels();
             System.out.println("xLabels: " + xLabels);
             assertEquals(2, xLabels.size());
             assertEquals("X1", xLabels.get(0));
             assertEquals("X2", xLabels.get(1));
 
             // Controllo zLabels
-            List<String> zLabels = matrix.getzLabels();
+            List<String> zLabels = matrix.zLabels();
             System.out.println("zLabels: " + zLabels);
             assertEquals(2, zLabels.size());
             assertEquals("Z1", zLabels.get(0));
             assertEquals("Z2", zLabels.get(1));
 
             // Controllo yValues
-            double[][] yValues = matrix.getyValues();
+            double[][] yValues = matrix.yValues();
             System.out.println("yValues:");
             for (int i = 0; i < yValues.length; i++) {
                 System.out.print("[ ");

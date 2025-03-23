@@ -2,9 +2,9 @@ package com.dataviz.backend.service.impl;
 
 import com.dataviz.backend.model.CoordinateEntity;
 import com.dataviz.backend.model.MatrixData;
+import com.dataviz.backend.model.impl.MatrixDataImpl;
 import com.dataviz.backend.repository.CoordinateRepository;
 import com.dataviz.backend.service.CoordinateService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +50,6 @@ public class DefaultCoordinateService implements CoordinateService {
             int xIndex = xLabels.indexOf(row.getXLabel());
             yValues[zIndex][xIndex] = row.getYValue();
         }
-        return new MatrixData(xLabels, zLabels, yValues);
+        return new MatrixDataImpl(xLabels, zLabels, yValues);
     }
 }
