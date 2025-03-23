@@ -3,6 +3,7 @@ package com.dataviz.backend.service.impl;
 import com.dataviz.backend.config.ExternalAPIProperties;
 import com.dataviz.backend.exception.APITimeoutException;
 import com.dataviz.backend.exception.NetworkErrorException;
+import com.dataviz.backend.exception.TooMuchDataException;
 import com.dataviz.backend.model.MatrixData;
 import com.dataviz.backend.model.impl.MatrixDataImpl;
 import com.dataviz.backend.service.ExternalDataService;
@@ -28,6 +29,7 @@ public class DefaultExternalDataService implements ExternalDataService {
     private final ExternalAPIProperties properties;
     private final ObjectMapper objectMapper;
 
+
     public DefaultExternalDataService(RestTemplate restTemplate, ExternalAPIProperties properties, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
         this.properties = properties;
@@ -35,7 +37,6 @@ public class DefaultExternalDataService implements ExternalDataService {
     }
 
     // TODO: Sistema di logging per capire cosa è successo durante gli errori ad esempio ?
-    // TODO: Deve restituire un MatrixData così che dal lato frontend si possa fare il parsing dei dati
     @Override
     public MatrixData fetchData() {
         try {
@@ -43,11 +44,11 @@ public class DefaultExternalDataService implements ExternalDataService {
             HttpStatus statusCode = (HttpStatus) response.getStatusCode();
             MediaType contentType = response.getHeaders().getContentType();
             String responseBody = response.getBody();
-            System.out.println(responseBody);
             if (statusCode.is2xxSuccessful()) {
                 if (MediaType.APPLICATION_JSON.includes(contentType)) {
-                    validateData(responseBody);
-                    return parseData(responseBody);
+                    MatrixData parsedData = parseData(responseBody);
+                    validateData(parsedData);
+                    return parsedData;
                 } else {
                     throw new NetworkErrorException("Unsupported content type: " + contentType);
                 }
@@ -96,9 +97,9 @@ public class DefaultExternalDataService implements ExternalDataService {
         return new MatrixDataImpl(xLabels, zLabels, yValues);
     }
 
-    // TODO: inserire qui la logica di validazione dei dati e nel caso lanciare un'eccezione specifica
-    private void validateData(String data) throws Exception {
-        JsonNode jsonNode = objectMapper.readTree(data);
-
+    private void validateData(MatrixData data) throws TooMuchDataException {
+        if (data.yValues().length > properties.getMaxNumData()) {
+            throw new TooMuchDataException("API response contains too much data.");
+        }
     }
 }
