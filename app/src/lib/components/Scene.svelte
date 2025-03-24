@@ -4,11 +4,11 @@
   import Chart from './Chart.svelte';
   let autoRotate = false;
   // define function control target to target the camera to the center of the chart
-  let target = $state<[number, number, number]>([0, 0, 0]);
+  //let target = $state<[number, number, number]>([0, 0, 0]);
   let controlTarget = (newTarget: [number, number, number]) => {
     target = newTarget;
   }
-  let { spacing, rangeValue, data, colorSelection, media, mediaFilter, avgEnabled } = $props();
+  let { spacing, rangeValue, data, colorSelection, media, mediaFilter, avgEnabled, target } = $props();
 </script>
 
   <!-- Camera e controlli -->

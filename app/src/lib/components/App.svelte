@@ -20,10 +20,15 @@
   const allValues = data.flat();
   const media = allValues.reduce((sum, val) => sum + val, 0) / allValues.length;
 
-  let value: [number, number] = [valMin, valMax];
-  let colorSelection: number = 2;
+  let value: [number, number];
+
+  //effetto reattivo per aggiornare `value` quando `valMin` o `valMax` cambiano
+  $effect(() => {
+    value = [valMin, valMax]; 
+  });
+  //let colorSelection: number = 2;
   
-  let avgEnabled = false;
+  let avgEnabled = $state(false);
 
   //definizione di mediaFilter per capire se attivo filtro della media 
   let mediaFilter = $state(0);
