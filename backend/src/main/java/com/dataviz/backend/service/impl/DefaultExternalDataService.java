@@ -9,6 +9,7 @@ import com.dataviz.backend.model.impl.MatrixDataImpl;
 import com.dataviz.backend.service.ExternalDataService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hibernate.sql.ast.tree.expression.SqlTuple;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -98,7 +99,7 @@ public class DefaultExternalDataService implements ExternalDataService {
     }
 
     private void validateData(MatrixData data) throws TooMuchDataException {
-        if (data.yValues().length > properties.getMaxNumData()) {
+        if (data.yValues().length * data.yValues()[0].length > properties.getMaxNumData()) {
             throw new TooMuchDataException("API response contains too much data.");
         }
     }

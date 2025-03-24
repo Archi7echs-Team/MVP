@@ -61,7 +61,7 @@ class DefaultExternalDataServiceTest {
         headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
 
         ResponseEntity<String> mockResponse = new ResponseEntity<>(MOCK_JSON_RESPONSE, headers, HttpStatus.OK);
-
+        when(properties.getMaxNumData()).thenReturn(1000);
         when(restTemplate.getForEntity(anyString(), eq(String.class)))
                 .thenReturn(mockResponse);
 
