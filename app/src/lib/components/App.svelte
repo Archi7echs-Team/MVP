@@ -21,6 +21,16 @@
   const allValues = data.flat();
   const media = allValues.reduce((sum, val) => sum + val, 0) / allValues.length;
 
+  let value: [number, number];
+
+  //effetto reattivo per aggiornare `value` quando `valMin` o `valMax` cambiano
+  $effect(() => {
+    value = [valMin, valMax]; 
+  });
+  //let colorSelection: number = 2;
+  
+  let avgEnabled = $state(false);
+
   //definizione di mediaFilter per capire se attivo filtro della media 
   let mediaFilter = $state(0);
 
@@ -58,9 +68,9 @@
 
 <div>
   <Canvas>
-    <SettingsPane {resetTarget} {defaultPosition} {valMin} {valMax} bind:mediaFilter={mediaFilter} bind:colorSelection={colorSelection} bind:rangeValue={rangeValue}/>
+    <SettingsPane {resetTarget} {defaultPosition} valMin={valMin} valMax={valMax} bind:mediaFilter={mediaFilter} bind:colorSelection={colorSelection} bind:rangeValue={rangeValue} bind:avgEnabled={avgEnabled}/>
     <BarPane {displayBarFilter} bind:barFilterSelection={barFilterSelection}/>
-    <Scene  {target} {spacing} {data} {rangeValue} {colorSelection} {media} {mediaFilter} {barFilterSelection} bind:displayBarFilter={displayBarFilter} bind:barValue={barValue}/>
+    <Scene {target} {spacing} {data} {rangeValue} {colorSelection} {media} {mediaFilter} {avgEnabled} {barFilterSelection} bind:displayBarFilter={displayBarFilter} bind:barValue={barValue}/>
   </Canvas>
 </div>
 

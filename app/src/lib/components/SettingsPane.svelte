@@ -4,9 +4,19 @@
   import DataSource from './DataSource.svelte';
   import DataRange from './DataFilter.svelte';
   import Color from './Color.svelte';
+  import Average from './Average.svelte';
   ThemeUtils.setGlobalDefaultTheme(ThemeUtils.presets.standard);
-
-  let { resetTarget, defaultPosition, valMin, valMax, mediaFilter=$bindable() ,colorSelection=$bindable(), rangeValue = $bindable([valMin, valMax] as [number, number]) } = $props();
+  let { 
+        resetTarget, 
+        defaultPosition, 
+        valMin, 
+        valMax, 
+        mediaFilter = $bindable(), 
+        colorSelection = $bindable(), 
+        rangeValue = $bindable([valMin, valMax] as [number, number]), 
+        value = $bindable([valMin, valMax] as [number, number]), 
+        avgEnabled = $bindable() 
+      } = $props();
 </script>
 
 
@@ -23,6 +33,9 @@
         </TabPage>
         <TabPage title="Color filter">
             <Color bind:colorSelection={colorSelection} />
+        </TabPage>
+        <TabPage title="Average">
+            <Average bind:avgEnabled={avgEnabled}/>
         </TabPage>
     </TabGroup>
 </Pane>
