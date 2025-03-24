@@ -16,10 +16,5 @@ public class BackendApplication {
         SpringApplication.run(BackendApplication.class, args);
     }
 
-    @GetMapping("/api/test")
-    public String apiTest(@RequestParam(value = "myName", defaultValue = "World") String name) {
-        return String.format("Hello %s!", name);
-    }
-
 
 }

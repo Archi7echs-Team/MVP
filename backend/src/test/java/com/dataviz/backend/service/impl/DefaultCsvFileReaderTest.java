@@ -1,6 +1,7 @@
 package com.dataviz.backend.service.impl;
 
 import com.dataviz.backend.controller.BackendApplication;
+import com.dataviz.backend.exception.FileTooBigException;
 import com.dataviz.backend.exception.InvalidCsvException;
 import com.dataviz.backend.exception.TooMuchDataException;
 import com.dataviz.backend.model.MatrixData;
@@ -98,6 +99,47 @@ class DefaultCsvFileReaderTest {
             System.out.println("testParseCsv_SuccessMultipleRows completato.");
         }
 
+        @Test
+        @DisplayName("File vuoto - deve lanciare InvalidCsvException")
+        void testParseCsv_EmptyFile() {
+
+            MockMultipartFile file = new MockMultipartFile(
+                    "file", "empty.csv", "text/csv", new byte[0]
+            );
+
+            InvalidCsvException ex = assertThrows(InvalidCsvException.class,
+                    () -> fileReader.parseCsv(file));
+            assertTrue(ex.getMessage().contains("File is empty"), "Il messaggio dell'eccezione deve contenere 'File is empty'");
+        }
+
+        @Test
+        @DisplayName("Tipo di file non CSV - deve lanciare InvalidCsvException")
+        void testParseCsv_InvalidFileType() {
+
+            MockMultipartFile file = new MockMultipartFile(
+                    "file", "test.pdf", "application/pdf", "test".getBytes()
+            );
+
+            InvalidCsvException ex = assertThrows(InvalidCsvException.class,
+                    () -> fileReader.parseCsv(file));
+            assertTrue(ex.getMessage().contains("Invalid file type. Only .csv is allowed."),
+                    "Il messaggio dell'eccezione deve contenere 'Invalid file type. Only .csv is allowed.'");
+        }
+
+        @Test
+        @DisplayName("File troppo grande - deve lanciare FileTooBigException")
+        void testParseCsv_FileTooLarge() {
+
+            byte[] largeFileContent = new byte[10 * 1024 * 1024 + 1];  // 10MB + 1 byte
+            MockMultipartFile file = new MockMultipartFile(
+                    "file", "large.csv", "text/csv", largeFileContent
+            );
+
+            FileTooBigException ex = assertThrows(FileTooBigException.class,
+                    () -> fileReader.parseCsv(file));
+            assertTrue(ex.getMessage().contains("File exceeds 10MB limit."),
+                    "Il messaggio dell'eccezione deve contenere 'File exceeds 10MB limit.'");
+        }
         @Test
         @DisplayName("CSV valido ma una sola riga di dati (header + 1 data row)")
         void testParseCsv_SuccessSingleDataRow() throws InvalidCsvException {
