@@ -85,9 +85,9 @@ class DefaultCoordinateServiceTest {
         // Esempio: ci aspettiamo 2 record, quelli con datasetType = SMALL
 
         // Verifichiamo che X sia [X1, X2], Z sia [Z1, Z2], e dimensioni matrice coerenti
-        List<String> xLabels = data.getxLabels();
-        List<String> zLabels = data.getzLabels();
-        double[][] yValues = data.getyValues();
+        List<String> xLabels = data.xLabels();
+        List<String> zLabels = data.zLabels();
+        double[][] yValues = data.yValues();
 
         // Controlla la consistenza
         assertEquals(2, xLabels.size(), "Dovrebbero esserci 2 xLabels (X1, X2)");
@@ -117,9 +117,9 @@ class DefaultCoordinateServiceTest {
         // Adesso ci aspettiamo i record SMALL e MEDIUM
         // Nel setUp, abbiamo 2 SMALL e 2 MEDIUM, per un totale di 4 record
 
-        List<String> xLabels = data.getxLabels();
-        List<String> zLabels = data.getzLabels();
-        double[][] yValues = data.getyValues();
+        List<String> xLabels = data.xLabels();
+        List<String> zLabels = data.zLabels();
+        double[][] yValues = data.yValues();
 
         // Dovrebbero esserci X1, X2, X3, X1 (quello MEDIUM con X1),
         // in una collezione (potrebbero esserci duplicati se non gestiti).
@@ -155,9 +155,9 @@ class DefaultCoordinateServiceTest {
 
         // Ci aspettiamo 2 (SMALL) + 2 (MEDIUM) + 2 (LARGE) = 6 record totali
 
-        List<String> xLabels = data.getxLabels();
-        List<String> zLabels = data.getzLabels();
-        double[][] yValues = data.getyValues();
+        List<String> xLabels = data.xLabels();
+        List<String> zLabels = data.zLabels();
+        double[][] yValues = data.yValues();
 
         // Dovrebbero comparire X1, X2, X3, X5 (e duplicati se ci sono).
         // Verifichiamo almeno che ci siano X1, X2, X3, X5
@@ -191,9 +191,9 @@ class DefaultCoordinateServiceTest {
         // Quindi verifichiamo la stessa cosa del test su LARGE.
 
         // Ci aspettiamo quindi 6 record in totale.
-        List<String> xLabels = data.getxLabels();
-        List<String> zLabels = data.getzLabels();
-        double[][] yValues = data.getyValues();
+        List<String> xLabels = data.xLabels();
+        List<String> zLabels = data.zLabels();
+        double[][] yValues = data.yValues();
 
         // Stesse asserzioni di testGetCoordinatesLarge()
         assertTrue(xLabels.contains("X1"));
@@ -222,8 +222,8 @@ class DefaultCoordinateServiceTest {
 
         // Chiediamo SMALL, per esempio
         MatrixData data = coordinateService.getCoordinates("SMALL");
-        assertTrue(data.getxLabels().isEmpty(), "xLabels deve essere vuoto");
-        assertTrue(data.getzLabels().isEmpty(), "zLabels deve essere vuoto");
-        assertEquals(0, data.getyValues().length, "yValues dovrebbe avere lunghezza 0");
+        assertTrue(data.xLabels().isEmpty(), "xLabels deve essere vuoto");
+        assertTrue(data.zLabels().isEmpty(), "zLabels deve essere vuoto");
+        assertEquals(0, data.yValues().length, "yValues dovrebbe avere lunghezza 0");
     }
 }
