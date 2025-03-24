@@ -24,13 +24,13 @@
 <Button 
   on:click={setFilterToLower}
   label="Values ​​lower than the global average"
-  title="Filtra"
+  title="Filter"
 />
 
 <Button 
   on:click={setFilterToHigher}
   label="Values higher than the global average" 
-  title="Filtra"
+  title="Filter"
 />
 
 <Button 
