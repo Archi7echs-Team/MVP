@@ -74,6 +74,7 @@
           mediaFilter={mediaFilter}
           onBarClick={handleBarClick}
           barFilterSelection={barFilterSelection}
+          bind:displayBarFilter = {displayBarFilter}
           bind:barValue = {barValue}
         />
       {/each}

@@ -7,12 +7,14 @@
 
   import * as THREE from 'three';
 
-  let { coordinates, height, currentCameraQuaternionArray, minVal, maxVal, colorSelection, media, mediaFilter, onBarClick, barFilterSelection, barValue = $bindable() } = $props();
+  let { coordinates, height, currentCameraQuaternionArray, minVal, maxVal, colorSelection, media, mediaFilter, onBarClick, barFilterSelection, displayBarFilter = $bindable(), barValue = $bindable() } = $props();
   
   const { scene } = useThrelte();
 
   // Raycaster e variabili per il mouse
   const raycaster = new Raycaster();
+
+  let selected = $state(false);
 
   // Opacità della barra
   let opacity = $state((height >= minVal && height <= maxVal) ? 1 : 0.2);
@@ -35,8 +37,13 @@
       passesFilter = false;
     }
 
-    if(barFilterSelection === 1){
+    if(barFilterSelection === 1 && !selected){
       passesFilter = false;
+    }
+
+    if(barFilterSelection === 0){
+      displayBarFilter = false;
+      selected = false;
     }
 
     opacity = (inRange && passesFilter) ? 1 : 0.2;
@@ -87,6 +94,7 @@
     if (onBarClick) {
       barValue = height;
       onBarClick({});
+      selected = true;
     }
   }}
   position={coordinates as [number, number, number]}
