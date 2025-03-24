@@ -4,9 +4,15 @@
   import DataSource from './DataSource.svelte';
   import DataRange from './DataRange.svelte';
   import Color from './Color.svelte';
+  import Average from './Average.svelte';
   ThemeUtils.setGlobalDefaultTheme(ThemeUtils.presets.standard);
-
-  let { valMin, valMax, colorSelection=$bindable(), value = $bindable([valMin, valMax] as [number, number]) } = $props();
+  
+  let { valMin, 
+        valMax, 
+        colorSelection=$bindable(), 
+        value = $bindable([valMin, valMax] as [number, number]), 
+        avgEnabled = $bindable() 
+      } = $props();
 </script>
 
 
@@ -23,6 +29,9 @@
         </TabPage>
         <TabPage title="Color">
             <Color bind:colorSelection={colorSelection} />
+        </TabPage>
+        <TabPage title="Average">
+            <Average bind:avgEnabled={avgEnabled}/>
         </TabPage>
     </TabGroup>
 </Pane>
