@@ -2,58 +2,64 @@
   import { T, useThrelte } from '@threlte/core';
   import { interactivity, Text } from '@threlte/extras';
   import { Raycaster, Vector2 } from 'three';
-	import { Tween } from 'svelte/motion';
+  import { Tween } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
 
   import * as THREE from 'three';
 
-  let { coordinates, height, currentCameraQuaternionArray, minVal, maxVal, colorSelection, media, mediaFilter } = $props();
+  let { coordinates, height, currentCameraQuaternionArray, minVal, maxVal, colorSelection, media, mediaFilter, onBarClick, barFilterSelection, barValue = $bindable() } = $props();
   
   const { scene } = useThrelte();
 
-  //raycaster e variabili per il mouse
+  // Raycaster e variabili per il mouse
   const raycaster = new Raycaster();
 
-  //opacità della barra
+  // Opacità della barra
   let opacity = $state((height >= minVal && height <= maxVal) ? 1 : 0.2);
 
-  //controllo per opacizzazione
+  // Controllo per opacizzazione
   $effect(() => {
-  //filtro per intervallo
-  let inRange = height >= minVal && height <= maxVal;
-  let passesFilter = true;
+    let inRange = height >= minVal && height <= maxVal;
+    let passesFilter = true;
 
-  //controllo se filtro per media
-  if (mediaFilter === 1 && height > media) {
-    passesFilter = false;
-  } else if (mediaFilter === 2 && height < media) {
-    passesFilter = false;
-  }
+    // Controllo se filtro per media
+    if (mediaFilter === 1 && height > media) {
+      passesFilter = false;
+    } else if (mediaFilter === 2 && height < media) {
+      passesFilter = false;
+    }
 
-  opacity = (inRange && passesFilter) ? 1 : 0.2;
-});
+    if(barFilterSelection === 2 && height < barValue) {
+      passesFilter = false;
+    } else if(barFilterSelection === 3 && height > barValue) {
+      passesFilter = false;
+    }
 
-  //riferimento al mesh della barra
+    if(barFilterSelection === 1){
+      passesFilter = false;
+    }
+
+    opacity = (inRange && passesFilter) ? 1 : 0.2;
+  });
+
+  // Riferimento al mesh della barra
   let mesh = $state<THREE.Mesh | undefined>(undefined);
   let hover = new Tween(0, {
     duration: 100,
     easing: cubicOut
   });
 
-  interactivity()
+  interactivity();
   
   const isFirstIntersected = (hits: THREE.Intersection[]) => {
     if (hits.length > 0 && hits[0].object === mesh) {
       return 1;
     }
     return 0;
-  }
+  };
 
-  //applicazione filtro colorazione
+  // Applicazione filtro colorazione
   function getBarColor() {
-    //1 = colorazione per righe - coordinata di riferimento: z
-    //2 = colorazione per colonne - coordinata di riferimento: x
-    //3 = colorazione per valore - controllo altezza tramite coordinata y e normalizzazione dei dati
     if (colorSelection === 1) {
       return `hsl(${(coordinates[2] * 50) % 360}, 80%, 60%)`;
     } else if (colorSelection === 2) {
@@ -65,7 +71,6 @@
     }
     return '#ffffff';
   }
-
 </script>
 
 <T.Mesh
@@ -77,6 +82,12 @@
   }}
   onpointerleave={() => {
     hover.target = 0;
+  }}
+  onpointerdown={() => {
+    if (onBarClick) {
+      barValue = height;
+      onBarClick({});
+    }
   }}
   position={coordinates as [number, number, number]}
   scale={[1, height, 1]}
@@ -98,5 +109,4 @@
   quaternion={currentCameraQuaternionArray}
   fontSize={0.2}
   fillOpacity={hover.current}
-  />
-
+/>

@@ -2,6 +2,7 @@
   import { Canvas } from '@threlte/core';
   import Scene from './Scene.svelte';
   import SettingsPane from './SettingsPane.svelte';
+  import BarPane from './BarPane.svelte';
 	import { Vector3 } from 'three';
 
   let data = $state([
@@ -26,6 +27,10 @@
   //definizione di limite inferiore superiore per passaggio di valori a SettingsPane
   let rangeValue: [number, number] = $state([0, 0]);
 
+  let displayBarFilter = $state(false);
+  let barValue = $state(0);
+  let barFilterSelection = $state(0);
+
   $effect(() => {
     rangeValue = [valMin, valMax];
   });
@@ -47,14 +52,18 @@
   function resetTarget() {
     target = ([rows*spacing/2 - spacing/2, (max-1)/2 , cols*spacing/2 - spacing/2]);
   }
+
+  
 </script>
 
 <div>
   <Canvas>
     <SettingsPane {resetTarget} {defaultPosition} {valMin} {valMax} bind:mediaFilter={mediaFilter} bind:colorSelection={colorSelection} bind:rangeValue={rangeValue}/>
-    <Scene  {target} {spacing} {data} {rangeValue} {colorSelection} {media} {mediaFilter}/>
+    <BarPane {displayBarFilter} bind:barFilterSelection={barFilterSelection}/>
+    <Scene  {target} {spacing} {data} {rangeValue} {colorSelection} {media} {mediaFilter} {barFilterSelection} bind:displayBarFilter={displayBarFilter} bind:barValue={barValue}/>
   </Canvas>
 </div>
+
 
 
 <style>
