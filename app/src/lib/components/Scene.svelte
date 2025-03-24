@@ -4,9 +4,11 @@
   import Chart from './Chart.svelte';
   let autoRotate = false;
   // define function control target to target the camera to the center of the chart
-
-  let { spacing, rangeValue, data, colorSelection, media, mediaFilter, target } = $props();
- 
+  let target = $state<[number, number, number]>([0, 0, 0]);
+  let controlTarget = (newTarget: [number, number, number]) => {
+    target = newTarget;
+  }
+  let { spacing, rangeValue, data, colorSelection, media, mediaFilter, avgEnabled } = $props();
 </script>
 
   <!-- Camera e controlli -->
@@ -22,7 +24,8 @@
   <T.DirectionalLight castShadow position={[-5, 10, 5]} intensity={1} />
   
   <!-- Componente grafico -->
-  <Chart {data} {rangeValue} {spacing} {colorSelection} {media} {mediaFilter} />
+  <Chart {data} {rangeValue} {spacing} {colorSelection} {media} {mediaFilter} {controlTarget} {avgEnabled}/>
+
   
 
 

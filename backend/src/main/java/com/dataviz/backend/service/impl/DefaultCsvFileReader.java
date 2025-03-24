@@ -5,6 +5,7 @@ import com.dataviz.backend.exception.FileTooBigException;
 import com.dataviz.backend.exception.InvalidCsvException;
 import com.dataviz.backend.exception.TooMuchDataException;
 import com.dataviz.backend.model.MatrixData;
+import com.dataviz.backend.model.impl.MatrixDataImpl;
 import com.dataviz.backend.service.CsvFileReader;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -102,9 +103,8 @@ public class DefaultCsvFileReader implements CsvFileReader {
             }
         }
 
-        return new MatrixData(xLabels, zLabels, yValues);
+        return new MatrixDataImpl(xLabels, zLabels, yValues);
     }
-
     /**
      * Estrae le xLabels dalla prima riga della tabella (ignorando la prima cella).
      */
@@ -169,4 +169,5 @@ public class DefaultCsvFileReader implements CsvFileReader {
         }
         return row;
     }
+
 }
