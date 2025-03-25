@@ -102,7 +102,6 @@
     <!-- 3D Bars -->
     {#each data as row, rowIndex}
       {#each row as height, colIndex}
-        console.log("abc");
         <Bar 
           coordinates={[
             rowIndex * spacing, // X

@@ -82,21 +82,29 @@
 
 <T.Mesh
   bind:ref={mesh}
+
   onpointermove={(e: any) => {
     raycaster.setFromCamera(e.pointer, e.camera);
     const intersects = raycaster.intersectObjects(scene.children, true);
     hover.target = isFirstIntersected(intersects);
   }}
+
   onpointerleave={() => {
     hover.target = 0;
   }}
-  onpointerdown={() => {
+
+  onpointerdown={(e: any) => {
     if (onBarClick) {
-      barValue = height;
-      onBarClick({});
-      selected = true;
-    }
+      raycaster.setFromCamera(e.pointer, e.camera);
+      const intersects = raycaster.intersectObjects(scene.children, true);
+      if (isFirstIntersected(intersects) == 1) {
+        barValue = height;
+        onBarClick();
+        selected = !selected;
+      };
+    };
   }}
+  
   position={coordinates as [number, number, number]}
   scale={[1, height, 1]}
 >
