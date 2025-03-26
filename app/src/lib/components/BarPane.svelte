@@ -23,7 +23,7 @@
   
     <Button 
         on:click={() => {barFilterSelection=3} }
-        label="Values ​​lower than the selected bar value"
+        label="Values lower than the selected bar value"
         title="Filter"
     />
 

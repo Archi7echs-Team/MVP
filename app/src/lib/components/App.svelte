@@ -38,7 +38,6 @@
   let rangeValue: [number, number] = $state([0, 0]);
 
   let displayBarFilter = $state(false);
-  let barValue = $state(0);
   let barFilterSelection = $state(0);
 
   $effect(() => {
@@ -68,9 +67,9 @@
 
 <div>
   <Canvas>
-    <SettingsPane {resetTarget} {defaultPosition} valMin={valMin} valMax={valMax} bind:mediaFilter={mediaFilter} bind:colorSelection={colorSelection} bind:rangeValue={rangeValue} bind:avgEnabled={avgEnabled}/>
-    <BarPane {displayBarFilter} bind:barFilterSelection={barFilterSelection}/>
-    <Scene {target} {spacing} {data} {rangeValue} {colorSelection} {media} {mediaFilter} {avgEnabled} {barFilterSelection} bind:displayBarFilter={displayBarFilter} bind:barValue={barValue}/>
+    <SettingsPane {resetTarget} {defaultPosition} {valMin} {valMax} bind:mediaFilter bind:colorSelection bind:rangeValue bind:avgEnabled/>
+    <BarPane {displayBarFilter} bind:barFilterSelection/>
+    <Scene {target} {spacing} {data} {rangeValue} {colorSelection} {media} {mediaFilter} {avgEnabled} {barFilterSelection} bind:displayBarFilter/>
   </Canvas>
 </div>
 

@@ -6,51 +6,47 @@
   import { cubicOut } from 'svelte/easing';
 
   import * as THREE from 'three';
+	import { select } from 'three/tsl';
 
-  let { coordinates, height, currentCameraQuaternionArray, minVal, maxVal, colorSelection, media, mediaFilter, onBarClick, barFilterSelection, displayBarFilter = $bindable(), barValue = $bindable() } = $props();
+  let { id, coordinates, height, currentCameraQuaternionArray, minVal, maxVal, colorSelection, media, mediaFilter, barFilterSelection, selection
+  } = $props();
   
   const { scene } = useThrelte();
 
   // Raycaster e variabili per il mouse
   const raycaster = new Raycaster();
 
-  let selected = $state(false);
-
   // Opacità della barra
-  let opacity = $state((height >= minVal && height <= maxVal) ? 1 : 0.2);
+  let inRange = $derived(height >= minVal && height <= maxVal)
+
+  let passesFilter = $derived.by(() => {
+    let lv = selection.lastValue();
+    if (mediaFilter === 1 && height > media) {
+      return false;
+    } else if (mediaFilter === 2 && height < media) {
+      return false;
+    }
+
+    if(barFilterSelection === 2 && height < lv) {
+      return false;
+    } else if(barFilterSelection === 3 && height > lv) {
+      return false;
+    }
+
+    if(barFilterSelection === 1 && !selection.check(id)){
+      return false;
+    }
+    return true;
+  })
 
   // Controllo per opacizzazione
-  $effect(() => {
-    let inRange = height >= minVal && height <= maxVal;
-    let passesFilter = true;
+  let opacity = $derived((inRange && passesFilter) ? 1 : 0.2)
 
-    // Controllo se filtro per media
-    if (mediaFilter === 1 && height > media) {
-      passesFilter = false;
-    } else if (mediaFilter === 2 && height < media) {
-      passesFilter = false;
-    }
-
-    if(barFilterSelection === 2 && height < barValue) {
-      passesFilter = false;
-    } else if(barFilterSelection === 3 && height > barValue) {
-      passesFilter = false;
-    }
-
-    if(barFilterSelection === 1 && !selected){
-      passesFilter = false;
-    }
-
-    if(barFilterSelection === 0){
-      displayBarFilter = false;
-      selected = false;
-    }
-
-    opacity = (inRange && passesFilter) ? 1 : 0.2;
-  });
 
   // Riferimento al mesh della barra
   let mesh = $state<THREE.Mesh | undefined>(undefined);
+  let text = $state<any>(undefined);
+    
   let hover = new Tween(0, {
     duration: 100,
     easing: cubicOut
@@ -58,12 +54,18 @@
 
   interactivity();
   
-  const isFirstIntersected = (hits: THREE.Intersection[]) => {
-    if (hits.length > 0 && hits[0].object === mesh) {
-      return 1;
-    }
-    return 0;
+  const isFirstIntersected = (e: any) => {
+    raycaster.setFromCamera(e.pointer, e.camera);
+    const hits = raycaster.intersectObjects(scene.children, true);
+    return hits.length > 0 && hits[0].object === mesh
   };
+
+  const isFirstTextIntersected = (e: any) => {
+    raycaster.setFromCamera(e.pointer, e.camera);
+    const hits = raycaster.intersectObjects(scene.children, true);
+    return hits.length > 0 && hits[0].object === text
+  };
+
 
   // Applicazione filtro colorazione
   function getBarColor() {
@@ -78,33 +80,31 @@
     }
     return '#ffffff';
   }
+
 </script>
 
 <T.Mesh
   bind:ref={mesh}
 
   onpointermove={(e: any) => {
-    raycaster.setFromCamera(e.pointer, e.camera);
-    const intersects = raycaster.intersectObjects(scene.children, true);
-    hover.target = isFirstIntersected(intersects);
+    hover.target = isFirstIntersected(e) ? 1 : 0;
   }}
 
   onpointerleave={() => {
     hover.target = 0;
   }}
 
-  onpointerdown={(e: any) => {
-    if (onBarClick) {
-      raycaster.setFromCamera(e.pointer, e.camera);
-      const intersects = raycaster.intersectObjects(scene.children, true);
-      if (isFirstIntersected(intersects) == 1) {
-        barValue = height;
-        onBarClick();
-        selected = !selected;
-      };
+  onclick={(e: any) => {
+    if (isFirstIntersected(e)) {
+      if (e.nativeEvent.detail === 1) {
+        selection.toggle(id);
+      }
+      else {
+        selection.set([id]);
+      }
     };
   }}
-  
+
   position={coordinates as [number, number, number]}
   scale={[1, height, 1]}
 >
@@ -125,4 +125,15 @@
   quaternion={currentCameraQuaternionArray}
   fontSize={0.2}
   fillOpacity={hover.current}
+  bind:ref={text}
+  onclick={(e: any) => {
+    if (isFirstTextIntersected(e)) {
+      if (e.nativeEvent.detail === 1) {
+        selection.toggle(id);
+      }
+      else {
+        selection.set([id]);
+      }
+    };
+  }}
 />
