@@ -46,7 +46,7 @@
   let colorSelection: number = $state(2);
   let defaultPosition = new Vector3(15, 7.5, 15);
 
-  let spacing = 1.2;
+  let spacing = 2;
   let max = Math.max(...data.flat()) || 1; // Normalize heights
   let rows = data.length;
   let cols = data[0].length;
