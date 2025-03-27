@@ -46,7 +46,7 @@
   let colorSelection: number = $state(2);
   let defaultPosition = new Vector3(15, 7.5, 15);
 
-  let spacing = 1.2;
+  let spacing = 2;
   let max = Math.max(...data.flat()) || 1; // Normalize heights
   let rows = data.length;
   let cols = data[0].length;
@@ -62,7 +62,6 @@
     target = ([rows*spacing/2 - spacing/2, (max-1)/2 , cols*spacing/2 - spacing/2]);
   }
 
-  
 </script>
 
 <div>
@@ -78,8 +77,8 @@
 <style>
   div {
     position: relative;
-    height: 100%;
-    width: 100%;
+    height: 100vh;
+    width: 100vw;
     background-color: rgb(14, 22, 37);
   }
 </style>
