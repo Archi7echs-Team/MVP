@@ -3,22 +3,68 @@
   import { Text } from '@threlte/extras';
   import Bar from './Bar.svelte';
   import { onMount, onDestroy } from 'svelte';
+	import { label } from 'three/tsl';
   const { camera, renderer, scene } = useThrelte();
   let currentCameraQuaternionArray = $state<[number, number, number, number]>([0, 0, 0, 1]);
   let animationFrameId: number;
 
-  let { data = [
-    [2, 3, 5, 2, 2],
-    [1, 4, 6, 3, 1],
-    [2, 5, 7, 4, 8],
-    [3, 2, 4, 1, 5],
-    [1, 3, 2, 6, 4]
-  ], rangeValue, spacing, colorSelection, media, mediaFilter, controlTarget, avgEnabled } = $props(); 
+  let { data , rangeValue, spacing, colorSelection, media, mediaFilter, avgEnabled, barFilterSelection,
+        displayBarFilter = $bindable() } = $props(); 
+
+  let lastValue = $state(0);
 
   let max = Math.max(...data.flat()) || 1; // Normalize heights
 
   let rows = data.length;
   let cols = data[0].length;
+
+  // define a class named selection
+  class Selection {
+    selected: any[] = $state([]);
+
+    constructor(){
+      this.selected = [];
+    }
+    add = (id: any) => {
+      // add the bar to the selecgted array if it is not already there
+      if (!this.selected.includes(id)) this.selected.push(id);
+    }
+    remove = (id: any) => {
+      this.selected = this.selected.filter(b => b !== id);
+    }
+    clear = () => {
+      this.selected = [];
+    }
+    set = (ids: any[]) => {
+      this.selected = ids;
+    }
+    check = (id: any) => {
+      return this.selected.includes(id)
+    }
+    active = () => {
+      return this.selected.length > 0
+    }
+    toggle = (id: any) => {
+      if (this.check(id)) {
+        this.remove(id);
+      } else {
+        this.add(id);
+      }
+    }
+    lastValue = () => {
+      return this.active() ? getValueFromId(selection.selected.at(-1)) : 0;
+    }
+  }
+  
+  let selection = new Selection();
+
+  const getValueFromId = (id: string) => {
+    return data[parseInt(id.split('-')[0])][parseInt(id.split('-')[1])];
+  }
+
+  $effect(() => {
+    displayBarFilter = selection.active();
+  })
 
   onMount(() => {
     const update = () => {
@@ -50,9 +96,10 @@
   let average = calculateAverage(data);
   console.log("Valore medio:", average);
 
-</script>
+  </script>
   
   <T.Group>
+
     <!-- Grid Plane (Under the Bars) -->
     <T.Mesh position={[rows*spacing/2 - spacing/2, 0 , cols*spacing/2 - spacing/2]}  rotation={[-Math.PI / 2, 0, 0]}>
       <T.PlaneGeometry args={[cols * spacing, rows * spacing]} />
@@ -63,7 +110,7 @@
     {#if avgEnabled}
       <T.Mesh position={[rows*spacing/2 - spacing/2, average , cols*spacing/2 - spacing/2]}  rotation={[-Math.PI / 2, 0, 0]}>
         <T.PlaneGeometry args={[cols * spacing, rows * spacing]} />
-        <T.MeshStandardMaterial color="lightgray" />
+        <T.MeshStandardMaterial color="lightgray" transparent={true} opacity={0.5}/>
       </T.Mesh>
     {/if}
 
@@ -92,8 +139,8 @@
     <!-- 3D Bars -->
     {#each data as row, rowIndex}
       {#each row as height, colIndex}
-        console.log("abc");
         <Bar 
+          id={`${rowIndex}-${colIndex}`}
           coordinates={[
             rowIndex * spacing, // X
             height / 2, // Y
@@ -103,9 +150,11 @@
           {currentCameraQuaternionArray}
           minVal={rangeValue[0]}
           maxVal={rangeValue[1]}  
-          colorSelection={colorSelection}
-          media={media}
-          mediaFilter={mediaFilter}
+          {colorSelection}
+          {media}
+          {mediaFilter}
+          {barFilterSelection}
+          {selection}
         />
       {/each}
     {/each}

@@ -5,10 +5,8 @@
   let autoRotate = false;
   // define function control target to target the camera to the center of the chart
   //let target = $state<[number, number, number]>([0, 0, 0]);
-  let controlTarget = (newTarget: [number, number, number]) => {
-    target = newTarget;
-  }
-  let { spacing, rangeValue, data, colorSelection, media, mediaFilter, avgEnabled, target } = $props();
+
+  let { spacing, rangeValue, data, colorSelection, media, mediaFilter, avgEnabled, target, barFilterSelection, displayBarFilter = $bindable() } = $props();
 </script>
 
   <!-- Camera e controlli -->
@@ -24,8 +22,4 @@
   <T.DirectionalLight castShadow position={[-5, 10, 5]} intensity={1} />
   
   <!-- Componente grafico -->
-  <Chart {data} {rangeValue} {spacing} {colorSelection} {media} {mediaFilter} {controlTarget} {avgEnabled}/>
-
-  
-
-
+  <Chart {data} {rangeValue} {spacing} {colorSelection} {media} {mediaFilter} {barFilterSelection} bind:displayBarFilter {avgEnabled}/>
