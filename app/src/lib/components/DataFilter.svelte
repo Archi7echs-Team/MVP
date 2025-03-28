@@ -14,7 +14,7 @@
 </script>
 
 <IntervalSlider
-  bind:value={value}
+  bind:value={value} 
   min={valMin}
   max={valMax}
   label="Visualization interval"
@@ -23,7 +23,7 @@
 
 <Button 
   on:click={setFilterToLower}
-  label="Values ​​lower than the global average"
+  label="Values lower than the global average"
   title="Filter"
 />
 

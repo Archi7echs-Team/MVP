@@ -11,3 +11,4 @@ describe('DataFilter', () => {
     expect(getByText('Visualization reset')).toBeTruthy(); 
   });
 });
+

@@ -2,7 +2,7 @@
   import { Pane, ThemeUtils, TabGroup, TabPage } from 'svelte-tweakpane-ui';
   import CameraSettings from './CameraSettings.svelte';
   import DataSource from './DataSource.svelte';
-  import DataRange from './DataFilter.svelte';
+  import DataFilter from './DataFilter.svelte';
   import Color from './Color.svelte';
   import Average from './Average.svelte';
   ThemeUtils.setGlobalDefaultTheme(ThemeUtils.presets.standard);
@@ -14,7 +14,6 @@
         mediaFilter = $bindable(), 
         colorSelection = $bindable(), 
         rangeValue = $bindable([valMin, valMax] as [number, number]), 
-        value = $bindable([valMin, valMax] as [number, number]), 
         avgEnabled = $bindable() 
       } = $props();
 </script>
@@ -29,7 +28,7 @@
             <DataSource />
         </TabPage>
         <TabPage title="Data filter">
-            <DataRange {valMin} {valMax} bind:mediaFilter={mediaFilter} bind:value={rangeValue} />
+            <DataFilter {valMin} {valMax} bind:mediaFilter={mediaFilter} bind:value={rangeValue} />
         </TabPage>
         <TabPage title="Color filter">
             <Color bind:colorSelection={colorSelection} />
@@ -40,6 +39,3 @@
     </TabGroup>
 </Pane>
 
-<style>
-
-</style>
