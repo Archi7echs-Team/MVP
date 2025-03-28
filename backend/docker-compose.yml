@@ -27,6 +27,9 @@ services:
       SPRING_DATASOURCE_USERNAME: architechs
       SPRING_DATASOURCE_PASSWORD: password_super_sicura
       TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+
     command: >
       sh -c "
         echo 'Running tests...';
