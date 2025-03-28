@@ -28,7 +28,7 @@
             <DataSource />
         </TabPage>
         <TabPage title="Data filter">
-            <DataFilter {valMin} {valMax} bind:mediaFilter={mediaFilter} bind:value={rangeValue} />
+            <DataFilter {valMin} {valMax} bind:mediaFilter bind:rangeValue />
         </TabPage>
         <TabPage title="Color filter">
             <Color bind:colorSelection={colorSelection} />

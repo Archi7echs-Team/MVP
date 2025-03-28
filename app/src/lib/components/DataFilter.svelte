@@ -1,6 +1,6 @@
 <script lang="ts">
     import {IntervalSlider, Button} from 'svelte-tweakpane-ui';
-    let {valMin, valMax, mediaFilter=$bindable(), value = $bindable([valMin, valMax] as [number, number]) } = $props(); 
+    let {valMin, valMax, mediaFilter=$bindable(), rangeValue = $bindable([valMin, valMax] as [number, number]) } = $props(); 
 
     //impostare mediaFilter a valori sotto alla media
     function setFilterToLower() {
@@ -11,10 +11,14 @@
     function setFilterToHigher() {
       mediaFilter = 2;
     }
+    let value : any= $state([0, 10]);
+    $effect(() => {
+      rangeValue = value;
+    });
 </script>
 
 <IntervalSlider
-  bind:value={value} 
+  bind:value
   min={valMin}
   max={valMax}
   label="Visualization interval"

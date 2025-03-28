@@ -21,12 +21,6 @@
   const allValues = data.flat();
   const media = allValues.reduce((sum, val) => sum + val, 0) / allValues.length;
 
-  let value: [number, number];
-
-  //effetto reattivo per aggiornare `value` quando `valMin` o `valMax` cambiano
-  $effect(() => {
-    value = [valMin, valMax]; 
-  });
   //let colorSelection: number = 2;
   
   let avgEnabled = $state(false);
@@ -35,14 +29,12 @@
   let mediaFilter = $state(0);
 
   //definizione di limite inferiore superiore per passaggio di valori a SettingsPane
-  let rangeValue: [number, number] = $state([0, 0]);
+  let rangeValue: [number, number] = $state([valMin, valMax] as [number, number]);
 
   let displayBarFilter = $state(false);
   let barFilterSelection = $state(0);
 
-  $effect(() => {
-    rangeValue = [valMin, valMax];
-  });
+  
   let colorSelection: number = $state(2);
   let defaultPosition = new Vector3(15, 7.5, 15);
 
