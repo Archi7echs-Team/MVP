@@ -3,7 +3,6 @@ import DataFilter from '../lib/components/DataFilter.svelte';
 import { describe, it, expect, test, vi } from 'vitest';
 import '@testing-library/jest-dom';
 import { filter } from '$lib/index.svelte';
-import { getAll } from 'three/examples/jsm/libs/tween.module.js';
 
 
 describe('DataFilter', () => {
@@ -33,7 +32,7 @@ describe('DataFilter', () => {
   });
   it('set avgFilter to 2 when click the Grater than average button', async () => {
     const { getByText } = render(DataFilter);
-    const buttonLabel = getByText('Grater than average');
+    const buttonLabel = getByText('Greater than average');
     const button = buttonLabel.closest('button');
     expect(filter.avgFilter).toBe(0);
     await fireEvent.click(button!);
