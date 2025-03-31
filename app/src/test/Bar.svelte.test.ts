@@ -25,7 +25,7 @@ let filterSettings = {
   barFilterSelection: 0
 }
 
-describe('Bar component', () => {
+describe('Bar', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     filterSettings.avgFilter = 0

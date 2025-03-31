@@ -1,6 +1,6 @@
 import { render } from '@testing-library/svelte'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
-import App from '../lib/components/App.svelte'
+import Page from '../routes/+page.svelte'
 
 vi.mock('@threlte/core', async (importOriginal) => {
   const actual = await importOriginal() as any;
@@ -9,17 +9,14 @@ vi.mock('@threlte/core', async (importOriginal) => {
     Canvas: () => '<div data-testid="mock-canvas">Mocked Canvas</div>',
   };
 });
-vi.mock('@threlte/extras', () => ({
-  Text: {}
-}))
 
-describe('App', () => {
+describe('Page', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   it('renders without crashing', () => {
-    const { container } = render(App);
+    const { container } = render(Page);
     expect(container).toBeTruthy()
   })
 })

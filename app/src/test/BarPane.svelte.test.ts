@@ -16,8 +16,7 @@ vi.mock('@threlte/core', () => ({
     Text: () => ({ $$render: () => '<text />' })
   }))
 
-describe('Bar component', () => {
-  
+describe('Bar pane', () => {
     it('renders without crashing', () => {
       const { container } = render(BarPane)
       expect(container).toBeTruthy()
