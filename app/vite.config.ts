@@ -16,6 +16,7 @@ export default defineConfig({
 				plugins: [svelteTesting()],
 
 				test: {
+					globals: true, 
 					name: 'client',
 					environment: 'jsdom',
 					clearMocks: true,
@@ -37,3 +38,4 @@ export default defineConfig({
 		]
 	}
 });
+

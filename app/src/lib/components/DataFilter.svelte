@@ -1,40 +1,41 @@
 <script lang="ts">
-    import {IntervalSlider, Button} from 'svelte-tweakpane-ui';
-    let {valMin, valMax, mediaFilter=$bindable(), value = $bindable([valMin, valMax] as [number, number]) } = $props(); 
+	import { IntervalSlider, Button, Checkbox } from 'svelte-tweakpane-ui';
+	import { filter, getData } from '$lib/index.svelte';
 
-    //impostare mediaFilter a valori sotto alla media
-    function setFilterToLower() {
-      mediaFilter = 1;
-    }
+	let utils = getData().computed;
 
-    //impostare mediaFilter a valori sopra alla media   
-    function setFilterToHigher() {
-      mediaFilter = 2;
-    }
+	filter.rangeValue.min = utils.min;
+	filter.rangeValue.max = utils.max;
 </script>
 
 <IntervalSlider
-  bind:value={value}
-  min={valMin}
-  max={valMax}
-  label="Visualization interval"
-  format={(v) => `${v.toFixed(0)}`}
+	bind:value={filter.rangeValue}
+	min={utils.min}
+	max={utils.max}
+	label="Visualization interval"
+	format={(v) => `${v.toFixed(0)}`}
 />
 
-<Button 
-  on:click={setFilterToLower}
-  label="Values ​​lower than the global average"
-  title="Filter"
+<Checkbox bind:value={filter.avgEnabled} label="Show average plane" />
+
+<Button
+	on:click={() => (filter.avgFilter = 1)}
+	label="Values lower than the global average"
+	title="Filter"
 />
 
-<Button 
-  on:click={setFilterToHigher}
-  label="Values higher than the global average" 
-  title="Filter"
+<Button
+	on:click={() => (filter.avgFilter = 2)}
+	label="Values higher than the global average"
+	title="Filter"
 />
 
-<Button 
-  on:click={() => {mediaFilter = 0, value = [valMin, valMax]}}
-  label="Visualization reset" 
-  title="Reset"
+<Button
+	on:click={() => {
+		filter.avgFilter = 0;
+		filter.rangeValue.min = utils.min;
+		filter.rangeValue.max = utils.max;
+	}}
+	label="Visualization reset"
+	title="Reset"
 />
