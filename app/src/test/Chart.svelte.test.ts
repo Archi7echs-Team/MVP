@@ -1,4 +1,4 @@
-import { act, render } from '@testing-library/svelte'
+import { render } from '@testing-library/svelte'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import Chart from '../lib/components/Chart.svelte'
 
