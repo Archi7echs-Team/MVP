@@ -1,6 +1,6 @@
 import { render } from '@testing-library/svelte'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
-import Chart from '../lib/components/Chart.svelte'
+import Scene from '../lib/components/Scene.svelte'
 
 vi.mock('@threlte/core', () => ({
   useThrelte: () => ({
@@ -25,8 +25,7 @@ describe('Chart', () => {
   })
 
   it('renders without crashing', () => {
-    const { container } = render(Chart);
+    const { container } = render(Scene);
     expect(container).toBeTruthy()
   })
 })
-

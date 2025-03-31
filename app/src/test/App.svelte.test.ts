@@ -1,20 +1,14 @@
 import { render } from '@testing-library/svelte'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
-import Chart from '../lib/components/Chart.svelte'
+import App from '../lib/components/App.svelte'
 
-vi.mock('@threlte/core', () => ({
-  useThrelte: () => ({
-    camera: {
-      current: {
-        quaternion: {
-          toArray: () => [0, 0, 0, 1]
-        }
-      }
-    }
-  }),
-  T: {}
-}))
-
+vi.mock('@threlte/core', async (importOriginal) => {
+  const actual = await importOriginal() as any;
+  return {
+    ...actual,
+    Canvas: () => '<div data-testid="mock-canvas">Mocked Canvas</div>',
+  };
+});
 vi.mock('@threlte/extras', () => ({
   Text: {}
 }))
@@ -25,8 +19,7 @@ describe('Chart', () => {
   })
 
   it('renders without crashing', () => {
-    const { container } = render(Chart);
+    const { container } = render(App);
     expect(container).toBeTruthy()
   })
 })
-
