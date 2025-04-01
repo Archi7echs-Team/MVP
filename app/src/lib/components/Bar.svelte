@@ -27,8 +27,6 @@
 		}
 	});
 
-	console.log(nMax);
-
 	let passesFilter = $derived.by(() => {
 		let lv = filter.selection.lastValue();
 		if (filter.avgFilter === 1 && height > utils.average) {
