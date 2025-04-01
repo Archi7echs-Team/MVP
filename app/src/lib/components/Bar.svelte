@@ -5,7 +5,7 @@
 	import { Tween } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 	import * as THREE from 'three';
-	import { getData, filter } from '$lib/index.svelte';
+	import { getData, filter, getMaxNValue, getMinNvalue } from '$lib/index.svelte';
 
 	let { id, coordinates, height, currentCameraQuaternionArray } = $props();
 
@@ -18,6 +18,17 @@
 
 	// Opacità della barra
 	let inRange = $derived(height >= filter.rangeValue.min && height <= filter.rangeValue.max);
+
+	let nMax = $derived(filter.nValuemax);
+	let nMin = $derived(filter.nValuemin);
+
+	$effect(() => {
+		if (filter.nValuemax != "0") {
+			console.log(nMax);
+		}
+	});
+
+	console.log(nMax);
 
 	let passesFilter = $derived.by(() => {
 		let lv = filter.selection.lastValue();
@@ -36,6 +47,15 @@
 		if (filter.barFilterSelection === 1 && !filter.selection.check(id)) {
 			return false;
 		}
+
+		if (filter.nValuemax != "0" && !getMaxNValue(height, nMax)){
+			return false;
+		}
+
+		if (filter.nValuemin != "0" && !getMinNvalue(height, nMin)){
+			return false;
+		}
+
 		return true;
 	});
 

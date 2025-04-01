@@ -37,6 +37,24 @@ export const getValueFromId = (id: string) => {
 	return data.values[parseInt(id.split('-')[0])][parseInt(id.split('-')[1])];
 };
 
+export const getMaxNValue = (value: number, n: string) => {
+	let num = parseInt(n);
+	let filtered = fecthedData
+    	.flat()                 
+    	.sort((a, b) => b - a)  
+    	.slice(0, num);  
+	return filtered.includes(value);
+}
+
+export const getMinNvalue = (value: number, n: string) => {
+	let num = parseInt(n);
+	let filtered = fecthedData
+    	.flat()                 
+    	.sort((a, b) => a - b)
+    	.slice(0, num);  
+	return filtered.includes(value);
+}
+
 class Selection {
 	selected: any[] = $state([]);
 
@@ -85,5 +103,7 @@ export const filter = $state({
 	avgEnabled: false,
 	barFilterSelection: 0,
 	displayBarFilter: false,
-	selection: selection
+	selection: selection,
+	nValuemin: "0",
+	nValuemax: "0"
 });

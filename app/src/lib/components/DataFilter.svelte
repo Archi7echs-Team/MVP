@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { IntervalSlider, Button, Checkbox } from 'svelte-tweakpane-ui';
+	import { IntervalSlider, Button, Checkbox, Text } from 'svelte-tweakpane-ui';
 	import { filter, getData } from '$lib/index.svelte';
 
 	let utils = getData().computed;
@@ -30,11 +30,17 @@
 	title="Filter"
 />
 
+<Text bind:value={filter.nValuemin} on:change={() => (filter.nValuemax = "0")} label="Show the n lowest value" />
+
+<Text bind:value={filter.nValuemax} on:change={() => (filter.nValuemin = "0")} label="Show the n highest value" />
+
 <Button
 	on:click={() => {
 		filter.avgFilter = 0;
 		filter.rangeValue.min = utils.min;
 		filter.rangeValue.max = utils.max;
+		filter.nValuemin = "0";
+		filter.nValuemax = "0";
 	}}
 	label="Visualization reset"
 	title="Reset"
