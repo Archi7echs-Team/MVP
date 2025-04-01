@@ -6,6 +6,9 @@ describe('Color', () => {
   it('load all components', () => {
     const { getByText } = render(Color);
     expect(getByText('Color type')).toBeTruthy();
+    expect(getByText('colonne')).toBeInTheDocument();
+    expect(getByText('righe')).toBeInTheDocument();
+    expect(getByText('valori')).toBeInTheDocument();
   });
 });
 

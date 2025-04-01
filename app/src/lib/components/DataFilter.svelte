@@ -21,13 +21,13 @@
 <Button
 	on:click={() => (filter.avgFilter = 1)}
 	label="Values lower than the global average"
-	title="Filter"
+	title="Lower than average"
 />
 
 <Button
 	on:click={() => (filter.avgFilter = 2)}
 	label="Values higher than the global average"
-	title="Filter"
+	title="Greater than average"
 />
 
 <Text bind:value={filter.nValuemin} on:change={() => (filter.nValuemax = "0")} label="Show the n lowest value" />
