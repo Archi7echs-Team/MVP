@@ -1,31 +1,43 @@
-import { render } from '@testing-library/svelte';
-import { describe, it, expect, vi } from 'vitest';
+import { render, fireEvent } from '@testing-library/svelte';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import CameraSettings from '../lib/components/CameraSettings.svelte';
 
-vi.mock('@threlte/core', () => ({
+
+vi.mock('@threlte/core', async () => {
+  const actual = await vi.importActual('@threlte/core');
+  return {
+    ...actual,
     useThrelte: () => ({
       camera: {
         current: {
-          quaternion: {
-            toArray: () => [0, 0, 0, 1]
-          }
+          getWorldDirection: (target: any) => {
+            target.set(0, 0, -1);
+            return target;
+          },
+          position: {
+            add: vi.fn(), 
+            copy: vi.fn(), 
+          },
         }
       }
-    }),
-    T: {}
-  }))
+    })
+  };
+});
+
+
 
 describe('CameraSettings', () => {
+  let resetTarget: any;
+
   it('renders without crashing', () => {
-    const { container } = render(CameraSettings);
+    const { container } = render(CameraSettings, { props: { resetTarget } });
     expect(container).toBeTruthy();
   });
 
-  it('load all compotents', () => {
-    const { getByText } = render(CameraSettings);
+  it('loads all components', () => {
+    const { getByText } = render(CameraSettings, { props: { resetTarget } });
     expect(getByText('Resetta')).toBeInTheDocument();
     expect(getByText('Zoom In')).toBeInTheDocument();
     expect(getByText('Zoom Out')).toBeInTheDocument();
   });
-
 });
