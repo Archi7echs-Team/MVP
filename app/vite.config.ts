@@ -38,7 +38,7 @@ export default defineConfig({
 		],
 		coverage: {
 			include: ['src/**/*.{js,ts,svelte}'],
-			exclude: ['src/routes/**'],
+			exclude: ['src/routes/**', 'src/app.d.ts'],
 			reporter: ['text'],
 			provider: 'v8',
 		}
