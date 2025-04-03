@@ -87,3 +87,14 @@ export const filter = $state({
 	displayBarFilter: false,
 	selection: selection
 });
+
+
+export const getSelectedBarInfo = () => {
+    if (!selection.active()) return null;
+    
+    const lastId = selection.selected.at(-1);
+    const [row, col] = lastId.split('-').map(Number);
+    const value = getValueFromId(lastId);
+    
+    return { row: row + 1, column: col + 1, height: value };
+};
