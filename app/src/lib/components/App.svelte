@@ -9,8 +9,12 @@
 
 	let target = $state(getData().computed.defaultTarget);
 
-	function resetTarget() {
+	export function resetTarget() {
 		target = utils.defaultTarget;
+	}
+
+	export function getTarget() {
+		return target;
 	}
 </script>
 
