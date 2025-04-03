@@ -1,32 +1,43 @@
 import { Vector3 } from 'three';
 
-let spacing = $state(2);
+import { getDbData, getExternalData } from '$lib/data.svelte';
 
-let fecthedData = $state([
-	[2, 3, 5, 2, 2],
-	[1, 4, 6, 3, 1],
-	[2, 5, 7, 4, 8],
-	[3, 2, 4, 1, 5],
-	[1, 3, 2, 6, 4]
-]);
+export let fetchedData = $state({
+	values: [
+		[2, 3, 5, 2, 2],
+		[1, 4, 6, 3, 1],
+		[2, 5, 7, 4, 8],
+		[3, 2, 4, 1, 5],
+		[1, 3, 2, 6, 4]
+	],
+	spacing: 2,
+});
+
+// set fetchedData to the data fetched from the server
+export const fetchDb = () => {
+	fetchedData.values = getDbData().yValues;
+};
+
+export const fetchExternal = () => {
+	fetchedData.values = getExternalData().yValues;
+};
 
 // data.computed are the values that are computed from the fetched datas and aren't editable by the user
-let data = $derived({
-	values: fecthedData,
-	computed: {
-		average: fecthedData.flat().reduce((a, b) => a + b, 0) / fecthedData.flat().length,
-		minmax: [Math.min(...fecthedData.flat()), Math.max(...fecthedData.flat())],
-		max: Math.max(...fecthedData.flat()),
-		min: Math.min(...fecthedData.flat()),
-		rows: fecthedData.length,
-		cols: fecthedData[0].length,
-		defaultTarget: [
-			(fecthedData.length * spacing) / 2 - spacing / 2,
-			(Math.max(...fecthedData.flat()) - 1) / 2,
-			(fecthedData[0].length * spacing) / 2 - spacing / 2
-		],
-		defaultPosition: new Vector3(15, 7.5, 15)
-	}
+let data = $derived(fetchedData.values);
+
+const utils = $derived({
+	average: data.flat().reduce((a, b) => a + b, 0) / data.flat().length,
+	minmax: [Math.min(...data.flat()), Math.max(...data.flat())],
+	max: Math.max(...data.flat()),
+	min: Math.min(...data.flat()),
+	rows: data.length,
+	cols: data[0].length,
+	defaultTarget: [
+		(data.length * fetchedData.spacing) / 2 - fetchedData.spacing / 2,
+		(Math.max(...data.flat()) - 1) / 2,
+		(data[0].length * fetchedData.spacing) / 2 - fetchedData.spacing / 2
+	],
+	defaultPosition: new Vector3(15, 7.5, 15)
 });
 
 export const getData = () => {
@@ -34,26 +45,26 @@ export const getData = () => {
 };
 
 export const getValueFromId = (id: string) => {
-	return data.values[parseInt(id.split('-')[0])][parseInt(id.split('-')[1])];
+	return data[parseInt(id.split('-')[0])][parseInt(id.split('-')[1])];
 };
 
 export const getMaxNValue = (value: number, n: string) => {
 	let num = parseInt(n);
-	let filtered = fecthedData
-    	.flat()                 
-    	.sort((a, b) => b - a)  
-    	.slice(0, num);  
+	let filtered = fetchedData.values
+		.flat()
+		.sort((a, b) => b - a)
+		.slice(0, num);
 	return filtered.includes(value);
-}
+};
 
 export const getMinNvalue = (value: number, n: string) => {
 	let num = parseInt(n);
-	let filtered = fecthedData
-    	.flat()                 
-    	.sort((a, b) => a - b)
-    	.slice(0, num);  
+	let filtered = fetchedData.values
+		.flat()
+		.sort((a, b) => a - b)
+		.slice(0, num);
 	return filtered.includes(value);
-}
+};
 
 class Selection {
 	selected: any[] = $state([]);
@@ -97,13 +108,12 @@ let selection = new Selection();
 export const filter = $state({
 	spacing: 2,
 	rangeValue: { min: 0, max: 0 },
-	//rangeValue: { min: $state.snapshot(data.computed.min), max: $state.snapshot(data.computed.max) },
 	colorSelection: 2,
 	avgFilter: 0,
 	avgEnabled: false,
 	barFilterSelection: 0,
 	displayBarFilter: false,
 	selection: selection,
-	nValuemin: "0",
-	nValuemax: "0"
+	nValuemin: '0',
+	nValuemax: '0'
 });
