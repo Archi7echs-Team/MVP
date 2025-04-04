@@ -23,7 +23,6 @@
 		defaultPosition: new Vector3(15, 7.5, 15)
 	});
 
-
 	let target = $state(utils.defaultTarget);
 
 	export function resetTarget() {
