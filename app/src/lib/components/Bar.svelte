@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { T, useThrelte } from '@threlte/core';
 	import { interactivity, Text } from '@threlte/extras';
-	import { Raycaster, Vector2 } from 'three';
+	import { Raycaster, Mesh } from 'three';
 	import { Tween } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
-	import * as THREE from 'three';
 	import { getData, filter } from '$lib/index.svelte';
 
 	let { id, coordinates, height, currentCameraQuaternionArray } = $props();
@@ -43,7 +42,7 @@
 	let opacity = $derived(inRange && passesFilter ? 1 : 0.2);
 
 	// Riferimento al mesh della barra
-	let mesh = $state<THREE.Mesh | undefined>(undefined);
+	let mesh = $state<Mesh | undefined>(undefined);
 	let text = $state<any>(undefined);
 
 	let hover = new Tween(0, {

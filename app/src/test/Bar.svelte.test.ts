@@ -1,6 +1,7 @@
 import { render } from '@testing-library/svelte'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import Bar from '../lib/components/Bar.svelte'
+import {filter } from '$lib/index.svelte';
 
 vi.mock('@threlte/core', () => ({
     useThrelte: () => ({
@@ -29,6 +30,7 @@ describe('Bar', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     filterSettings.avgFilter = 0
+    filterSettings.avgFilter = 1
     filterSettings.barFilterSelection = 0
     lastValue = 5
     mockAverage = 10
