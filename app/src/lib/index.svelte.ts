@@ -91,6 +91,8 @@ export const filter = $state({
 	barFilterSelection: 0,
 	displayBarFilter: false,
 	selectedOpacity: 100, // predefinito (100)
+	showRowAvgPlane: false,
+    showColAvgPlane: false,
 	selection: selection
 });
 

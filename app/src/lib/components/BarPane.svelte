@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Pane, Button, Text, Separator, Folder, Slider } from 'svelte-tweakpane-ui';
+	import { Pane, Button, Text, Separator, Folder, Slider, Checkbox } from 'svelte-tweakpane-ui';
 	import { filter, getData, getSelectedBarInfo } from '$lib/index.svelte';
 
 	let selectedBarInfo = $derived(getSelectedBarInfo());
@@ -49,6 +49,10 @@
 			label="Filter reset"
 			title="Reset"
 		/>
+
+		<Checkbox bind:value={filter.showRowAvgPlane} label="Show average row plane" />
+
+		<Checkbox bind:value={filter.showColAvgPlane} label="Show average column plane" />
 
 		<Slider label="Selected opacity" min={10} max={100} step={1} bind:value={filter.selectedOpacity} format={(v) => `${v}%`} />
 
