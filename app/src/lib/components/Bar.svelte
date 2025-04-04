@@ -20,26 +20,32 @@
 
 	let passesFilter = $derived.by(() => {
 		let lv = filter.selection.lastValue();
-		if (filter.avgFilter === 1 && height > utils.average) {
-			return false;
-		} else if (filter.avgFilter === 2 && height < utils.average) {
-			return false;
-		}
+		const isSelected = filter.selection.check(id);
+		
+		if (filter.avgFilter === 1 && height > utils.average) return false;
+		if (filter.avgFilter === 2 && height < utils.average) return false;
 
-		if (filter.barFilterSelection === 2 && height < lv) {
-			return false;
-		} else if (filter.barFilterSelection === 3 && height > lv) {
-			return false;
-		}
+	    if (filter.barFilterSelection === 1 && !isSelected) return false;
 
-		if (filter.barFilterSelection === 1 && !filter.selection.check(id)) {
-			return false;
-		}
-		return true;
+		//escludo la barra selezionata
+		if (filter.barFilterSelection === 2) {
+        return height > lv && !isSelected; 
+        }
+    
+		//escludo la barra selezionata
+        if (filter.barFilterSelection === 3) {
+        return height < lv && !isSelected;
+        }
+    
+        return true;
 	});
 
 	// Controllo per opacizzazione
-	let opacity = $derived(inRange && passesFilter ? 1 : 0.2);
+	let opacity = $derived(
+        inRange && passesFilter 
+            ? (filter.selection.check(id) ? filter.selectedOpacity / 100 : 1) 
+            : 0.2
+    );
 
 	// Riferimento al mesh della barra
 	let mesh = $state<Mesh | undefined>(undefined);

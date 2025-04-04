@@ -90,9 +90,9 @@ export const filter = $state({
 	avgEnabled: false,
 	barFilterSelection: 0,
 	displayBarFilter: false,
+	selectedOpacity: 100, // predefinito (100)
 	selection: selection
 });
-
 
 export const getSelectedBarInfo = () => {
     if (!selection.active()) return null;

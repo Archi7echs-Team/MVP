@@ -69,7 +69,7 @@
 	<!-- Etichette delle righe -->
 	{#each data[0] as _, rowIndex}
 		<Text
-			position={[rowIndex * spacing, 0.2, -spacing]}
+			position={[rowIndex * spacing - 0.4, 0.2, -spacing]}
 			text={truncateText(`Row ${rowIndex + 1}`, 13)}
 			fontSize={0.5}
 			color="white"
@@ -80,7 +80,7 @@
 	<!-- Etichette delle colonne -->
 	{#each data as _, colIndex}
 		<Text
-			position={[cols * spacing, 0.2, colIndex * spacing]}
+			position={[cols * spacing, 0.2, colIndex * spacing - 0.4]}
 			text={truncateText(`Col ${colIndex + 1}`, 13)}
 			fontSize={0.5}
 			color="white"

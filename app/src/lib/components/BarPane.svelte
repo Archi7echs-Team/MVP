@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Pane, Button, Text, Separator, Folder,IntervalSlider } from 'svelte-tweakpane-ui';
+	import { Pane, Button, Text, Separator, Folder, Slider } from 'svelte-tweakpane-ui';
 	import { filter, getData, getSelectedBarInfo } from '$lib/index.svelte';
 
 	let selectedBarInfo = $derived(getSelectedBarInfo());
@@ -49,6 +49,16 @@
 			label="Filter reset"
 			title="Reset"
 		/>
+
+		<Slider label="Selected opacity" min={10} max={100} step={1} bind:value={filter.selectedOpacity} format={(v) => `${v}%`} />
+
+	   <Button
+	   on:click={() => {
+		   filter.selection.clear();
+	   }}
+	   label="Reset selection"
+	   title="Reset"
+        />
 		</Folder>
 		
 		<Separator />
