@@ -27,7 +27,8 @@
 		],
 		defaultPosition: new Vector3(15, 7.5, 15)
 	});
-
+	let zLabels = $derived(fetchedData.zLabels);
+	let xLabels = $derived(fetchedData.xLabels);
 	let rows = $derived(utils.rows);
 	let cols = $derived(utils.cols);
 	let spacing = $derived(filter.spacing);
@@ -59,10 +60,14 @@
 <T.Group>
 	<!-- Grid Plane (Under the Bars) -->
 	<T.Mesh
-		position={[(rows * spacing) / 2 - spacing / 2, 0, (cols * spacing) / 2 - spacing / 2]}
+		position={[
+			(rows * spacing) / 2 - spacing / 2,
+			0,
+			(cols * spacing) / 2 - spacing / 2
+		 ]}
 		rotation={[-Math.PI / 2, 0, 0]}
 	>
-		<T.PlaneGeometry args={[cols * spacing, rows * spacing]} />
+		<T.PlaneGeometry args={[rows * spacing, cols * spacing]} />
 		<T.MeshStandardMaterial color="gray" />
 	</T.Mesh>
 
@@ -76,16 +81,16 @@
 			]}
 			rotation={[-Math.PI / 2, 0, 0]}
 		>
-			<T.PlaneGeometry args={[cols * spacing, rows * spacing]} />
+			<T.PlaneGeometry args={[rows * spacing, cols * spacing]} />
 			<T.MeshStandardMaterial color="lightgray" transparent={true} opacity={0.5} />
 		</T.Mesh>
 	{/if}
 
 	<!-- Etichette delle righe -->
-	{#each data[0] as _, rowIndex}
+	{#each xLabels as xl, rowIndex}
 		<Text
-			position={[rowIndex * spacing, 0.2, -spacing]}
-			text={truncateText(`Row ${rowIndex + 1}`, 13)}
+			position={[-spacing, 0.2, rowIndex * spacing + spacing/3]}
+			text={truncateText(xl, 13)}
 			fontSize={0.5}
 			color="white"
 			rotation={[-Math.PI / 2, 0, Math.PI / 2]}
@@ -93,10 +98,10 @@
 	{/each}
 
 	<!-- Etichette delle colonne -->
-	{#each data as _, colIndex}
+	{#each zLabels as zl, colIndex}
 		<Text
-			position={[cols * spacing, 0.2, colIndex * spacing]}
-			text={truncateText(`Col ${colIndex + 1}`, 13)}
+			position={[colIndex * spacing - spacing/3, 0.2, cols * spacing]}
+			text={truncateText(zl, 13)}
 			fontSize={0.5}
 			color="white"
 			rotation={[-Math.PI / 2, 0, 0]}

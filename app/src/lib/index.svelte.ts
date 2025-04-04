@@ -11,15 +11,23 @@ export let fetchedData = $state({
 		[1, 3, 2, 6, 4]
 	],
 	spacing: 2,
+	xLabels : ['A', 'B', 'C', 'D', 'E'],
+	zLabels : ['1', '2', '3', '4', '5'],
 });
 
 // set fetchedData to the data fetched from the server
 export const fetchDb = () => {
-	fetchedData.values = getDbData().yValues;
+	let tmp = getDbData();
+	fetchedData.values = tmp.yValues;
+	fetchedData.xLabels = tmp.xLabels;
+	fetchedData.zLabels = tmp.zLabels;
 };
 
 export const fetchExternal = () => {
-	fetchedData.values = getExternalData().yValues;
+	let tmp = getExternalData();
+	fetchedData.values = tmp.yValues;
+	fetchedData.xLabels = tmp.xLabels;
+	fetchedData.zLabels = tmp.zLabels;
 };
 
 // data.computed are the values that are computed from the fetched datas and aren't editable by the user
@@ -39,10 +47,6 @@ const utils = $derived({
 	],
 	defaultPosition: new Vector3(15, 7.5, 15)
 });
-
-export const getData = () => {
-	return data;
-};
 
 export const getValueFromId = (id: string) => {
 	return data[parseInt(id.split('-')[0])][parseInt(id.split('-')[1])];
