@@ -14,20 +14,25 @@ let fecthedData = $state([
 let data = $derived({
 	values: fecthedData,
 	computed: {
-		average: fecthedData.flat().reduce((a, b) => a + b, 0) / fecthedData.flat().length,
-		minmax: [Math.min(...fecthedData.flat()), Math.max(...fecthedData.flat())],
-		max: Math.max(...fecthedData.flat()),
-		min: Math.min(...fecthedData.flat()),
-		rows: fecthedData.length,
-		cols: fecthedData[0].length,
-		defaultTarget: [
-			(fecthedData.length * spacing) / 2 - spacing / 2,
-			(Math.max(...fecthedData.flat()) - 1) / 2,
-			(fecthedData[0].length * spacing) / 2 - spacing / 2
-		],
-		defaultPosition: new Vector3(15, 7.5, 15)
+	  // Media totale di tutti i dati
+	  average: fecthedData.flat().reduce((a, b) => a + b, 0) / fecthedData.flat().length,
+	  // Media per ogni riga: ogni elemento dell'array è la media dei valori della corrispondente riga
+	  averageRows: fecthedData.map(row => row.reduce((a, b) => a + b, 0) / row.length),
+	  // Media per ogni colonna: ogni elemento è la media dei valori nella stessa posizione in tutte le righe
+	  averageCols: Array.from({ length: fecthedData[0].length }, (_, colIndex) => fecthedData.map(row => row[colIndex]).reduce((a, b) => a + b, 0) / fecthedData.length),
+	  minmax: [Math.min(...fecthedData.flat()), Math.max(...fecthedData.flat())],
+	  max: Math.max(...fecthedData.flat()),
+	  min: Math.min(...fecthedData.flat()),
+	  rows: fecthedData.length,
+	  cols: fecthedData[0].length,
+	  defaultTarget: [
+		(fecthedData.length * spacing) / 2 - spacing / 2,
+		(Math.max(...fecthedData.flat()) - 1) / 2,
+		(fecthedData[0].length * spacing) / 2 - spacing / 2
+	  ],
+	  defaultPosition: new Vector3(15, 7.5, 15)
 	}
-});
+  });
 
 export const getData = () => {
 	return data;

@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { Pane, Button, Text, Separator, Folder } from 'svelte-tweakpane-ui';
-	import { filter, getSelectedBarInfo } from '$lib/index.svelte';
+	import { Pane, Button, Text, Separator, Folder,IntervalSlider } from 'svelte-tweakpane-ui';
+	import { filter, getData, getSelectedBarInfo } from '$lib/index.svelte';
 
 	let selectedBarInfo = $derived(getSelectedBarInfo());
+	let data = $derived(getData());
 </script>
 
 {#if filter.displayBarFilter}
@@ -11,6 +12,9 @@
 			<Text value={selectedBarInfo ? `${selectedBarInfo.row}` : "-"}  label="Row" disabled={true} />
 			<Text value={selectedBarInfo ? `${selectedBarInfo.column}` : "-"} label="Column" disabled={true} />
 			<Text value={selectedBarInfo ? `${selectedBarInfo.height.toFixed(2)}` : "-"} label="Height" disabled={true} />
+			<Text value={selectedBarInfo ? `${data.computed.averageRows[selectedBarInfo.row - 1]?.toFixed(2)}` : "-"} label="Avg X (row)" disabled={true} />
+			<Text value={selectedBarInfo ? `${data.computed.averageCols[selectedBarInfo.column - 1]?.toFixed(2)}` : "-"} label="Avg Z (column)" disabled={true} />
+			<Text value={`${data.computed.average?.toFixed(2) || "-"}`} label="Avg Global" disabled={true} />
 		</Folder>
 
 		<Folder title="Filter">
