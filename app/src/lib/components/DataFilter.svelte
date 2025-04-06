@@ -21,13 +21,13 @@
 <Button
 	on:click={() => (filter.avgFilter = 1)}
 	label="Values lower than the global average"
-	title="Lower than average"
+	title="Filter"
 />
 
 <Button
 	on:click={() => (filter.avgFilter = 2)}
 	label="Values higher than the global average"
-	title="Greater than average"
+	title="Filter"
 />
 
 <Button
