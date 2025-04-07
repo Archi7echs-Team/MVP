@@ -1,5 +1,6 @@
-import { getData, getValueFromId, filter, getSelectedBarInfo } from '../lib/index.svelte';
-import { describe, it, expect } from 'vitest';
+import { Vector3 } from 'three';
+import { getData, getValueFromId, filter, getSelectedBarInfo, truncateText, takeScreenshot, downloadImage, cameraUtils } from '../lib/index.svelte';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 describe('Index', () => {
     it("getData() return the correct data", () => { 
@@ -107,4 +108,154 @@ describe('Index', () => {
             height: 4,
         });
     });
+
+    it('should truncate text longer than maxLength and append "..."', () => {
+        const result = truncateText('Questo è un testo molto lungo', 10);
+        expect(result).toBe('Questo è u...');
+      });
+    
+      it('should return the original text if it is shorter than maxLength', () => {
+        const result = truncateText('Testo corto', 20);
+        expect(result).toBe('Testo corto');
+      });
+    
+      it('should return the original text if it is exactly maxLength', () => {
+        const result = truncateText('1234567890', 10);
+        expect(result).toBe('1234567890');
+      });
+    
+      it('should use the default maxLength of 20 when not provided', () => {
+        const result = truncateText('Questo è un testo abbastanza lungo da essere troncato');
+        expect(result).toBe('Questo è un testo ab...');
+      });
+    
+      it('should handle empty string input', () => {
+        const result = truncateText('', 10);
+        expect(result).toBe('');
+      });
+    
 });
+
+
+describe('takeScreenshot', () => {
+    let mockRenderer: any;
+    let mockScene: any;
+    let mockCamera: any;
+  
+    beforeEach(() => {
+      mockRenderer = {
+        render: vi.fn(),
+        domElement: {
+          toDataURL: vi.fn().mockReturnValue('data:image/png;base64,fakeimage'),
+        },
+        setClearColor: vi.fn()
+      };
+  
+      mockScene = {}; // Non usato direttamente nella funzione, quindi può essere vuoto
+      mockCamera = {
+        current: {}
+      };
+
+      const mockClick = vi.fn();
+  
+      // Mock globale per downloadImage
+      vi.spyOn(document, 'createElement').mockImplementation(() => {
+        let _download = '';
+        let _href = '';
+        return {
+          set download(value: string) {
+            _download = value;
+          },
+          get download() {
+            return _download;
+          },
+          set href(value: string) {
+            _href = value;
+          },
+          get href() {
+            return _href;
+          },
+          click: mockClick
+        } as unknown as HTMLAnchorElement;
+      });
+    });
+  
+    it('should call renderer.render and renderer.setClearColor', () => {
+      const spyDownload = vi.spyOn(document, 'createElement');
+  
+      takeScreenshot(mockRenderer, mockScene, mockCamera);
+  
+      expect(mockRenderer.render).toHaveBeenCalledWith(mockScene, mockCamera.current);
+      expect(mockRenderer.setClearColor).toHaveBeenCalledWith('#0e1625');
+      expect(mockRenderer.domElement.toDataURL).toHaveBeenCalled();
+      expect(spyDownload).toHaveBeenCalledWith('a');
+    });
+  });
+  
+  describe('downloadImage', () => {
+    it('should create a link and trigger click', () => {
+        const mockClick = vi.fn();
+        let _download = '';
+        let _href = '';
+      
+        const mockLink = {
+          set download(value: string) {
+            _download = value;
+          },
+          get download() {
+            return _download;
+          },
+          set href(value: string) {
+            _href = value;
+          },
+          get href() {
+            return _href;
+          },
+          click: mockClick
+        };
+      
+        vi.spyOn(document, 'createElement').mockReturnValue(mockLink as unknown as HTMLAnchorElement);
+      
+        const fakeUrl = 'data:image/png;base64,fakeimage';
+        downloadImage(fakeUrl);
+      
+        expect(_download).toContain('Screenshot_');
+        expect(_href).toBe(fakeUrl);
+        expect(mockClick).toHaveBeenCalled();
+      });
+    });
+
+    describe('cameraUtils', () => {
+        let mockCamera: any;
+        let mockResetTarget: any;
+    
+        beforeEach(() => {
+            mockCamera = {
+                current: {
+                    position: { copy: vi.fn(), add: vi.fn() },
+                    getWorldDirection: vi.fn(() => new Vector3()),
+                }
+            };
+            mockResetTarget = vi.fn();
+        });
+    
+        it('should reset camera position correctly', () => {
+            cameraUtils.resetCamera(mockCamera, mockResetTarget);
+            expect(mockCamera.current.position.copy).toHaveBeenCalledWith(expect.anything());
+            expect(mockResetTarget).toHaveBeenCalled();
+        });
+    
+        it('should zoom in the camera', () => {
+            const originalPosition = { ...mockCamera.current.position };
+            cameraUtils.zoomIn(mockCamera);
+            expect(mockCamera.current.position.add).toHaveBeenCalled();
+        });
+    
+        it('should zoom out the camera', () => {
+            const originalPosition = { ...mockCamera.current.position };
+            cameraUtils.zoomOut(mockCamera);
+            expect(mockCamera.current.position.add).toHaveBeenCalled();
+        });
+
+        //mancherebbe il test su updateCamera
+    });

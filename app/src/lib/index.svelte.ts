@@ -105,3 +105,51 @@ export const getSelectedBarInfo = () => {
     
     return { row: row + 1, column: col + 1, height: value };
 };
+
+//funzione per troncare il testo se troppo lungo
+export function truncateText(text: string, maxLength: number = 20) {
+	return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+}
+
+export function takeScreenshot(renderer: any, scene: any, camera: any) {
+    renderer.render(scene, camera.current);
+    const dataUrl = renderer.domElement.toDataURL('image/png');
+	renderer.setClearColor('#0e1625');
+    downloadImage(dataUrl);
+}
+
+export function downloadImage(dataUrl: string) {
+    const link = document.createElement('a');
+    link.download = `Screenshot_${new Date().toLocaleDateString()}.png`;
+    link.href = dataUrl;
+    link.click();
+}
+
+export const cameraUtils = {
+    zoomStep: 2,
+    zoomValue: 5,
+
+    zoomIn(camera: any) {
+        this.updateCamera(camera, -this.zoomStep);
+    },
+
+    zoomOut(camera: any) {
+        this.updateCamera(camera, this.zoomStep);
+    },
+
+    updateCamera(camera: any, step: number) {
+        if (camera?.current) {
+			const direction = new Vector3();
+			camera.current.getWorldDirection(direction); // Ottiene la direzione attuale della camera
+			direction.multiplyScalar(step); // Scala il vettore di zoomStep
+			camera.current.position.add(direction);
+		}
+    },
+
+    resetCamera(camera: any, resetTarget: () => void) {
+        if (camera?.current) {
+            camera.current.position.copy(data.computed.defaultPosition);
+            if (resetTarget) resetTarget();
+        }
+    }
+}
