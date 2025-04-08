@@ -1,6 +1,7 @@
-import { Vector3 } from 'three';
-import { getData, getValueFromId, filter, getSelectedBarInfo, truncateText, takeScreenshot, downloadImage, cameraUtils, setBarFilterSelection, resetBarSelection, hideBarFilterPane } from '../lib/index.svelte';
+import { Object3D, PerspectiveCamera, Raycaster, Scene, Vector2, Vector3 } from 'three';
+import { getData, getValueFromId, filter, getSelectedBarInfo, truncateText, takeScreenshot, downloadImage, cameraUtils, setBarFilterSelection, resetBarSelection, hideBarFilterPane, resetTarget, isInRange, passesBarFilter, getBarColor, handleTextClick } from '../lib/index.svelte';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { writable } from 'svelte/store';
 
 describe('Index', () => {
     it("getData() return the correct data", () => { 
@@ -256,8 +257,6 @@ describe('takeScreenshot', () => {
             cameraUtils.zoomOut(mockCamera);
             expect(mockCamera.current.position.add).toHaveBeenCalled();
         });
-
-        //mancherebbe il test su updateCamera
     });
 
     describe('filter utility functions', () => {
@@ -297,3 +296,143 @@ describe('takeScreenshot', () => {
         });
       });
     });
+
+    describe('resetTarget', () => {
+      it('dovrebbe impostare targetStore su defaultTarget', () => {
+        // Crea un store di esempio
+        const targetStore = writable<number[]>([1, 2, 3]);
+    
+        // Definisci un oggetto "utils" con un defaultTarget
+        const utils = {
+          defaultTarget: [10, 20, 30]
+        };
+    
+        // Esegui la funzione che deve essere testata
+        resetTarget(targetStore, utils);
+    
+        // Verifica che lo store sia stato aggiornato correttamente
+        let result: number[] | undefined;
+        targetStore.subscribe(value => {
+          result = value;
+        })();
+    
+        // Verifica che il valore dello store sia uguale a defaultTarget
+        expect(result).toEqual(utils.defaultTarget);
+      });
+    });
+
+    describe('isInRange', () => {
+      it('should return true if height is within the range', () => {
+          filter.rangeValue = { min: 2, max: 5 };
+          expect(isInRange(3)).toBe(true);
+          expect(isInRange(5)).toBe(true);
+          expect(isInRange(2)).toBe(true);
+      });
+  
+      it('should return false if height is outside the range', () => {
+          filter.rangeValue = { min: 2, max: 5 };
+          expect(isInRange(1)).toBe(false);
+          expect(isInRange(6)).toBe(false);
+      });
+  
+      it('should return false if min and max are equal', () => {
+          filter.rangeValue = { min: 5, max: 5 };
+          expect(isInRange(5)).toBe(true); // This should be true, as the height equals the range
+          expect(isInRange(6)).toBe(false);
+      });
+  });
+
+  describe('passesBarFilter', () => {
+    it('should return true if the bar passes the filter (avgFilter == 0)', () => {
+        filter.avgFilter = 0;
+        filter.barFilterSelection = 0;
+        expect(passesBarFilter('0-0', 2)).toBe(true);
+    });
+
+    it('should return false if the bar does not pass the filter (avgFilter == 1)', () => {
+        filter.avgFilter = 1;
+        filter.barFilterSelection = 0;
+        expect(passesBarFilter('0-0', 6)).toBe(false); // height > average
+    });
+
+    it('should return false if the bar does not pass the filter (avgFilter == 2)', () => {
+        filter.avgFilter = 2;
+        filter.barFilterSelection = 0;
+        expect(passesBarFilter('0-0', 1)).toBe(false); // height < average
+    });
+
+    it('should return false if the bar does not pass the filter (barFilterSelection == 2)', () => {
+        filter.barFilterSelection = 2;
+        filter.selection.add('0-0');
+        expect(passesBarFilter('0-0', 5)).toBe(false); // height <= lastValue
+    });
+
+    it('should return false if the bar does not pass the filter (barFilterSelection == 3)', () => {
+        filter.barFilterSelection = 3;
+        filter.selection.add('0-0');
+        expect(passesBarFilter('0-0', 5)).toBe(false); // height >= lastValue
+    });
+
+    it('should return true if no filters apply', () => {
+        filter.avgFilter = 0;
+        filter.barFilterSelection = 0;
+        expect(passesBarFilter('1-1', 3)).toBe(true); // default condition
+    });
+});
+
+describe('getBarColor', () => {
+  it('should return default color (#ffffff) when colorSelection is 0', () => {
+    filter.colorSelection = 0;
+    const color = getBarColor([1, 2, 3], 5);
+    expect(color).toBe('#ffffff');
+});
+
+  it('should return a color based on the x-coordinate when colorSelection is 1', () => {
+      filter.colorSelection = 1;
+      const color = getBarColor([1, 2, 3], 5);
+      expect(color).toContain('hsl');
+  });
+
+  it('should return a color based on the z-coordinate when colorSelection is 2', () => {
+      filter.colorSelection = 2;
+      const color = getBarColor([1, 2, 3], 5);
+      expect(color).toContain('hsl');
+  });
+
+  it('should return a color based on the height value when colorSelection is 3', () => {
+      filter.colorSelection = 3;
+      filter.rangeValue = { min: 0, max: 10 };
+      const color = getBarColor([1, 2, 3], 5);
+      expect(color).toContain('hsl');
+  });
+});
+
+describe('Raycasting functions', () => {
+  const raycaster = new Raycaster();
+  const scene = new Scene();
+
+  const fakePointerEvent = {
+      pointer: new Vector2(0, 0),
+      camera: new PerspectiveCamera(),
+      nativeEvent: {
+          detail: 1
+      }
+  };
+
+  it('handleTextClick does nothing if not intersected', () => {
+      const text = new Object3D();
+      raycaster.intersectObjects = vi.fn(() => []);
+
+      const filterMock = {
+          selection: {
+              toggle: vi.fn(),
+              set: vi.fn()
+          }
+      };
+
+      handleTextClick(fakePointerEvent, '1-1', filterMock, raycaster, text, scene);
+
+      expect(filterMock.selection.toggle).not.toHaveBeenCalled();
+      expect(filterMock.selection.set).not.toHaveBeenCalled();
+  });
+});

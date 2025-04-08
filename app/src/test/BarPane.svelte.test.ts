@@ -55,18 +55,18 @@ describe('BarPane info rendering', () => {
 		});
 
     vi.spyOn(store, 'getData').mockReturnValue({
-      values: [[1, 2], [3, 4], [5, 6]], // Aggiungi la proprietà 'values'
+      values: [[1, 2], [3, 4], [5, 6]],
       computed: {
           averageRows: [1.11, 2.22, 3.33],
           averageCols: [4.44, 5.55, 6.66],
           average: 9.99,
-          minmax: [0, 10], // Aggiungi la proprietà 'minmax'
-          max: 10,         // Aggiungi la proprietà 'max'
-          min: 0,          // Aggiungi la proprietà 'min'
-          rows: 3,         // Aggiungi la proprietà 'rows'
-          cols: 3,         // Aggiungi la proprietà 'cols'
-          defaultTarget: [0, 0, 0], // Aggiungi la proprietà 'defaultTarget'
-          defaultPosition: new Vector3(0, 0, 0) // Aggiungi la proprietà 'defaultPosition'
+          minmax: [0, 10], 
+          max: 10, 
+          min: 0, 
+          rows: 3, 
+          cols: 3, 
+          defaultTarget: [0, 0, 0], 
+          defaultPosition: new Vector3(0, 0, 0) 
       }
     });
   });

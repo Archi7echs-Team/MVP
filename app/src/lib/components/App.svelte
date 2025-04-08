@@ -3,15 +3,10 @@
 	import Scene from './Scene.svelte';
 	import SettingsPane from './SettingsPane.svelte';
 	import BarPane from './BarPane.svelte';
-	import { getData } from '$lib/index.svelte';
+	import { getData, resetTarget } from '$lib/index.svelte';
 
 	let utils = $derived(getData().computed);
-
 	let target = $state(getData().computed.defaultTarget);
-
-	function resetTarget() {
-		target = utils.defaultTarget;
-	}
 </script>
 
 <div>
