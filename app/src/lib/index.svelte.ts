@@ -153,3 +153,17 @@ export const cameraUtils = {
         }
     }
 }
+
+export function setBarFilterSelection(value: number) {
+	if ([0, 1, 2, 3].includes(value)) {
+		filter.barFilterSelection = value;
+	}
+}
+
+export function resetBarSelection() {
+	filter.selection.clear();
+}
+
+export function hideBarFilterPane() {
+	filter.displayBarFilter = false;
+}

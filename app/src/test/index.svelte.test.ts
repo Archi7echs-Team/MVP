@@ -1,5 +1,5 @@
 import { Vector3 } from 'three';
-import { getData, getValueFromId, filter, getSelectedBarInfo, truncateText, takeScreenshot, downloadImage, cameraUtils } from '../lib/index.svelte';
+import { getData, getValueFromId, filter, getSelectedBarInfo, truncateText, takeScreenshot, downloadImage, cameraUtils, setBarFilterSelection, resetBarSelection, hideBarFilterPane } from '../lib/index.svelte';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 describe('Index', () => {
@@ -258,4 +258,42 @@ describe('takeScreenshot', () => {
         });
 
         //mancherebbe il test su updateCamera
+    });
+
+    describe('filter utility functions', () => {
+      beforeEach(() => {
+        filter.barFilterSelection = 0;
+        filter.displayBarFilter = true;
+        filter.selection.set(['0-0', '1-1']);
+      });
+    
+      describe('setBarFilterSelection', () => {
+        it('should set barFilterSelection to a valid value', () => {
+          setBarFilterSelection(1);
+          expect(filter.barFilterSelection).toBe(1);
+    
+          setBarFilterSelection(2);
+          expect(filter.barFilterSelection).toBe(2);
+        });
+    
+        it('should not change barFilterSelection if value is invalid', () => {
+          setBarFilterSelection(99);
+          expect(filter.barFilterSelection).not.toBe(99);
+        });
+      });
+    
+      describe('resetBarSelection', () => {
+        it('should clear the selection array', () => {
+          expect(filter.selection.selected.length).toBeGreaterThan(0);
+          resetBarSelection();
+          expect(filter.selection.selected.length).toBe(0);
+        });
+      });
+    
+      describe('hideBarFilterPane', () => {
+        it('should set displayBarFilter to false', () => {
+          hideBarFilterPane();
+          expect(filter.displayBarFilter).toBe(false);
+        });
+      });
     });

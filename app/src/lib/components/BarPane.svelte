@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Pane, Button, Text, Separator, Folder, Slider, Checkbox } from 'svelte-tweakpane-ui';
-	import { filter, getData, getSelectedBarInfo } from '$lib/index.svelte';
+	import { filter, getData, getSelectedBarInfo, setBarFilterSelection, resetBarSelection, hideBarFilterPane } from '$lib/index.svelte';
 
 	let selectedBarInfo = $derived(getSelectedBarInfo());
 	let data = $derived(getData());
@@ -14,38 +14,30 @@
 			<Text value={selectedBarInfo ? `${selectedBarInfo.height.toFixed(2)}` : "-"} label="Height" disabled={true} />
 			<Text value={selectedBarInfo ? `${data.computed.averageRows[selectedBarInfo.row - 1]?.toFixed(2)}` : "-"} label="Avg X (row)" disabled={true} />
 			<Text value={selectedBarInfo ? `${data.computed.averageCols[selectedBarInfo.column - 1]?.toFixed(2)}` : "-"} label="Avg Z (column)" disabled={true} />
-			<Text value={`${data.computed.average?.toFixed(2) || "-"}`} label="Avg Global" disabled={true} />
+			<Text value={`${data.computed.average.toFixed(2)}`} label="Avg Global" disabled={true} />
 		</Folder>
 
 		<Folder title="Filter">
 		<Button
-			on:click={() => {
-				filter.barFilterSelection = 1;
-			}}
+			on:click={()=> setBarFilterSelection(1)}
 			label="Only selected bar"
 			title="Display"
 		/>
 
 		<Button
-			on:click={() => {
-				filter.barFilterSelection = 2;
-			}}
+			on:click={()=> setBarFilterSelection(2)}
 			label="Values higher than the selected bar value"
 			title="Filter"
 		/>
 
 		<Button
-			on:click={() => {
-				filter.barFilterSelection = 3;
-			}}
+			on:click={()=> setBarFilterSelection(3)}
 			label="Values lower than the selected bar value"
 			title="Filter"
 		/>
 
 		<Button
-			on:click={() => {
-				filter.barFilterSelection = 0;
-			}}
+			on:click={()=> setBarFilterSelection(0)}
 			label="Filter reset"
 			title="Reset"
 		/>
@@ -57,9 +49,7 @@
 		<Slider label="Selected opacity" min={10} max={100} step={1} bind:value={filter.selectedOpacity} format={(v) => `${v}%`} />
 
 	   <Button
-	   on:click={() => {
-		   filter.selection.clear();
-	   }}
+	   on:click={()=> resetBarSelection()}
 	   label="Reset selection"
 	   title="Reset"
         />
@@ -68,9 +58,7 @@
 		<Separator />
 
 		<Button
-		on:click={() => {
-			filter.displayBarFilter = false;
-		}}
+		on:click={() => hideBarFilterPane()}
 		label="Close pane"
 		title="Close"
 	/>
