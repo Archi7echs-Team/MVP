@@ -2,23 +2,31 @@
 import { type FileValue } from 'svelte-tweakpane-ui';
 
 const fetchDbData = async () => {
-	const response = await fetch('http://localhost:8080/api/coordinates');
-	if (!response.ok) {
-		throw new Error('Failed to fetch data');
+	try {
+		const response = await fetch('http://localhost:8080/api/coordinates');
+		if (!response.ok) {
+			throw new Error('Failed to fetch data');
+		}
+		const data = await response.json();
+		return data;
+	} catch (error) {
+		console.error('Error fetching DB data:', error);
 	}
-	const data = await response.json();
-	return data;
 };
 
 // http://localhost:8080/api/external/data
 // fetch external data from the server
 const fetchExternalData = async () => {
-	const response = await fetch('http://localhost:8080/api/external/data');
-	if (!response.ok) {
-		throw new Error('Failed to fetch data');
+	try {
+		const response = await fetch('http://localhost:8080/api/external/data');
+		if (!response.ok) {
+			throw new Error('Failed to fetch data');
+		}
+		const data = await response.json();
+		return data;
+	} catch (error) {
+		console.error('Error fetching external data:', error);
 	}
-	const data = await response.json();
-	return data;
 };
 
 export async function uploadCsvFile(file: any) {
