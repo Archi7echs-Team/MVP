@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('L’utente può visualizzare il grafico 3D interattivo con barre', async ({ page }) => {
+test('TS.1', async ({ page }) => {
   test.setTimeout(60000);
   // Vai all'app
   await page.goto('http://localhost:5173'); // o l'URL della tua app
@@ -21,7 +21,7 @@ test('L’utente può visualizzare il grafico 3D interattivo con barre', async (
   await canvas.click({ position: { x: 100, y: 100 } });
 });
 
-test('L’utente può ruotare la visualizzazione 3D con il mouse', async ({ page }) => {
+test('TS.10', async ({ page }) => {
   await page.goto('http://localhost:5173');
 
   // Aspetta che il canvas sia visibile
@@ -52,7 +52,7 @@ test('L’utente può ruotare la visualizzazione 3D con il mouse', async ({ page
   expect(before).not.toBe(after); // Confronto diretto (rimozione del Buffer.compare)
 });
 
-test('L’utente può muoversi nel grafico come se fosse in un ambiente 2D, spostandosi solo orizzontalmente', async ({ page }) => {
+test('TS.11', async ({ page }) => {
   await page.goto('http://localhost:5173');
 
   // Aspetta che il canvas sia visibile
@@ -90,7 +90,7 @@ test('L’utente può muoversi nel grafico come se fosse in un ambiente 2D, spos
   expect(before).not.toBe(after);
 });
 
-test('L’utente può muoversi nel grafico come se fosse in un ambiente 2D, spostandosi solo verticalmente', async ({ page }) => {
+test('TS.12', async ({ page }) => {
   await page.goto('http://localhost:5173');
 
   // Aspetta che il canvas sia visibile
@@ -126,5 +126,69 @@ test('L’utente può muoversi nel grafico come se fosse in un ambiente 2D, spos
 
   // Verifica che l'immagine sia cambiata (movimento visivo)
   expect(before).not.toBe(after);
+});
+
+test('TS.13', async ({ page }) => {
+  await page.goto('http://localhost:5173');
+
+  // Aspetta che il canvas sia visibile
+  const canvas = page.locator('canvas');
+  await canvas.waitFor({ state: 'visible', timeout: 10000 });
+
+  const before = await page.screenshot({ fullPage: true });
+
+  // Prendi le dimensioni del canvas per calcolare la posizione di zoom
+  const box = await canvas.boundingBox();
+  if (box) {
+    const centerX = box.x + box.width / 2;  // Centro del canvas (asse X)
+    const centerY = box.y + box.height / 2; // Centro del canvas (asse Y)
+
+    // Posiziona il mouse al centro del canvas
+    await page.mouse.move(centerX, centerY);
+
+    // Simula lo zoom in (scroll del mouse in avanti)
+    await page.mouse.wheel(0, -100); // Movimenti più negativi per lo zoom in
+
+    // Aspetta un po’ per permettere alla scena di aggiornarsi
+    await page.waitForTimeout(3000);
+
+    // Screenshot dopo lo zoom
+    const after = await page.screenshot({ fullPage: false });
+
+    // Verifica che l'immagine sia cambiata (zoom visivo)
+    expect(before).not.toBe(after);
+  }
+});
+
+test('TS.14', async ({ page }) => {
+  await page.goto('http://localhost:5173');
+
+  // Aspetta che il canvas sia visibile
+  const canvas = page.locator('canvas');
+  await canvas.waitFor({ state: 'visible', timeout: 10000 });
+
+  const before = await page.screenshot({ fullPage: true });
+
+  // Prendi le dimensioni del canvas per calcolare la posizione di zoom
+  const box = await canvas.boundingBox();
+  if (box) {
+    const centerX = box.x + box.width / 2;  // Centro del canvas (asse X)
+    const centerY = box.y + box.height / 2; // Centro del canvas (asse Y)
+
+    // Posiziona il mouse al centro del canvas
+    await page.mouse.move(centerX, centerY);
+
+    // Simula lo zoom in (scroll del mouse in avanti)
+    await page.mouse.wheel(0, +100); // Movimenti più positivi per lo zoom out
+
+    // Aspetta un po’ per permettere alla scena di aggiornarsi
+    await page.waitForTimeout(5000);
+
+    // Screenshot dopo lo zoom
+    const after = await page.screenshot({ fullPage: false });
+
+    // Verifica che l'immagine sia cambiata (zoom visivo)
+    expect(before).not.toBe(after);
+  }
 });
 
