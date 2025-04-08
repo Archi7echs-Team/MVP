@@ -36,12 +36,6 @@
 	let nMax = $derived(filter.nValuemax);
 	let nMin = $derived(filter.nValuemin);
 
-	$effect(() => {
-		if (filter.nValuemax != "0") {
-			console.log(nMax);
-		}
-	});
-
 	let passesFilter = $derived.by(() => {
 		let lv = filter.selection.lastValue();
 		if (filter.avgFilter === 1 && height > utils.average) {
@@ -60,11 +54,11 @@
 			return false;
 		}
 
-		if (filter.nValuemax != "0" && !getMaxNValue(height, nMax)){
+		if (filter.nValuemax != 0 && !getMaxNValue(height, nMax)){
 			return false;
 		}
 
-		if (filter.nValuemin != "0" && !getMinNvalue(height, nMin)){
+		if (filter.nValuemin != 0 && !getMinNvalue(height, nMin)){
 			return false;
 		}
 

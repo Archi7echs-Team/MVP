@@ -10,7 +10,6 @@
 	let currentCameraQuaternionArray = $state<[number, number, number, number]>([0, 0, 0, 1]);
 	let animationFrameId: number;
 
-	
 	let data = $derived(fetchedData.values);
 	
 	const utils = $derived({

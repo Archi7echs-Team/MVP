@@ -19,7 +19,7 @@
 			(Math.max(...data.flat()) - 1) / 2,
 			(data[0].length * fetchedData.spacing) / 2 - fetchedData.spacing / 2
 		],
-		defaultPosition: new Vector3(15, 7.5, 15)
+		defaultPosition: new Vector3(15, 10, 15)
 	});
 	
 	let zoomValue = 5;
@@ -40,9 +40,10 @@
 	function updateCamera(step: number) {
 		if (camera?.current) {
 			const direction = new Vector3();
+			console.log(camera.current.position);
 			camera.current.getWorldDirection(direction); // Ottiene la direzione attuale della camera
-			direction.multiplyScalar(step); // Scala il vettore di zoomStep
-			camera.current.position.add(direction);
+			camera.current.position.addScaledVector(direction, step);
+			console.log(camera.current.position);
 		}
 	}
 
@@ -52,9 +53,10 @@
 			resetTarget();
 		}
 	}
+
 </script>
 
-<Button label="Resetta" title="Reset" on:click={resetPosition} />
+<Button label="Reset" title="Reset" on:click={resetPosition} />
 
 <Button label="Zoom In" title="+" on:click={zoomIn} />
 

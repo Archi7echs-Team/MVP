@@ -32,6 +32,7 @@
 		<Button
 			on:click={() => {
 				filter.barFilterSelection = 0;
+				filter.selection.clear();
 			}}
 			label="Filter reset"
 			title="Reset"

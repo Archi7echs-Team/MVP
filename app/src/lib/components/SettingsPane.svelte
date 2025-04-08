@@ -14,12 +14,12 @@
 			<CameraSettings {resetTarget} />
 		</TabPage>
 		<TabPage title="Data source">
-			<DataSource />
+			<DataSource {resetTarget} />
 		</TabPage>
 		<TabPage title="Data filter">
 			<DataFilter />
 		</TabPage>
-		<TabPage title="Color filter">
+		<TabPage title="Color scheme">
 			<Color />
 		</TabPage>
 	</TabGroup>
