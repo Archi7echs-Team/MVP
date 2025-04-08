@@ -12,6 +12,8 @@ describe('DataFilter', () => {
     expect(getByText('Show average plane')).toBeTruthy();
     expect(getByText('Values lower than the global average')).toBeTruthy(); 
     expect(getByText('Values higher than the global average')).toBeTruthy(); 
+    expect(getByText('Values lower than the global average')).toBeTruthy(); 
+    expect(getByText('Values higher than the global average')).toBeTruthy(); 
     expect(getByText('Visualization reset')).toBeTruthy(); 
   });
   it('set avgFilter to 1 when click the Lower than average button', async () => {

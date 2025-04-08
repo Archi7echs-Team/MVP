@@ -10,4 +10,3 @@
 </script>
 
 <List bind:value={filter.colorSelection} label="Color type" {options} />
-<pre>Selected Option: {filter.colorSelection}</pre>

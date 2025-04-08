@@ -4,48 +4,71 @@
 	import { Raycaster, Mesh } from 'three';
 	import { Tween } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
-	import { getData, filter } from '$lib/index.svelte';
+	import { fetchedData, filter, getMaxNValue, getMinNvalue } from '$lib/index.svelte';
+	import { Vector3 } from 'three';
 
 	let { id, coordinates, height, currentCameraQuaternionArray } = $props();
 
-	let utils = $derived(getData().computed);
-
+	let data = $derived(fetchedData.values);
+	
+	const utils = $derived({
+		average: data.flat().reduce((a, b) => a + b, 0) / data.flat().length,
+		minmax: [Math.min(...data.flat()), Math.max(...data.flat())],
+		max: Math.max(...data.flat()),
+		min: Math.min(...data.flat()),
+		rows: data.length,
+		cols: data[0].length,
+		defaultTarget: [
+			(data.length * fetchedData.spacing) / 2 - fetchedData.spacing / 2,
+			(Math.max(...data.flat()) - 1) / 2,
+			(data[0].length * fetchedData.spacing) / 2 - fetchedData.spacing / 2
+		],
+		defaultPosition: new Vector3(15, 7.5, 15)
+	});
 	const { scene } = useThrelte();
 
 	// Raycaster e variabili per il mouse
 	const raycaster = new Raycaster();
 
 	// Opacità della barra
-	let inRange = $derived(height >= filter.rangeValue.min && height <= filter.rangeValue.max);
 
-	let passesFilter = $derived.by(() => {
+	let nMax = $derived(filter.nValuemax);
+	let nMin = $derived(filter.nValuemin);
+
+	let visible = $derived.by(() => {
+		if (!(height >= filter.rangeValue.min && height <= filter.rangeValue.max)) {
+			return false;
+		}
 		let lv = filter.selection.lastValue();
-		const isSelected = filter.selection.check(id);
-		
-		if (filter.avgFilter === 1 && height > utils.average) return false;
-		if (filter.avgFilter === 2 && height < utils.average) return false;
+		if (filter.avgFilter === 1 && height > utils.average) {
+			return false;
+		} else if (filter.avgFilter === 2 && height < utils.average) {
+			return false;
+		}
 
-	    if (filter.barFilterSelection === 1 && !isSelected) return false;
+		if (filter.barFilterSelection === 2 && height < lv) {
+			return false;
+		} else if (filter.barFilterSelection === 3 && height > lv) {
+			return false;
+		}
 
-		//escludo la barra selezionata
-		if (filter.barFilterSelection === 2) {
-        return height > lv && !isSelected; 
-        }
-    
-		//escludo la barra selezionata
-        if (filter.barFilterSelection === 3) {
-        return height < lv && !isSelected;
-        }
-    
-        return true;
+		if (filter.barFilterSelection === 1 && !filter.selection.check(id)) {
+			return false;
+		}
+
+		if (filter.nValuemax != 0 && !getMaxNValue(height, nMax)){
+			return false;
+		}
+
+		if (filter.nValuemin != 0 && !getMinNvalue(height, nMin)){
+			return false;
+		}
+
+		return true;
 	});
 
 	// Controllo per opacizzazione
-	let opacity = $derived(
-        inRange && passesFilter 
-            ? (filter.selection.check(id) ? filter.selectedOpacity / 100 : 1) 
-            : 0.2
-    );
+	let opacity = $derived(visible ? 1 : 0.2);
 
 	// Riferimento al mesh della barra
 	let mesh = $state<Mesh | undefined>(undefined);

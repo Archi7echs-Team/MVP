@@ -3,14 +3,34 @@
 	import Scene from './Scene.svelte';
 	import SettingsPane from './SettingsPane.svelte';
 	import BarPane from './BarPane.svelte';
-	import { getData } from '$lib/index.svelte';
+	import { fetchedData } from '$lib/index.svelte';
+	import { Vector3 } from 'three';
+	
+	let data = $derived(fetchedData.values);
+	
+	const utils = $derived({
+		average: data.flat().reduce((a, b) => a + b, 0) / data.flat().length,
+		minmax: [Math.min(...data.flat()), Math.max(...data.flat())],
+		max: Math.max(...data.flat()),
+		min: Math.min(...data.flat()),
+		rows: data.length,
+		cols: data[0].length,
+		defaultTarget: [
+			(data.length * fetchedData.spacing) / 2 - fetchedData.spacing / 2,
+			(Math.max(...data.flat()) - 1) / 2,
+			(data[0].length * fetchedData.spacing) / 2 - fetchedData.spacing / 2
+		],
+		defaultPosition: new Vector3(15, 7.5, 15)
+	});
 
-	let utils = $derived(getData().computed);
+	let target = $state(utils.defaultTarget);
 
-	let target = $state(getData().computed.defaultTarget);
-
-	function resetTarget() {
+	export function resetTarget() {
 		target = utils.defaultTarget;
+	}
+
+	export function getTarget() {
+		return target;
 	}
 </script>
 

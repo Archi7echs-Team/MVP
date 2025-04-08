@@ -33,8 +33,9 @@ INSERT INTO coordinates (x_label, z_label, y_value, dataset_type) VALUES
                                                                       ('Venezia', 'Arance', 13.0, 'MEDIUM'),
                                                                       ('Venezia', 'Uva', 11.0, 'MEDIUM'),
 
-                                                                      ('Vicenza', 'Kiwi', 100.0, 'LARGE'),
-                                                                      ('Padova', 'Kiwi', 120.0, 'LARGE'),
-                                                                      ('Venezia', 'Kiwi', 130.0, 'LARGE'),
-                                                                      ('Padova', 'Cocco', 126.0, 'LARGE'),
-                                                                      ('Venezia', 'Cocco', 133.0, 'LARGE');
+                                                                      ('Vicenza', 'Kiwi', 26.0, 'LARGE'),
+                                                                      ('Padova', 'Kiwi', 19.0, 'LARGE'),
+                                                                      ('Venezia', 'Kiwi', 23.0, 'LARGE'),
+                                                                      ('Vicenza', 'Cocco', 25.0, 'LARGE'),
+                                                                      ('Padova', 'Cocco', 24.0, 'LARGE'),
+                                                                      ('Venezia', 'Cocco', 27.0, 'LARGE');
