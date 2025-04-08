@@ -4,6 +4,7 @@
 	import DataSource from './DataSource.svelte';
 	import DataFilter from './DataFilter.svelte';
 	import Color from './Color.svelte';
+	import Export from './Export.svelte';
 	ThemeUtils.setGlobalDefaultTheme(ThemeUtils.presets.standard);
 	let { resetTarget } = $props();
 </script>
@@ -14,13 +15,16 @@
 			<CameraSettings {resetTarget} />
 		</TabPage>
 		<TabPage title="Data source">
-			<DataSource />
+			<DataSource {resetTarget} />
 		</TabPage>
 		<TabPage title="Data filter">
 			<DataFilter />
 		</TabPage>
-		<TabPage title="Color filter">
+		<TabPage title="Color scheme">
 			<Color />
+		</TabPage>
+		<TabPage title="Export">
+			<Export />
 		</TabPage>
 	</TabGroup>
 </Pane>

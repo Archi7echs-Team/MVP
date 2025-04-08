@@ -4,13 +4,12 @@
 	import Bar from './Bar.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	const { camera } = useThrelte();
-	import { filter, fetchedData } from '$lib/index.svelte';
+	import { filter, fetchedData, getSelectedBarInfo } from '$lib/index.svelte';
 	import { Vector3 } from 'three';
 
 	let currentCameraQuaternionArray = $state<[number, number, number, number]>([0, 0, 0, 1]);
 	let animationFrameId: number;
 
-	
 	let data = $derived(fetchedData.values);
 	
 	const utils = $derived({
@@ -32,6 +31,8 @@
 	let rows = $derived(utils.rows);
 	let cols = $derived(utils.cols);
 	let spacing = $derived(filter.spacing);
+
+	let selectedBarInfo = $derived(getSelectedBarInfo());
 
 	$effect(() => {
 		filter.displayBarFilter = filter.selection.active();
@@ -68,7 +69,7 @@
 		rotation={[-Math.PI / 2, 0, 0]}
 	>
 		<T.PlaneGeometry args={[rows * spacing, cols * spacing]} />
-		<T.MeshStandardMaterial color="gray" />
+		<T.MeshBasicMaterial color="gray" />
 	</T.Mesh>
 
 	<!-- Creazione piano medio se selezionato -->
@@ -82,29 +83,61 @@
 			rotation={[-Math.PI / 2, 0, 0]}
 		>
 			<T.PlaneGeometry args={[rows * spacing, cols * spacing]} />
-			<T.MeshStandardMaterial color="lightgray" transparent={true} opacity={0.5} />
+			<T.MeshBasicMaterial color="lightgray" transparent={true} opacity={0.5} />
 		</T.Mesh>
 	{/if}
+
+	<!-- Piano medio della riga selezionata -->
+    {#if filter.showRowAvgPlane && selectedBarInfo}
+    <T.Mesh
+	    position={[
+		    (selectedBarInfo.row - 1) * spacing, // posizione X centrata sulla riga
+		    utils.averageRows[selectedBarInfo.row - 1],
+		    (cols * spacing) / 2 - spacing / 2 // posizione Z centrata sulla griglia
+	    ]}
+	    rotation={[-Math.PI / 2, 0, 0]}
+    >
+	    <T.PlaneGeometry args={[spacing, cols * spacing]} />
+	    <T.MeshStandardMaterial color="#ff9999" transparent={true} opacity={0.5} />
+    </T.Mesh>
+    {/if}
+
+    <!-- Piano medio della colonna selezionata -->
+    {#if filter.showColAvgPlane && selectedBarInfo}
+    <T.Mesh
+        position={[
+            (rows * spacing) / 2 - spacing / 2, // posizione X centrata sulla griglia
+		    utils.averageCols[selectedBarInfo.column - 1],
+		    (selectedBarInfo.column - 1) * spacing // posizione Z centrata sulla colonna
+        ]}
+        rotation={[-Math.PI / 2, 0, 0]}
+    >
+        <T.PlaneGeometry args={[rows * spacing, spacing]} />
+        <T.MeshStandardMaterial color="#9999ff" transparent={true} opacity={0.5} />
+    </T.Mesh>
+    {/if}
 
 	<!-- Etichette delle righe -->
 	{#each xLabels as xl, rowIndex}
 		<Text
-			position={[-spacing, 0.2, rowIndex * spacing + spacing/3]}
-			text={truncateText(xl, 13)}
+			position={[-spacing, 0.2, rowIndex * spacing]}
+			text={xl}
 			fontSize={0.5}
+			anchorX="right"
 			color="white"
-			rotation={[-Math.PI / 2, 0, Math.PI / 2]}
+			rotation={[-Math.PI / 2, 0, 0]}
 		/>
 	{/each}
 
 	<!-- Etichette delle colonne -->
 	{#each zLabels as zl, colIndex}
 		<Text
-			position={[colIndex * spacing - spacing/3, 0.2, cols * spacing]}
-			text={truncateText(zl, 13)}
+			position={[colIndex * spacing - spacing/7, 0.2, -spacing]}
+			text={zl}
+			anchorX="left"
 			fontSize={0.5}
 			color="white"
-			rotation={[-Math.PI / 2, 0, 0]}
+			rotation={[-Math.PI / 2, 0, Math.PI / 2]}
 		/>
 	{/each}
 

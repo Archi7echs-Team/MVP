@@ -28,5 +28,6 @@ describe('SettingsPane', () => {
     expect(getByText('Data source')).toBeInTheDocument();
     expect(getByText('Data filter')).toBeInTheDocument();
     expect(getByText('Color filter')).toBeInTheDocument();
+    expect(getByText('Export')).toBeInTheDocument();
   });
 });

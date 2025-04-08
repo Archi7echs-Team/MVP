@@ -31,18 +31,14 @@
 	const raycaster = new Raycaster();
 
 	// Opacità della barra
-	let inRange = $derived(height >= filter.rangeValue.min && height <= filter.rangeValue.max);
 
 	let nMax = $derived(filter.nValuemax);
 	let nMin = $derived(filter.nValuemin);
 
-	$effect(() => {
-		if (filter.nValuemax != "0") {
-			console.log(nMax);
+	let visible = $derived.by(() => {
+		if (!(height >= filter.rangeValue.min && height <= filter.rangeValue.max)) {
+			return false;
 		}
-	});
-
-	let passesFilter = $derived.by(() => {
 		let lv = filter.selection.lastValue();
 		if (filter.avgFilter === 1 && height > utils.average) {
 			return false;
@@ -60,11 +56,11 @@
 			return false;
 		}
 
-		if (filter.nValuemax != "0" && !getMaxNValue(height, nMax)){
+		if (filter.nValuemax != 0 && !getMaxNValue(height, nMax)){
 			return false;
 		}
 
-		if (filter.nValuemin != "0" && !getMinNvalue(height, nMin)){
+		if (filter.nValuemin != 0 && !getMinNvalue(height, nMin)){
 			return false;
 		}
 
@@ -72,7 +68,7 @@
 	});
 
 	// Controllo per opacizzazione
-	let opacity = $derived(inRange && passesFilter ? 1 : 0.2);
+	let opacity = $derived(visible ? 1 : 0.2);
 
 	// Riferimento al mesh della barra
 	let mesh = $state<Mesh | undefined>(undefined);
