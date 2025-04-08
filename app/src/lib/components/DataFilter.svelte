@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { IntervalSlider, Button, Checkbox, Slider, File, type FileValue } from 'svelte-tweakpane-ui';
-
+	import { IntervalSlider, Button, Checkbox, Slider } from 'svelte-tweakpane-ui';
 	import { filter, fetchedData, getLength, resetFilter } from '$lib/index.svelte';
 	import { Vector3 } from 'three';
 

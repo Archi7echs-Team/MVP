@@ -1,6 +1,10 @@
 import { Vector3 } from 'three';
 
-import { getDbData, getExternalData } from '$lib/data.svelte';
+import { getDbData, getExternalData, uploadCsvFile } from '$lib/data.svelte';
+
+// row of matrix are the xValues (a zLabel for each row)
+// column of matrix are the zValues (a xLabel for each column)
+// e.g. xLabel A refer to first column
 
 export let fetchedData = $state({
 	values: [
@@ -31,6 +35,22 @@ export const fetchExternal = () => {
 	fetchedData.zLabels = tmp.zLabels;
 	resetFilter();
 };
+
+export const uploadFile = async (file: any) => {
+	try {
+		let tmp = await uploadCsvFile(file);
+		if (!tmp) {
+			return;
+		}
+		fetchedData.values = tmp.yValues;
+		fetchedData.xLabels = tmp.xLabels;
+		fetchedData.zLabels = tmp.zLabels;
+		resetFilter();
+	}
+	catch (error) {
+		console.error('Error uploading file:', error);
+	}
+}
 
 // data.computed are the values that are computed from the fetched datas and aren't editable by the user
 let data = $derived(fetchedData.values);

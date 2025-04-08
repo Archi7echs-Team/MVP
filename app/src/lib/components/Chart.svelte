@@ -67,7 +67,7 @@
 		rotation={[-Math.PI / 2, 0, 0]}
 	>
 		<T.PlaneGeometry args={[rows * spacing, cols * spacing]} />
-		<T.MeshStandardMaterial color="gray" />
+		<T.MeshBasicMaterial color="gray" />
 	</T.Mesh>
 
 	<!-- Creazione piano medio se selezionato -->
@@ -81,29 +81,31 @@
 			rotation={[-Math.PI / 2, 0, 0]}
 		>
 			<T.PlaneGeometry args={[rows * spacing, cols * spacing]} />
-			<T.MeshStandardMaterial color="lightgray" transparent={true} opacity={0.5} />
+			<T.MeshBasicMaterial color="lightgray" transparent={true} opacity={0.5} />
 		</T.Mesh>
 	{/if}
 
 	<!-- Etichette delle righe -->
 	{#each xLabels as xl, rowIndex}
 		<Text
-			position={[-spacing, 0.2, rowIndex * spacing + spacing/3]}
-			text={truncateText(xl, 13)}
+			position={[-spacing, 0.2, rowIndex * spacing]}
+			text={xl}
 			fontSize={0.5}
+			anchorX="right"
 			color="white"
-			rotation={[-Math.PI / 2, 0, Math.PI / 2]}
+			rotation={[-Math.PI / 2, 0, 0]}
 		/>
 	{/each}
 
 	<!-- Etichette delle colonne -->
 	{#each zLabels as zl, colIndex}
 		<Text
-			position={[colIndex * spacing - spacing/3, 0.2, cols * spacing]}
-			text={truncateText(zl, 13)}
+			position={[colIndex * spacing - spacing/7, 0.2, -spacing]}
+			text={zl}
+			anchorX="left"
 			fontSize={0.5}
 			color="white"
-			rotation={[-Math.PI / 2, 0, 0]}
+			rotation={[-Math.PI / 2, 0, Math.PI / 2]}
 		/>
 	{/each}
 
