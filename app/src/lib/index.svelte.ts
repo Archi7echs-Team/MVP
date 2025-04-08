@@ -46,11 +46,10 @@ export const uploadFile = async (file: any) => {
 		fetchedData.xLabels = tmp.xLabels;
 		fetchedData.zLabels = tmp.zLabels;
 		resetFilter();
-	}
-	catch (error) {
+	} catch (error) {
 		console.error('Error uploading file:', error);
 	}
-}
+};
 
 // data.computed are the values that are computed from the fetched datas and aren't editable by the user
 let data = $derived(fetchedData.values);
@@ -107,7 +106,6 @@ export const getMinNvalue = (value: number, n: number) => {
 	return filtered.includes(value);
 };
 
-
 export const getValueFromId = (id: string) => {
 	return data[parseInt(id.split('-')[0])][parseInt(id.split('-')[1])];
 };
@@ -157,25 +155,24 @@ export const filter = $state({
 	colorSelection: 2,
 	avgFilter: 0,
 	avgEnabled: false,
-	barFilterSelection: 0,
-	displayBarFilter: false,
-	selection: selection,
 	nValuemin: 0,
 	nValuemax: 0,
+	barFilterSelection: 0,
+	displayBarFilter: false,
 	selectedOpacity: 100, // predefinito (100)
 	showRowAvgPlane: false,
-  showColAvgPlane: false,
-	selection: selection
+	showColAvgPlane: false,
+	selection: selection,
 });
 
 export const getSelectedBarInfo = () => {
-    if (!selection.active()) return null;
-    
-    const lastId = selection.selected.at(-1);
-    const [row, col] = lastId.split('-').map(Number);
-    const value = getValueFromId(lastId);
-    
-    return { row: row + 1, column: col + 1, height: value };
+	if (!selection.active()) return null;
+
+	const lastId = selection.selected.at(-1);
+	const [row, col] = lastId.split('-').map(Number);
+	const value = getValueFromId(lastId);
+
+	return { row: row + 1, column: col + 1, height: value };
 };
 
 export const resetFilter = () => {
@@ -188,5 +185,8 @@ export const resetFilter = () => {
 	filter.avgEnabled = false;
 	filter.barFilterSelection = 0;
 	filter.displayBarFilter = false;
+	filter.selectedOpacity = 100;
+	filter.showRowAvgPlane = false;
+	filter.showColAvgPlane = false;
 	filter.selection.clear();
-}
+};
