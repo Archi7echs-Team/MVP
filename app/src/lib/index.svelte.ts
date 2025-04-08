@@ -161,9 +161,22 @@ export const filter = $state({
 	displayBarFilter: false,
 	selection: selection,
 	nValuemin: 0,
-	nValuemax: 0
+	nValuemax: 0,
+	selectedOpacity: 100, // predefinito (100)
+	showRowAvgPlane: false,
+  showColAvgPlane: false,
+	selection: selection
 });
 
+export const getSelectedBarInfo = () => {
+    if (!selection.active()) return null;
+    
+    const lastId = selection.selected.at(-1);
+    const [row, col] = lastId.split('-').map(Number);
+    const value = getValueFromId(lastId);
+    
+    return { row: row + 1, column: col + 1, height: value };
+};
 
 export const resetFilter = () => {
 	filter.rangeValue.min = 0;

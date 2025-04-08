@@ -4,6 +4,7 @@
 	import DataSource from './DataSource.svelte';
 	import DataFilter from './DataFilter.svelte';
 	import Color from './Color.svelte';
+	import Export from './Export.svelte';
 	ThemeUtils.setGlobalDefaultTheme(ThemeUtils.presets.standard);
 	let { resetTarget } = $props();
 </script>
@@ -21,6 +22,9 @@
 		</TabPage>
 		<TabPage title="Color scheme">
 			<Color />
+		</TabPage>
+		<TabPage title="Export">
+			<Export />
 		</TabPage>
 	</TabGroup>
 </Pane>
