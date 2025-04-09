@@ -1,5 +1,4 @@
 import { Mesh, Raycaster, Vector3 } from 'three';
-import type { Writable } from 'svelte/store';
 
 import { getDbData, getExternalData, uploadCsvFile } from '$lib/data.svelte';
 
@@ -21,16 +20,24 @@ export let fetchedData = $state({
 });
 
 // set fetchedData to the data fetched from the server
-export const fetchDb = () => {
-	let tmp = getDbData();
+export const fetchDb = async () => {
+	let tmp = await getDbData();
+	if (!tmp) {
+		//alert('Error fetching data from the server');
+		return;
+	}
 	fetchedData.values = tmp.yValues;
 	fetchedData.xLabels = tmp.xLabels;
 	fetchedData.zLabels = tmp.zLabels;
 	resetFilter();
 };
 
-export const fetchExternal = () => {
-	let tmp = getExternalData();
+export const fetchExternal = async () => {
+	let tmp = await getExternalData();
+	if (!tmp) {
+		//alert('Error fetching data from the server');
+		return;
+	}
 	fetchedData.values = tmp.yValues;
 	fetchedData.xLabels = tmp.xLabels;
 	fetchedData.zLabels = tmp.zLabels;

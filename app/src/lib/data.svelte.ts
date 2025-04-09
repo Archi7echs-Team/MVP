@@ -2,31 +2,24 @@
 import { type FileValue } from 'svelte-tweakpane-ui';
 
 export const fetchDbData = async () => {
-	try {
-		const response = await fetch('http://localhost:8080/api/coordinates');
-		if (!response.ok) {
-			throw new Error('Failed to fetch data');
-		}
-		const data = await response.json();
-		return data;
-	} catch (error) {
-		console.error('Error fetching DB data:', error);
+	const response = await fetch('http://localhost:8080/api/coordinates');
+	if (!response.ok) {
+		throw new Error('networkError');
 	}
+	const data = await response.json();
+	return data;
 };
 
 // http://localhost:8080/api/external/data
 // fetch external data from the server
 export const fetchExternalData = async () => {
-	try {
-		const response = await fetch('http://localhost:8080/api/external/data');
-		if (!response.ok) {
-			throw new Error('Failed to fetch data');
-		}
-		const data = await response.json();
-		return data;
-	} catch (error) {
-		console.error('Error fetching external data:', error);
+	const response = await fetch('http://localhost:8080/api/external/data');
+	if (!response.ok) {
+		const errorMessage = await response.text();
+		throw new Error(errorMessage);
 	}
+	const data = await response.json();
+	return data;
 };
 
 export async function uploadCsvFile(file: any) {
@@ -34,9 +27,19 @@ export async function uploadCsvFile(file: any) {
 		alert('No file provided');
 		return;
 	}
+	// check if file is a csv file
+	if (file.type !== 'text/csv') {
+		alert('File is not a csv file');
+		return;
+	}
+	// check if file is less than 10MB
+	if (file.size > 10 * 1024 * 1024) {
+		alert('File is too large');
+		return;
+	}
 	const formData = new FormData();
 	formData.append('file', file); // Attach the file with the key "file"
-
+	
 	try {
 		const response = await fetch('http://localhost:8080/api/uploadCsv', {
 			method: 'POST',
@@ -44,14 +47,18 @@ export async function uploadCsvFile(file: any) {
 		});
 		if (!response.ok) {
 			const errorMessage = await response.text();
-			alert('File invalido:\n' + errorMessage);
-			throw new Error(`Error: ${response.statusText}`);
+			throw new Error(`${errorMessage}`);
 		} else {
-			const data = await response.json(); // Parse the JSON response
+			const data = await response.json();
 			return data;
 		}
-	} catch (error) {
-		console.error('Error uploading file:', error);
+	} catch (error: any) {
+		if (error.message === 'Failed to fetch') {
+			alert('Failed to upload file:\nnet::ERR_CONNECTION_REFUSED');
+		} else {
+			alert('Error uploading file:\n' + error);
+		}
+		console.error('Error uploading file: ', error);
 	}
 	return null;
 }
@@ -60,22 +67,48 @@ let externalData: any = null;
 let dbData: any = null;
 
 const init = async () => {
-	externalData = await fetchExternalData();
-	dbData = await fetchDbData();
+	try {
+		externalData = await fetchExternalData();
+	} catch (error: any) {
+		console.error('Error init fetching external API: ', error);
+	}
+	try {
+		dbData = await fetchDbData();
+	} catch (error: any) {
+		console.error('Error init fetching DB: ', error);
+	}
 };
 
 init();
 
-export const getDbData = () => {
+export const getDbData = async () => {
 	if (!dbData) {
-		throw new Error('Data not initialized');
+		try {
+			dbData = await fetchDbData();
+		} catch (error: any) {
+			if (error.message === 'Failed to fetch') {
+				alert('Failed to load DB data:\nnet::ERR_CONNECTION_REFUSED');
+			} else {
+				alert('Error fetching DB data:\n' + error);
+			}
+			console.error('Error fetching DB data: ', error);
+		}
 	}
 	return dbData;
 };
 
-export const getExternalData = () => {
+export const getExternalData = async () => {
 	if (!externalData) {
-		throw new Error('Data not initialized');
+		try {
+			externalData = await fetchExternalData();
+		} catch (error: any) {
+			if (error.message === 'Failed to fetch') {
+				alert('Failed to load external data:\nnet::ERR_CONNECTION_REFUSED');
+			} else {
+				alert('Error fetching external data:\n' + error);
+			}
+			console.error('Error fetching external data: ', error);
+		}
 	}
 	return externalData;
 };
