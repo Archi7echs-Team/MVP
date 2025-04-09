@@ -1,7 +1,7 @@
 // fetch datas from the server
 import { type FileValue } from 'svelte-tweakpane-ui';
 
-const fetchDbData = async () => {
+export const fetchDbData = async () => {
 	try {
 		const response = await fetch('http://localhost:8080/api/coordinates');
 		if (!response.ok) {
@@ -16,7 +16,7 @@ const fetchDbData = async () => {
 
 // http://localhost:8080/api/external/data
 // fetch external data from the server
-const fetchExternalData = async () => {
+export const fetchExternalData = async () => {
 	try {
 		const response = await fetch('http://localhost:8080/api/external/data');
 		if (!response.ok) {

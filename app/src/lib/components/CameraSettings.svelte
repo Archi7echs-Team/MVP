@@ -53,7 +53,7 @@
 	}
 </script>
 
-<Button label="Reset" title="Reset" on:click={() => cameraUtils.resetCamera(camera, resetTarget)} />
+<Button label="Reset" title="Reset position" on:click={() => cameraUtils.resetCamera(camera, resetTarget)} />
 
 <Button label="Zoom In" title="+" on:click={() => cameraUtils.zoomIn(camera)} />
 

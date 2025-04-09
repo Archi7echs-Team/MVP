@@ -50,9 +50,9 @@ describe('CameraSettings', () => {
     expect(getByText('Zoom Out')).toBeInTheDocument();
   });
 
-  it('calls resetPosition on "Reset" click', async () => {
+  it('calls resetPosition on "Reset position" click', async () => {
     const { getByText } = render(CameraSettings, { props: { resetTarget } });
-    await fireEvent.click(getByText('Reset'));
+    await fireEvent.click(getByText('Reset position'));
     expect(cameraUtils.resetCamera).toHaveBeenCalledTimes(1);
     expect(cameraUtils.resetCamera).toHaveBeenCalledWith(expect.anything(), resetTarget);
   });

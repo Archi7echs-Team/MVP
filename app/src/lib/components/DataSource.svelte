@@ -9,7 +9,7 @@
 
 <Button
 	label="External API"
-	title="Select"
+	title="Select API"
 	on:click={() => {
 		fetchExternal();
 		resetTarget();
@@ -18,7 +18,7 @@
 
 <Button
 	label="DB1"
-	title="Select"
+	title="Select DB1"
 	on:click={() => {
 		fetchDb();
 		resetTarget();
@@ -26,4 +26,4 @@
 />
 
 <File bind:value={file} label="File" />
-<Button label="Send file CSV" title="Select" on:click={() => {uploadFile(file)}}/>
+<Button label="Send file CSV" title="Select CSV" on:click={() => {uploadFile(file)}}/>

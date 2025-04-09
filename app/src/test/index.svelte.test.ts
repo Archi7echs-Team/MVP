@@ -1,17 +1,9 @@
 import { Object3D, PerspectiveCamera, Raycaster, Scene, Vector2, Vector3 } from 'three';
-import { getData, getValueFromId, filter, getSelectedBarInfo, truncateText, takeScreenshot, downloadImage, cameraUtils, setBarFilterSelection, resetBarSelection, hideBarFilterPane, resetTarget, isInRange, passesBarFilter, getBarColor, handleTextClick } from '../lib/index.svelte';
+import { getValueFromId, filter, getSelectedBarInfo, takeScreenshot, downloadImage, cameraUtils, setBarFilterSelection, resetBarSelection, hideBarFilterPane, isInRange, passesBarFilter, getBarColor, handleTextClick } from '../lib/index.svelte';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { writable } from 'svelte/store';
 
 describe('Index', () => {
-    it("getData() return the correct data", () => { 
-        const data = getData();
-        expect(data.values.length).toBe(5);
-        expect(data.computed.rows).toBe(5);
-        expect(data.computed.cols).toBe(5);
-        expect(data.computed.average).toBeGreaterThan(0); 
-    });
-
     it("getValueFromId() return the correct value", () => {
         expect(getValueFromId('0-0')).toBe(2);
         expect(getValueFromId('2-2')).toBe(7);
@@ -109,31 +101,6 @@ describe('Index', () => {
             height: 4,
         });
     });
-
-    it('should truncate text longer than maxLength and append "..."', () => {
-        const result = truncateText('Questo è un testo molto lungo', 10);
-        expect(result).toBe('Questo è u...');
-      });
-    
-      it('should return the original text if it is shorter than maxLength', () => {
-        const result = truncateText('Testo corto', 20);
-        expect(result).toBe('Testo corto');
-      });
-    
-      it('should return the original text if it is exactly maxLength', () => {
-        const result = truncateText('1234567890', 10);
-        expect(result).toBe('1234567890');
-      });
-    
-      it('should use the default maxLength of 20 when not provided', () => {
-        const result = truncateText('Questo è un testo abbastanza lungo da essere troncato');
-        expect(result).toBe('Questo è un testo ab...');
-      });
-    
-      it('should handle empty string input', () => {
-        const result = truncateText('', 10);
-        expect(result).toBe('');
-      });
     
 });
 
@@ -294,30 +261,6 @@ describe('takeScreenshot', () => {
           hideBarFilterPane();
           expect(filter.displayBarFilter).toBe(false);
         });
-      });
-    });
-
-    describe('resetTarget', () => {
-      it('dovrebbe impostare targetStore su defaultTarget', () => {
-        // Crea un store di esempio
-        const targetStore = writable<number[]>([1, 2, 3]);
-    
-        // Definisci un oggetto "utils" con un defaultTarget
-        const utils = {
-          defaultTarget: [10, 20, 30]
-        };
-    
-        // Esegui la funzione che deve essere testata
-        resetTarget(targetStore, utils);
-    
-        // Verifica che lo store sia stato aggiornato correttamente
-        let result: number[] | undefined;
-        targetStore.subscribe(value => {
-          result = value;
-        })();
-    
-        // Verifica che il valore dello store sia uguale a defaultTarget
-        expect(result).toEqual(utils.defaultTarget);
       });
     });
 

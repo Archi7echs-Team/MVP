@@ -4,7 +4,7 @@
 	import Bar from './Bar.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	const { camera } = useThrelte();
-	import { filter, getSelectedBarInfo, truncateText, fetchedData } from '$lib/index.svelte';
+	import { filter, getSelectedBarInfo, fetchedData } from '$lib/index.svelte';
 	import { Vector3 } from 'three';
 
 

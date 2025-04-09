@@ -11,16 +11,16 @@
 
 <Pane title="Settings" position="fixed">
 	<TabGroup>
-		<TabPage title="Camera options">
+		<TabPage title="Camera">
 			<CameraSettings {resetTarget} />
 		</TabPage>
-		<TabPage title="Data source">
+		<TabPage title="Source">
 			<DataSource {resetTarget} />
 		</TabPage>
-		<TabPage title="Data filter">
+		<TabPage title="Filter">
 			<DataFilter />
 		</TabPage>
-		<TabPage title="Color scheme">
+		<TabPage title="Color">
 			<Color />
 		</TabPage>
 		<TabPage title="Export">

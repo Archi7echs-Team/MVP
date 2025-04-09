@@ -111,10 +111,6 @@ export const getValueFromId = (id: string) => {
 	return data[parseInt(id.split('-')[0])][parseInt(id.split('-')[1])];
 };
 
-export function resetTarget(targetStore: Writable<number[]>, utils: { defaultTarget: number[] }) {
-	targetStore.set(utils.defaultTarget);
-};
-
 class Selection {
 	selected: any[] = $state([]);
 
@@ -178,11 +174,6 @@ export const getSelectedBarInfo = () => {
 	const value = getValueFromId(lastId);
 
 	return { row: row + 1, column: col + 1, height: value };
-};
-
-//funzione per troncare il testo se troppo lungo
-export function truncateText(text: string, maxLength: number = 20) {
-	return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
 };
 
 export function takeScreenshot(renderer: any, scene: any, camera: any) {
