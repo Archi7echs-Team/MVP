@@ -54,7 +54,7 @@ class ExternalDataControllerTest {
     @DisplayName("POST /api/external/data - Metodo non consentito")
     void testFetchExternalData_WrongMethod() throws Exception {
         // Verifica che usare un metodo HTTP non corretto (POST) risulti in 405
-        
+
         mockMvc.perform(post("/api/external/data") // Usa il metodo POST
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isMethodNotAllowed()); // Verifica Status 405
