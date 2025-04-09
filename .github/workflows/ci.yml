@@ -13,7 +13,6 @@ on:
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres:17

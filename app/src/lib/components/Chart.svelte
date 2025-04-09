@@ -14,6 +14,12 @@
 	
 	const utils = $derived({
 		average: data.flat().reduce((a, b) => a + b, 0) / data.flat().length,
+		averageRows: data.map((row) => row.reduce((a, b) => a + b, 0) / row.length),
+		averageCols: Array.from(
+			{ length: data[0].length },
+			(_, colIndex) =>
+				data.map((row) => row[colIndex]).reduce((a, b) => a + b, 0) / data.length
+		),
 		minmax: [Math.min(...data.flat()), Math.max(...data.flat())],
 		max: Math.max(...data.flat()),
 		min: Math.min(...data.flat()),
