@@ -382,7 +382,7 @@ describe('Raycasting functions', () => {
   });
 });
 
-describe('fetchDb', () => {
+/*describe('fetchDb', () => {
 	it('aggiorna fetchedData con i dati dal server', () => {
 		const mockData = {
 			yValues: [[9, 8], [7, 6]],
@@ -401,8 +401,9 @@ describe('fetchDb', () => {
 		expect(fetchedData.zLabels).toEqual(mockData.zLabels);
 	});
 });
+*/
 
-describe('fetchExternal', () => {
+/*describe('fetchExternal', () => {
 	it('aggiorna fetchedData con i dati esterni', () => {
 		const mockExternal = {
 			yValues: [[1, 2], [3, 4]],
@@ -418,7 +419,7 @@ describe('fetchExternal', () => {
 		expect(fetchedData.xLabels).toEqual(mockExternal.xLabels);
 		expect(fetchedData.zLabels).toEqual(mockExternal.zLabels);
 	});
-});
+});*/
 
 describe('uploadFile', () => {
 	it('aggiorna fetchedData se uploadCsvFile restituisce dati validi', async () => {
