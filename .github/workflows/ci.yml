@@ -21,6 +21,7 @@ jobs:
           POSTGRES_USER: architechs
           POSTGRES_PASSWORD: password_super_sicura
           POSTGRES_DB: coordinateDB
+          TESTCONTAINERS_CHECKS_DISABLE: true
         ports:
           - 5432:5432
         options: >-
