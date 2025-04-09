@@ -1,6 +1,6 @@
 import { render } from '@testing-library/svelte';
 import Color from '../lib/components/Color.svelte';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect} from 'vitest';
 
 describe('Color', () => {
   it('load all components', () => {
@@ -10,6 +10,12 @@ describe('Color', () => {
     expect(getByText('rows')).toBeInTheDocument();
     expect(getByText('values')).toBeInTheDocument();
   });
+
+  it('should display the initial selected option', () => {
+    const { getByText } = render(Color);
+    expect(getByText('Selected Option: 2')).toBeInTheDocument();
+  });
+
 });
 
 

@@ -1,8 +1,26 @@
 <script lang="ts">
-	import { IntervalSlider, Button, Checkbox } from 'svelte-tweakpane-ui';
-	import { filter, getData } from '$lib/index.svelte';
+	import { IntervalSlider, Button, Checkbox, Slider } from 'svelte-tweakpane-ui';
+	import { filter, fetchedData, getLength, resetFilter } from '$lib/index.svelte';
+	import { Vector3 } from 'three';
 
-	let utils = getData().computed;
+	let data = $derived(fetchedData.values);
+
+	const utils = $derived({
+		average: data.flat().reduce((a, b) => a + b, 0) / data.flat().length,
+		minmax: [Math.min(...data.flat()), Math.max(...data.flat())],
+		max: Math.max(...data.flat()),
+		min: Math.min(...data.flat()),
+		rows: data.length,
+		cols: data[0].length,
+		defaultTarget: [
+			(data.length * fetchedData.spacing) / 2 - fetchedData.spacing / 2,
+			(Math.max(...data.flat()) - 1) / 2,
+			(data[0].length * fetchedData.spacing) / 2 - fetchedData.spacing / 2
+		],
+		defaultPosition: new Vector3(15, 7.5, 15)
+	});
+
+	let length = $derived(getLength(data));
 
 	filter.rangeValue.min = utils.min;
 	filter.rangeValue.max = utils.max;
@@ -30,12 +48,24 @@
 	title="Greater than average"
 />
 
+<Slider
+	bind:value={filter.nValuemin}
+	min={0}
+	max={length}
+	step={1}
+	label="Hide the N highest values"
+/>
+
+<Slider
+	bind:value={filter.nValuemax}
+	min={0}
+	max={length}
+	step={1}
+	label="Hide the N lowest values"
+/>
+
 <Button
-	on:click={() => {
-		filter.avgFilter = 0;
-		filter.rangeValue.min = utils.min;
-		filter.rangeValue.max = utils.max;
-	}}
+	on:click={resetFilter}
 	label="Visualization reset"
 	title="Reset"
 />

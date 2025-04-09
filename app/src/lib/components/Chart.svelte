@@ -4,15 +4,37 @@
 	import Bar from './Bar.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	const { camera } = useThrelte();
-	import { filter, getData, getSelectedBarInfo, truncateText } from '$lib/index.svelte';
+	import { filter, getSelectedBarInfo, truncateText, fetchedData } from '$lib/index.svelte';
+	import { Vector3 } from 'three';
+
 
 	let currentCameraQuaternionArray = $state<[number, number, number, number]>([0, 0, 0, 1]);
 	let animationFrameId: number;
 
-	let dt = $derived(getData());
-
-	let data = $derived(dt.values);
-	let utils = $derived(dt.computed);
+	let data = $derived(fetchedData.values);
+	
+	const utils = $derived({
+		average: data.flat().reduce((a, b) => a + b, 0) / data.flat().length,
+		averageRows: data.map((row) => row.reduce((a, b) => a + b, 0) / row.length),
+		averageCols: Array.from(
+			{ length: data[0].length },
+			(_, colIndex) =>
+				data.map((row) => row[colIndex]).reduce((a, b) => a + b, 0) / data.length
+		),
+		minmax: [Math.min(...data.flat()), Math.max(...data.flat())],
+		max: Math.max(...data.flat()),
+		min: Math.min(...data.flat()),
+		rows: data.length,
+		cols: data[0].length,
+		defaultTarget: [
+			(data.length * fetchedData.spacing) / 2 - fetchedData.spacing / 2,
+			(Math.max(...data.flat()) - 1) / 2,
+			(data[0].length * fetchedData.spacing) / 2 - fetchedData.spacing / 2
+		],
+		defaultPosition: new Vector3(15, 7.5, 15)
+	});
+	let zLabels = $derived(fetchedData.zLabels);
+	let xLabels = $derived(fetchedData.xLabels);
 	let rows = $derived(utils.rows);
 	let cols = $derived(utils.cols);
 	let spacing = $derived(filter.spacing);
@@ -41,11 +63,15 @@
 <T.Group>
 	<!-- Grid Plane (Under the Bars) -->
 	<T.Mesh
-		position={[(rows * spacing) / 2 - spacing / 2, 0, (cols * spacing) / 2 - spacing / 2]}
+		position={[
+			(rows * spacing) / 2 - spacing / 2,
+			0,
+			(cols * spacing) / 2 - spacing / 2
+		 ]}
 		rotation={[-Math.PI / 2, 0, 0]}
 	>
-		<T.PlaneGeometry args={[cols * spacing, rows * spacing]} />
-		<T.MeshStandardMaterial color="gray" />
+		<T.PlaneGeometry args={[rows * spacing, cols * spacing]} />
+		<T.MeshBasicMaterial color="gray" />
 	</T.Mesh>
 
 	<!-- Creazione piano medio se selezionato -->
@@ -58,8 +84,8 @@
 			]}
 			rotation={[-Math.PI / 2, 0, 0]}
 		>
-			<T.PlaneGeometry args={[cols * spacing, rows * spacing]} />
-			<T.MeshStandardMaterial color="lightgray" transparent={true} opacity={0.5} />
+			<T.PlaneGeometry args={[rows * spacing, cols * spacing]} />
+			<T.MeshBasicMaterial color="lightgray" transparent={true} opacity={0.5} />
 		</T.Mesh>
 	{/if}
 
@@ -94,24 +120,26 @@
     {/if}
 
 	<!-- Etichette delle righe -->
-	{#each data[0] as _, rowIndex}
+	{#each xLabels as xl, rowIndex}
 		<Text
-			position={[rowIndex * spacing - 0.4, 0.2, -spacing]}
-			text={truncateText(`Row ${rowIndex + 1}`, 13)}
+			position={[-spacing, 0.2, rowIndex * spacing]}
+			text={xl}
 			fontSize={0.5}
+			anchorX="right"
 			color="white"
-			rotation={[-Math.PI / 2, 0, Math.PI / 2]}
+			rotation={[-Math.PI / 2, 0, 0]}
 		/>
 	{/each}
 
 	<!-- Etichette delle colonne -->
-	{#each data as _, colIndex}
+	{#each zLabels as zl, colIndex}
 		<Text
-			position={[cols * spacing, 0.2, colIndex * spacing - 0.4]}
-			text={truncateText(`Col ${colIndex + 1}`, 13)}
+			position={[colIndex * spacing - spacing/7, 0.2, -spacing]}
+			text={zl}
+			anchorX="left"
 			fontSize={0.5}
 			color="white"
-			rotation={[-Math.PI / 2, 0, 0]}
+			rotation={[-Math.PI / 2, 0, Math.PI / 2]}
 		/>
 	{/each}
 

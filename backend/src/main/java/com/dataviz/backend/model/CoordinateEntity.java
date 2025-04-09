@@ -37,43 +37,17 @@ public class CoordinateEntity {
         this.datasetType = datasetType;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getXLabel() {
         return xLabel;
     }
 
-    public void setXLabel(String xLabel) {
-        this.xLabel = xLabel;
-    }
 
     public String getZLabel() {
         return zLabel;
     }
 
-    public void setZLabel(String zLabel) {
-        this.zLabel = zLabel;
-    }
 
     public Double getYValue() {
         return yValue;
-    }
-
-    public void setYValue(Double yValue) {
-        this.yValue = yValue;
-    }
-
-    public String getDatasetType() {
-        return datasetType;
-    }
-
-    public void setDatasetType(String datasetType) {
-        this.datasetType = datasetType;
     }
 }

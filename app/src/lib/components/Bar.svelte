@@ -4,12 +4,27 @@
 	import { Raycaster, Mesh } from 'three';
 	import { Tween } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
-	import { getData, filter, isInRange, passesBarFilter, getBarColor, isFirstTextIntersected, isFirstIntersected, handleTextClick } from '$lib/index.svelte';
+	import { fetchedData, filter, isInRange, passesBarFilter, getBarColor, isFirstTextIntersected, isFirstIntersected, handleTextClick } from '$lib/index.svelte';
+	import { Vector3 } from 'three';
 
 	let { id, coordinates, height, currentCameraQuaternionArray } = $props();
 
-	let utils = $derived(getData().computed);
-
+	let data = $derived(fetchedData.values);
+	
+	const utils = $derived({
+		average: data.flat().reduce((a, b) => a + b, 0) / data.flat().length,
+		minmax: [Math.min(...data.flat()), Math.max(...data.flat())],
+		max: Math.max(...data.flat()),
+		min: Math.min(...data.flat()),
+		rows: data.length,
+		cols: data[0].length,
+		defaultTarget: [
+			(data.length * fetchedData.spacing) / 2 - fetchedData.spacing / 2,
+			(Math.max(...data.flat()) - 1) / 2,
+			(data[0].length * fetchedData.spacing) / 2 - fetchedData.spacing / 2
+		],
+		defaultPosition: new Vector3(15, 7.5, 15)
+	});
 	const { scene } = useThrelte();
 
 	// Raycaster e variabili per il mouse
@@ -24,7 +39,6 @@
             ? (filter.selection.check(id) ? filter.selectedOpacity / 100 : 1) 
             : 0.2
     );
-
 	// Riferimento al mesh della barra
 	let mesh = $state<Mesh | undefined>(undefined);
 	let text = $state<any>(undefined);

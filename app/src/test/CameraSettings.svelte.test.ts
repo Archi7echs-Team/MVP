@@ -43,14 +43,14 @@ describe('CameraSettings', () => {
     vi.clearAllMocks();
   });
 
-  it('load all components', () => {
+  it('loads all components', () => {
     const { getByText } = render(CameraSettings, { props: { resetTarget } });
-    expect(getByText('Resetta')).toBeInTheDocument();
+    expect(getByText('Reset')).toBeInTheDocument();
     expect(getByText('Zoom In')).toBeInTheDocument();
     expect(getByText('Zoom Out')).toBeInTheDocument();
   });
 
-  it('calls resetPosition on "Resetta" click', async () => {
+  it('calls resetPosition on "Reset" click', async () => {
     const { getByText } = render(CameraSettings, { props: { resetTarget } });
     await fireEvent.click(getByText('Reset'));
     expect(cameraUtils.resetCamera).toHaveBeenCalledTimes(1);
