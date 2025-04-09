@@ -67,3 +67,27 @@ describe('uploadCsvFile', () => {
 		expect(result).toEqual(responseData);
 	});
 });
+
+describe('getDbData', () => {
+	it('throws error if dbData is null', () => {
+	  (dataModule as any).dbData = null;
+	  expect(() => dataModule.getDbData()).toThrow('Data not initialized');
+	});
+  
+	/*it('returns dbData if defined', () => {
+	  dataModule.__set__('dbData', { mocked: true });
+	  expect(dataModule.getDbData()).toEqual({ mocked: true });
+	});*/
+});
+  
+//describe('getExternalData', () => {
+	/*it('throws error if externalData is null', () => {
+	  (dataModule as any).externalData = null;
+	  expect(() => dataModule.getExternalData()).toThrow('Data not initialized');
+	});*/
+  
+	/*it('returns externalData if defined', () => {
+	  (dataModule as any).externalData = { external: true };
+	  expect(dataModule.getExternalData()).toEqual({ external: true });
+	});*/
+//});

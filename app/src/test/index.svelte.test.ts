@@ -1,7 +1,9 @@
 import { Object3D, PerspectiveCamera, Raycaster, Scene, Vector2, Vector3 } from 'three';
-import { getValueFromId, filter, getSelectedBarInfo, takeScreenshot, downloadImage, cameraUtils, setBarFilterSelection, resetBarSelection, hideBarFilterPane, isInRange, passesBarFilter, getBarColor, handleTextClick } from '../lib/index.svelte';
+import { getValueFromId, filter, getSelectedBarInfo, takeScreenshot, downloadImage, cameraUtils, setBarFilterSelection, resetBarSelection, hideBarFilterPane, isInRange, passesBarFilter, getBarColor, handleTextClick, fetchExternal, uploadFile, sortAscData,sortDescData } from '../lib/index.svelte';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { writable } from 'svelte/store';
+import { fetchDb, fetchedData } from '../lib/index.svelte';
+import * as dataModule from '../lib/data.svelte';
 
 describe('Index', () => {
     it("getValueFromId() return the correct value", () => {
@@ -378,4 +380,146 @@ describe('Raycasting functions', () => {
       expect(filterMock.selection.toggle).not.toHaveBeenCalled();
       expect(filterMock.selection.set).not.toHaveBeenCalled();
   });
+});
+
+describe('fetchDb', () => {
+	it('aggiorna fetchedData con i dati dal server', () => {
+		const mockData = {
+			yValues: [[9, 8], [7, 6]],
+			xLabels: ['X', 'Y'],
+			zLabels: ['1', '2']
+		};
+
+		// Mock della funzione getDbData
+		vi.spyOn(dataModule, 'getDbData').mockReturnValue(mockData);
+
+		// Chiamata alla funzione
+		fetchDb();
+
+		expect(fetchedData.values).toEqual(mockData.yValues);
+		expect(fetchedData.xLabels).toEqual(mockData.xLabels);
+		expect(fetchedData.zLabels).toEqual(mockData.zLabels);
+	});
+});
+
+describe('fetchExternal', () => {
+	it('aggiorna fetchedData con i dati esterni', () => {
+		const mockExternal = {
+			yValues: [[1, 2], [3, 4]],
+			xLabels: ['A', 'B'],
+			zLabels: ['1', '2']
+		};
+
+		vi.spyOn(dataModule, 'getExternalData').mockReturnValue(mockExternal);
+
+		fetchExternal();
+
+		expect(fetchedData.values).toEqual(mockExternal.yValues);
+		expect(fetchedData.xLabels).toEqual(mockExternal.xLabels);
+		expect(fetchedData.zLabels).toEqual(mockExternal.zLabels);
+	});
+});
+
+describe('uploadFile', () => {
+	it('aggiorna fetchedData se uploadCsvFile restituisce dati validi', async () => {
+		const mockData = {
+			yValues: [[7, 8], [9, 10]],
+			xLabels: ['U', 'V'],
+			zLabels: ['10', '11']
+		};
+
+		const file = new File(['a,b\n1,2'], 'test.csv', { type: 'text/csv' });
+
+		vi.spyOn(dataModule, 'uploadCsvFile').mockResolvedValue(mockData);
+
+		await uploadFile(file);
+
+		expect(fetchedData.values).toEqual(mockData.yValues);
+		expect(fetchedData.xLabels).toEqual(mockData.xLabels);
+		expect(fetchedData.zLabels).toEqual(mockData.zLabels);
+	});
+
+  it('non modifica fetchedData se uploadCsvFile restituisce null', async () => {
+    const file = new File(['a,b\n1,2'], 'test.csv', { type: 'text/csv' });
+    
+    // Cloniamo solo i dati effettivi di fetchedData
+    const originalValues = [...fetchedData.values];
+    const originalXLabels = [...fetchedData.xLabels];
+    const originalZLabels = [...fetchedData.zLabels];
+
+    vi.spyOn(dataModule, 'uploadCsvFile').mockResolvedValue(null);
+
+    await uploadFile(file);
+
+    // Verifica che i dati non siano cambiati
+    expect(fetchedData.values).toEqual(originalValues);
+    expect(fetchedData.xLabels).toEqual(originalXLabels);
+    expect(fetchedData.zLabels).toEqual(originalZLabels);
+  });
+});
+
+describe('sortAscData', () => {
+	it('ordina i dati e rimuove i duplicati', () => {
+		const data = [
+			[3, 5, 2],
+			[8, 7, 3],
+			[4, 6, 5]
+		];
+
+		const result = sortAscData(data);
+
+		expect(result).toEqual([2, 3, 4, 5, 6, 7, 8]);
+	});
+
+	it('restituisce un array vuoto se i dati sono vuoti', () => {
+		const data: number[][] = [];
+
+		const result = sortAscData(data);
+
+		expect(result).toEqual([]);
+	});
+
+	it('mantiene gli elementi unici', () => {
+		const data = [
+			[1, 2, 3],
+			[1, 3, 4]
+		];
+
+		const result = sortAscData(data);
+
+		expect(result).toEqual([1, 2, 3, 4]);
+	});
+});
+
+describe('sortDescData', () => {
+	it('ordina i dati in ordine decrescente e rimuove i duplicati', () => {
+		const data = [
+			[3, 5, 2],
+			[8, 7, 3],
+			[4, 6, 5]
+		];
+
+		const result = sortDescData(data);
+
+		expect(result).toEqual([8, 7, 6, 5, 4, 3, 2]);
+	});
+
+	it('restituisce un array vuoto se i dati sono vuoti', () => {
+		const data: number[][] = [];
+
+		const result = sortDescData(data);
+
+		expect(result).toEqual([]);
+	});
+
+	it('mantiene gli elementi unici', () => {
+		const data = [
+			[1, 2, 3],
+			[1, 3, 4]
+		];
+
+		const result = sortDescData(data);
+
+		expect(result).toEqual([4, 3, 2, 1]);
+	});
 });
