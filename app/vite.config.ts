@@ -32,16 +32,16 @@ export default defineConfig({
 					name: 'server',
 					environment: 'node',
 					include: ['src/**/*.{test,spec}.{js,ts}'],
-					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
+					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}','**/+page.svelte', '**/+layout.svelte']
 				}
 			}
 		],
 		coverage: {
 			include: ['src/**/*.{js,ts,svelte}'],
-			exclude: ['src/routes/**'],
+			exclude: ['**/+page.svelte', '**/+layout.svelte', '**/app.d.ts', '**/app.html', '**/app.ts'],
 			reporter: ['text', 'html'],
 			provider: 'v8',
-		}
+		  }
 	}
 });
 

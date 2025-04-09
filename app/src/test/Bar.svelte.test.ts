@@ -1,7 +1,6 @@
 import { render } from '@testing-library/svelte'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import Bar from '../lib/components/Bar.svelte'
-import {filter } from '$lib/index.svelte';
 
 vi.mock('@threlte/core', () => ({
     useThrelte: () => ({

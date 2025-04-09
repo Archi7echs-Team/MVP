@@ -4,7 +4,7 @@
 	import { Raycaster, Mesh } from 'three';
 	import { Tween } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
-	import { fetchedData, filter, getMaxNValue, getMinNvalue } from '$lib/index.svelte';
+	import { fetchedData, filter, isInRange, passesBarFilter, getBarColor, isFirstTextIntersected, isFirstIntersected, handleTextClick } from '$lib/index.svelte';
 	import { Vector3 } from 'three';
 
 	let { id, coordinates, height, currentCameraQuaternionArray } = $props();
@@ -30,46 +30,15 @@
 	// Raycaster e variabili per il mouse
 	const raycaster = new Raycaster();
 
-	// Opacità della barra
-
-	let nMax = $derived(filter.nValuemax);
-	let nMin = $derived(filter.nValuemin);
-
-	let visible = $derived.by(() => {
-		if (!(height >= filter.rangeValue.min && height <= filter.rangeValue.max)) {
-			return false;
-		}
-		let lv = filter.selection.lastValue();
-		if (filter.avgFilter === 1 && height > utils.average) {
-			return false;
-		} else if (filter.avgFilter === 2 && height < utils.average) {
-			return false;
-		}
-
-		if (filter.barFilterSelection === 2 && height < lv) {
-			return false;
-		} else if (filter.barFilterSelection === 3 && height > lv) {
-			return false;
-		}
-
-		if (filter.barFilterSelection === 1 && !filter.selection.check(id)) {
-			return false;
-		}
-
-		if (filter.nValuemax != 0 && !getMaxNValue(height, nMax)){
-			return false;
-		}
-
-		if (filter.nValuemin != 0 && !getMinNvalue(height, nMin)){
-			return false;
-		}
-
-		return true;
-	});
+	let inRange = $derived(isInRange(height));
+	let passesFilter = $derived.by(() => passesBarFilter(id, height));
 
 	// Controllo per opacizzazione
-	let opacity = $derived(visible ? 1 : 0.2);
-
+	let opacity = $derived(
+        inRange && passesFilter 
+            ? (filter.selection.check(id) ? filter.selectedOpacity / 100 : 1) 
+            : 0.2
+    );
 	// Riferimento al mesh della barra
 	let mesh = $state<Mesh | undefined>(undefined);
 	let text = $state<any>(undefined);
@@ -81,44 +50,20 @@
 
 	interactivity();
 
-	const isFirstIntersected = (e: any) => {
-		raycaster.setFromCamera(e.pointer, e.camera);
-		const hits = raycaster.intersectObjects(scene.children, true);
-		return hits.length > 0 && hits[0].object === mesh;
-	};
-
-	const isFirstTextIntersected = (e: any) => {
-		raycaster.setFromCamera(e.pointer, e.camera);
-		const hits = raycaster.intersectObjects(scene.children, true);
-		return hits.length > 0 && hits[0].object === text;
-	};
-
-	// Applicazione filtro colorazione
-	function getBarColor() {
-		if (filter.colorSelection === 1) {
-			return `hsl(${(coordinates[2] * 50) % 360}, 80%, 60%)`;
-		} else if (filter.colorSelection === 2) {
-			return `hsl(${(coordinates[0] * 50) % 360}, 80%, 60%)`;
-		} else if (filter.colorSelection === 3) {
-			let normalized =
-				(height - filter.rangeValue.min) / (filter.rangeValue.max - filter.rangeValue.min || 1);
-			let hue = 240 - normalized * 240;
-			return `hsl(${hue}, 80%, 50%)`;
-		}
-		return '#ffffff';
-	}
+    const isIntersected = (e: any) => isFirstIntersected(e, raycaster, mesh, scene);
+    const isTextIntersected = (e: any) => isFirstTextIntersected(e, raycaster, text, scene);
 </script>
 
 <T.Mesh
 	bind:ref={mesh}
 	onpointermove={(e: any) => {
-		hover.target = isFirstIntersected(e) ? 1 : 0;
+		hover.target = isFirstIntersected(e, raycaster, mesh, scene) ? 1 : 0;
 	}}
 	onpointerleave={() => {
 		hover.target = 0;
 	}}
 	onclick={(e: any) => {
-		if (isFirstIntersected(e)) {
+		if (isFirstIntersected(e, raycaster, mesh, scene)) {
 			if (e.nativeEvent.detail === 1) {
 				filter.selection.toggle(id);
 			} else {
@@ -130,7 +75,7 @@
 	scale={[1, height, 1]}
 >
 	<T.BoxGeometry args={[1, 1, 1]} />
-	<T.MeshStandardMaterial color={getBarColor()} transparent={true} {opacity} />
+	<T.MeshStandardMaterial color={getBarColor(coordinates, height)} transparent={true} {opacity} />
 </T.Mesh>
 
 <Text
@@ -144,12 +89,6 @@
 	fillOpacity={hover.current}
 	bind:ref={text}
 	onclick={(e: any) => {
-		if (isFirstTextIntersected(e)) {
-			if (e.nativeEvent.detail === 1) {
-				filter.selection.toggle(id);
-			} else {
-				filter.selection.set([id]);
-			}
-		}
+		handleTextClick(e, id, filter, raycaster, text, scene);
 	}}
 />

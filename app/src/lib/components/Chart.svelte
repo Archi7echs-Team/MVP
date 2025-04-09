@@ -4,8 +4,9 @@
 	import Bar from './Bar.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	const { camera } = useThrelte();
-	import { filter, fetchedData, getSelectedBarInfo } from '$lib/index.svelte';
+	import { filter, getSelectedBarInfo, truncateText, fetchedData } from '$lib/index.svelte';
 	import { Vector3 } from 'three';
+
 
 	let currentCameraQuaternionArray = $state<[number, number, number, number]>([0, 0, 0, 1]);
 	let animationFrameId: number;
@@ -57,11 +58,6 @@
 	onDestroy(() => {
 		cancelAnimationFrame(animationFrameId);
 	});
-
-	//funzione per troncare il testo se troppo lungo
-	export function truncateText(text: string, maxLength: number = 20) {
-		return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
-	}
 </script>
 
 <T.Group>

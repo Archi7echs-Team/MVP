@@ -1,6 +1,13 @@
 <script lang="ts">
 	import { Pane, Button, Text, Separator, Folder, Slider, Checkbox } from 'svelte-tweakpane-ui';
-	import { filter, getSelectedBarInfo, fetchedData } from '$lib/index.svelte';
+	import {
+		filter,
+		fetchedData,
+		getSelectedBarInfo,
+		setBarFilterSelection,
+		resetBarSelection,
+		hideBarFilterPane
+	} from '$lib/index.svelte';
 
 	let selectedBarInfo = $derived(getSelectedBarInfo());
 	let data = $derived(fetchedData.values);
@@ -10,8 +17,7 @@
 		averageRows: data.map((row) => row.reduce((a, b) => a + b, 0) / row.length),
 		averageCols: Array.from(
 			{ length: data[0].length },
-			(_, colIndex) =>
-				data.map((row) => row[colIndex]).reduce((a, b) => a + b, 0) / data.length
+			(_, colIndex) => data.map((row) => row[colIndex]).reduce((a, b) => a + b, 0) / data.length
 		),
 		minmax: [Math.min(...data.flat()), Math.max(...data.flat())],
 		max: Math.max(...data.flat()),
@@ -52,42 +58,25 @@
 				label="Avg Z (column)"
 				disabled={true}
 			/>
-			<Text value={`${utils.average?.toFixed(2) || '-'}`} label="Avg Global" disabled={true} />
+			<Text value={`${utils.average.toFixed(2)}`} label="Avg Global" disabled={true} />
 		</Folder>
 
 		<Folder title="Filter">
-			<Button
-				on:click={() => {
-					filter.barFilterSelection = 1;
-				}}
-				label="Only selected bar"
-				title="Display"
-			/>
+			<Button on:click={() => setBarFilterSelection(1)} label="Only selected bar" title="Display" />
 
 			<Button
-				on:click={() => {
-					filter.barFilterSelection = 2;
-				}}
+				on:click={() => setBarFilterSelection(2)}
 				label="Values higher than the selected bar value"
 				title="Filter"
 			/>
 
 			<Button
-				on:click={() => {
-					filter.barFilterSelection = 3;
-				}}
+				on:click={() => setBarFilterSelection(3)}
 				label="Values lower than the selected bar value"
 				title="Filter"
 			/>
 
-			<Button
-				on:click={() => {
-					filter.barFilterSelection = 0;
-					filter.selection.clear();
-				}}
-				label="Filter reset"
-				title="Reset"
-			/>
+			<Button on:click={() => setBarFilterSelection(0)} label="Filter reset" title="Reset" />
 
 			<Checkbox bind:value={filter.showRowAvgPlane} label="Show average row plane" />
 
@@ -102,23 +91,11 @@
 				format={(v) => `${v}%`}
 			/>
 
-			<Button
-				on:click={() => {
-					filter.selection.clear();
-				}}
-				label="Reset selection"
-				title="Reset"
-			/>
+			<Button on:click={() => resetBarSelection()} label="Reset selection" title="Reset" />
 		</Folder>
 
 		<Separator />
 
-		<Button
-			on:click={() => {
-				filter.displayBarFilter = false;
-			}}
-			label="Close pane"
-			title="Close"
-		/>
+		<Button on:click={() => hideBarFilterPane()} label="Close pane" title="Close" />
 	</Pane>
 {/if}

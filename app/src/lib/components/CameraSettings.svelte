@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { useThrelte } from '@threlte/core';
 	import { Button } from 'svelte-tweakpane-ui';
-	import { fetchedData } from '$lib/index.svelte';
-
 	import { Vector3 } from 'three';
-	
+	import { fetchedData, cameraUtils } from '$lib/index.svelte';
+
 	let data = $derived(fetchedData.values);
 	
 	const utils = $derived({
@@ -21,7 +20,7 @@
 		],
 		defaultPosition: new Vector3(15, 10, 15)
 	});
-	
+
 	let zoomValue = 5;
 	const zoomStep = 2; // Quanto zoomare per ogni click
 	let { resetTarget } = $props();
@@ -40,10 +39,9 @@
 	function updateCamera(step: number) {
 		if (camera?.current) {
 			const direction = new Vector3();
-			console.log(camera.current.position);
 			camera.current.getWorldDirection(direction); // Ottiene la direzione attuale della camera
-			camera.current.position.addScaledVector(direction, step);
-			console.log(camera.current.position);
+			direction.multiplyScalar(step); // Scala il vettore di zoomStep
+			camera.current.position.add(direction);
 		}
 	}
 
@@ -53,11 +51,10 @@
 			resetTarget();
 		}
 	}
-
 </script>
 
-<Button label="Reset" title="Reset" on:click={resetPosition} />
+<Button label="Reset" title="Reset" on:click={() => cameraUtils.resetCamera(camera, resetTarget)} />
 
-<Button label="Zoom In" title="+" on:click={zoomIn} />
+<Button label="Zoom In" title="+" on:click={() => cameraUtils.zoomIn(camera)} />
 
-<Button label="Zoom Out" title="-" on:click={zoomOut} />
+<Button label="Zoom Out" title="-" on:click={() => cameraUtils.zoomOut(camera)} />
