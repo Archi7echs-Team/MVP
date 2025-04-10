@@ -66,7 +66,7 @@ export async function uploadCsvFile(file: any) {
 let externalData: any = null;
 let dbData: any = null;
 
-const init = async () => {
+export const init = async () => {
 	try {
 		externalData = await fetchExternalData();
 	} catch (error: any) {

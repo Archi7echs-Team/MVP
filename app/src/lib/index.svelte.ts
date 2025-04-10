@@ -102,17 +102,15 @@ export const getLength = (data: number[][]) => {
 
 const length = $derived(getLength(data));
 
-export const getMaxNValue = (value: number, n: number) => {
-	const num = length - n;
-	let filtered = sortedData.desc.slice(0, num);
+/*export const getMaxNValue = (value: number, n: number) => {
+	const filtered = sortedData.desc.slice(0, n); 
 	return filtered.includes(value);
 };
 
 export const getMinNvalue = (value: number, n: number) => {
-	const num = length - n;
-	let filtered = sortedData.asc.slice(0, num);
+	const filtered = sortedData.asc.slice(0, n); 
 	return filtered.includes(value);
-};
+};*/
 
 export const getValueFromId = (id: string) => {
 	return data[parseInt(id.split('-')[0])][parseInt(id.split('-')[1])];

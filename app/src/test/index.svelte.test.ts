@@ -1,9 +1,10 @@
 import { Object3D, PerspectiveCamera, Raycaster, Scene, Vector2, Vector3 } from 'three';
-import { getValueFromId, filter, getSelectedBarInfo, takeScreenshot, downloadImage, cameraUtils, setBarFilterSelection, resetBarSelection, hideBarFilterPane, isInRange, passesBarFilter, getBarColor, handleTextClick, fetchExternal, uploadFile, sortAscData,sortDescData } from '../lib/index.svelte';
+import { getValueFromId, filter, getSelectedBarInfo, takeScreenshot, downloadImage, cameraUtils, setBarFilterSelection, resetBarSelection, hideBarFilterPane, isInRange, passesBarFilter, getBarColor, handleTextClick, fetchExternal, uploadFile, sortAscData,sortDescData, isFirstIntersected, isFirstTextIntersected} from '../lib/index.svelte';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { writable } from 'svelte/store';
 import { fetchDb, fetchedData } from '../lib/index.svelte';
 import * as dataModule from '../lib/data.svelte';
+import * as indexModule from '../lib/index.svelte';
+import { Mesh, BufferGeometry, Material } from 'three';
 
 describe('Index', () => {
     it("getValueFromId() return the correct value", () => {
@@ -248,6 +249,27 @@ describe('takeScreenshot', () => {
           setBarFilterSelection(99);
           expect(filter.barFilterSelection).not.toBe(99);
         });
+        it('chiama filter.selection.clear() se value è 0', () => {
+          // Spy su filter.selection.clear
+          const clearSpy = vi.spyOn(filter.selection, 'clear');
+      
+          // Chiamata alla funzione con value = 0
+          setBarFilterSelection(0);
+      
+          // Verifica che filter.selection.clear() sia stato chiamato
+          expect(clearSpy).toHaveBeenCalled();
+        });
+      
+        it('non chiama filter.selection.clear() se value non è 0', () => {
+          // Spy su filter.selection.clear
+          const clearSpy = vi.spyOn(filter.selection, 'clear');
+      
+          // Chiamata alla funzione con value = 1 (o altri valori diversi da 0)
+          setBarFilterSelection(1);
+      
+          // Verifica che filter.selection.clear() non sia stato chiamato
+          expect(clearSpy).not.toHaveBeenCalled();
+        });
       });
     
       describe('resetBarSelection', () => {
@@ -380,46 +402,61 @@ describe('Raycasting functions', () => {
       expect(filterMock.selection.toggle).not.toHaveBeenCalled();
       expect(filterMock.selection.set).not.toHaveBeenCalled();
   });
-});
 
-/*describe('fetchDb', () => {
-	it('aggiorna fetchedData con i dati dal server', () => {
-		const mockData = {
-			yValues: [[9, 8], [7, 6]],
-			xLabels: ['X', 'Y'],
-			zLabels: ['1', '2']
+  /*it('chiama filter.selection.toggle se il click è singolo', () => {
+		// Mock delle dipendenze necessarie
+		const e = {
+			nativeEvent: { detail: 1 },
+			pointer: { x: 1, y: 1 },
+			camera: { position: { x: 1, y: 1, z: 1 } }
 		};
+		const filter = { selection: { toggle: vi.fn(), set: vi.fn() } };
+    const raycaster = {
+			setFromCamera: vi.fn(),
+			intersectObjects: vi.fn().mockReturnValue([]) // Nessun oggetto intersecato
+		} as unknown as Raycaster; // Cast per evitare l'errore di tipo
+		const text = {};
+		const scene = { children: [text] };
+		const id = '1';
 
-		// Mock della funzione getDbData
-		vi.spyOn(dataModule, 'getDbData').mockReturnValue(mockData);
+		// Mock per la funzione isFirstTextIntersected che restituisce true
+		vi.spyOn(indexModule, 'isFirstTextIntersected').mockReturnValue(true);
 
 		// Chiamata alla funzione
-		fetchDb();
+		handleTextClick(e, id, filter, raycaster, text, scene);
 
-		expect(fetchedData.values).toEqual(mockData.yValues);
-		expect(fetchedData.xLabels).toEqual(mockData.xLabels);
-		expect(fetchedData.zLabels).toEqual(mockData.zLabels);
+		// Verifica che filter.selection.toggle sia stato chiamato con l'id
+		expect(filter.selection.toggle).toHaveBeenCalledWith(id);
+		expect(filter.selection.set).not.toHaveBeenCalled();
 	});
-});
-*/
 
-/*describe('fetchExternal', () => {
-	it('aggiorna fetchedData con i dati esterni', () => {
-		const mockExternal = {
-			yValues: [[1, 2], [3, 4]],
-			xLabels: ['A', 'B'],
-			zLabels: ['1', '2']
+	it('chiama filter.selection.set se il click è doppio', () => {
+		// Mock delle dipendenze necessarie
+		const e = {
+			nativeEvent: { detail: 2 },
+			pointer: { x: 1, y: 1 },
+			camera: { position: { x: 1, y: 1, z: 1 } }
 		};
+		const filter = { selection: { toggle: vi.fn(), set: vi.fn() } };
+    const raycaster = {
+			setFromCamera: vi.fn(),
+			intersectObjects: vi.fn().mockReturnValue([]) // Nessun oggetto intersecato
+		} as unknown as Raycaster; // Cast per evitare l'errore di tipo
+		const text = {};
+		const scene = { children: [text] };
+		const id = '1';
 
-		vi.spyOn(dataModule, 'getExternalData').mockReturnValue(mockExternal);
+		// Mock per la funzione isFirstTextIntersected che restituisce true
+		vi.spyOn(indexModule, 'isFirstTextIntersected').mockReturnValue(true);
 
-		fetchExternal();
+		// Chiamata alla funzione
+		handleTextClick(e, id, filter, raycaster, text, scene);
 
-		expect(fetchedData.values).toEqual(mockExternal.yValues);
-		expect(fetchedData.xLabels).toEqual(mockExternal.xLabels);
-		expect(fetchedData.zLabels).toEqual(mockExternal.zLabels);
-	});
-});*/
+		
+		expect(filter.selection.toggle).not.toHaveBeenCalled();
+	});*/
+
+});
 
 describe('uploadFile', () => {
 	it('aggiorna fetchedData se uploadCsvFile restituisce dati validi', async () => {
@@ -457,6 +494,26 @@ describe('uploadFile', () => {
     expect(fetchedData.xLabels).toEqual(originalXLabels);
     expect(fetchedData.zLabels).toEqual(originalZLabels);
   });
+
+  it('deve chiamare console.error quando si verifica un errore durante il caricamento del file', async () => {
+    const file = new File(['a,b\n1,2'], 'test.csv', { type: 'text/csv' });
+
+    // Mock della funzione uploadCsvFile che lancia un errore
+    vi.spyOn(dataModule, 'uploadCsvFile').mockRejectedValue(new Error('Errore nel caricamento del file'));
+
+    // Spy su console.error
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await uploadFile(file);
+
+    // Verifica che console.error sia stato chiamato con l'errore giusto
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error uploading file:', expect.any(Error));
+
+    // Ripristina il mock
+    consoleErrorSpy.mockRestore();
+  });
+
+
 });
 
 describe('sortAscData', () => {
@@ -524,3 +581,121 @@ describe('sortDescData', () => {
 		expect(result).toEqual([4, 3, 2, 1]);
 	});
 });
+
+// Test for fetchDb function
+describe('fetchDb', () => {
+	it('aggiorna fetchedData con i dati dal server se disponibili', async () => {
+		const mockData = {
+			yValues: [[1, 2], [3, 4]],
+			xLabels: ['A', 'B'],
+			zLabels: ['1', '2']
+		};
+
+		vi.spyOn(dataModule, 'getDbData').mockResolvedValue(mockData);
+
+		await fetchDb();
+
+		expect(fetchedData.values).toEqual(mockData.yValues);
+		expect(fetchedData.xLabels).toEqual(mockData.xLabels);
+		expect(fetchedData.zLabels).toEqual(mockData.zLabels);
+	});
+
+	it('non aggiorna fetchedData se getDbData restituisce null', async () => {
+		const originalValues = [...fetchedData.values];
+    const originalXLabels = [...fetchedData.xLabels];
+    const originalZLabels = [...fetchedData.zLabels];
+		vi.spyOn(dataModule, 'getDbData').mockResolvedValue(null);
+
+		await fetchDb();
+
+		expect(fetchedData.values).toEqual(originalValues);
+    expect(fetchedData.xLabels).toEqual(originalXLabels);
+    expect(fetchedData.zLabels).toEqual(originalZLabels);
+	});
+});
+
+describe('fetchExternal', () => {
+	it('aggiorna fetchedData con i dati dal server se disponibili', async () => {
+		const mockData = {
+			yValues: [[1, 2], [3, 4]],
+			xLabels: ['A', 'B'],
+			zLabels: ['1', '2']
+		};
+    vi.spyOn(dataModule, 'getExternalData').mockResolvedValue(mockData);
+
+    await fetchExternal();
+
+    expect(fetchedData.values).toEqual(mockData.yValues);
+		expect(fetchedData.xLabels).toEqual(mockData.xLabels);
+		expect(fetchedData.zLabels).toEqual(mockData.zLabels);
+	});
+  it('non aggiorna fetchedData se getExternalData restituisce null', async () => {
+		const originalValues = [...fetchedData.values];
+		const originalXLabels = [...fetchedData.xLabels];
+		const originalZLabels = [...fetchedData.zLabels];
+    vi.spyOn(dataModule, 'getExternalData').mockResolvedValue(null);
+    await fetchExternal();
+    expect(fetchedData.values).toEqual(originalValues);
+		expect(fetchedData.xLabels).toEqual(originalXLabels);
+		expect(fetchedData.zLabels).toEqual(originalZLabels);
+	});
+});
+
+describe('isFirstIntersected', () => {
+	it('restituisce true se l\'oggetto è intersecato', () => {
+		// Crea un oggetto mesh mock con le proprietà necessarie
+		const mesh = new Mesh(new BufferGeometry(), new Material());
+
+		// Mock delle dipendenze necessarie
+		const e = {
+			pointer: { x: 1, y: 1 },
+			camera: { position: { x: 1, y: 1, z: 1 } }
+		};
+		
+		// Mock parziale di Raycaster
+		const raycaster = {
+			setFromCamera: vi.fn(),
+			intersectObjects: vi.fn().mockReturnValue([
+				{ object: mesh } // Restituisci il mesh come oggetto intersecato
+			])
+		} as unknown as Raycaster; // Cast per evitare l'errore di tipo
+
+		const scene = { children: [mesh] };
+
+		// Chiamata alla funzione
+		const result = isFirstIntersected(e, raycaster, mesh, scene);
+
+		// Verifica che la funzione restituisca true
+		expect(result).toBe(true);
+		expect(raycaster.setFromCamera).toHaveBeenCalledWith(e.pointer, e.camera);
+		expect(raycaster.intersectObjects).toHaveBeenCalledWith(scene.children, true);
+	});
+
+	it('restituisce false se l\'oggetto non è intersecato', () => {
+		// Crea un oggetto mesh mock con le proprietà necessarie
+		const mesh = new Mesh(new BufferGeometry(), new Material());
+
+		// Mock delle dipendenze necessarie
+		const e = {
+			pointer: { x: 1, y: 1 },
+			camera: { position: { x: 1, y: 1, z: 1 } }
+		};
+		
+		// Mock parziale di Raycaster
+		const raycaster = {
+			setFromCamera: vi.fn(),
+			intersectObjects: vi.fn().mockReturnValue([]) // Nessun oggetto intersecato
+		} as unknown as Raycaster; // Cast per evitare l'errore di tipo
+
+		const scene = { children: [mesh] };
+
+		// Chiamata alla funzione
+		const result = isFirstIntersected(e, raycaster, mesh, scene);
+
+		// Verifica che la funzione restituisca false
+		expect(result).toBe(false);
+		expect(raycaster.setFromCamera).toHaveBeenCalledWith(e.pointer, e.camera);
+		expect(raycaster.intersectObjects).toHaveBeenCalledWith(scene.children, true);
+	});
+});
+
