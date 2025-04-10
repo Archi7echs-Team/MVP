@@ -33,6 +33,15 @@ Il progetto è configurato per essere eseguito tramite Docker Compose, che crea 
 - Backend (Spring Boot) per l'API.
 - Frontend (Svelte) per l'interfaccia utente.
 
+## File .env
+
+Creare un file .env partendo dall'esempio facendo:
+```bash
+cp .env.example .env
+```
+Andare a sostituire i valori opportuni alle variabili.
+ATTENZIONE: la variabile inerente al TESTCONTAINERS_HOST_OVERRIDE deve essere commentata SE E SOLO SE si usa Linux. Se il SO della tua macchina è MacOs o Windows, va eliminato il commento, in modo da impostare il valore alla variabile
+
 ## Costruisci e Avvia i Contenitori
 
 Nel terminale, esegui il seguente comando per costruire e avviare tutti i contenitori:
