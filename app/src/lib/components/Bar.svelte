@@ -68,9 +68,12 @@
 <Text
 	position={[coordinates[0], height + 0.25, coordinates[2]]}
 	text={height.toFixed(2)}
-	color="black"
+	color="white"
 	anchorX="center"
 	anchorY="middle"
+	outlineColor="black"
+	outlineWidth={0.01} 
+	outlineOpacity={hover.current}
 	quaternion={currentCameraQuaternionArray}
 	fontSize={0.2}
 	fillOpacity={hover.current}

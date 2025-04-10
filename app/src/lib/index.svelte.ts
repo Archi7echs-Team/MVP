@@ -99,19 +99,19 @@ export const createUtils = () => {
 };
 
 // sort the data by value without repetition
-const sortAscData = (data: number[][]) => {
+export const sortAscData = (data: number[][]) => {
 	let sorted = data.flat().sort((a, b) => a - b);
 	let unique = [...new Set(sorted)];
 	return unique;
 };
 
-const sortDescData = (data: number[][]) => {
+export const sortDescData = (data: number[][]) => {
 	let sorted = data.flat().sort((a, b) => b - a);
 	let unique = [...new Set(sorted)];
 	return unique;
 };
 
-const sortedData = $derived({
+const sortecdData = $derived({
 	asc: sortAscData(data),
 	desc: sortDescData(data)
 });

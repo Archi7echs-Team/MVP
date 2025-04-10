@@ -1,6 +1,15 @@
-import { render } from '@testing-library/svelte'
+import { fireEvent, render } from '@testing-library/svelte'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import Bar from '../lib/components/Bar.svelte'
+import type { handleTextClick, isFirstIntersected } from '$lib/index.svelte';
+
+vi.mock('$lib/index.svelte', async () => {
+  const actual = await vi.importActual('$lib/index.svelte');
+  return {
+    isFirstIntersected: vi.fn(),
+    handleTextClick: vi.fn(),
+  };
+});
 
 vi.mock('@threlte/core', () => ({
     useThrelte: () => ({

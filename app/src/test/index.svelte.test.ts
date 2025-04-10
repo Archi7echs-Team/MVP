@@ -1,10 +1,17 @@
 import { Object3D, PerspectiveCamera, Raycaster, Scene, Vector2, Vector3 } from 'three';
-import { getValueFromId, filter, getSelectedBarInfo, takeScreenshot, downloadImage, cameraUtils, setBarFilterSelection, resetBarSelection, hideBarFilterPane, isInRange, passesBarFilter, getBarColor, handleTextClick, fetchExternal, uploadFile, sortAscData,sortDescData, isFirstIntersected, isFirstTextIntersected} from '../lib/index.svelte';
+import { getValueFromId, filter, getSelectedBarInfo, takeScreenshot, downloadImage, cameraUtils, setBarFilterSelection, resetBarSelection, hideBarFilterPane, isInRange, passesBarFilter, getBarColor, handleTextClick, fetchExternal, uploadFile, sortAscData,sortDescData, isFirstIntersected, isFirstTextIntersected, resetFilter, getMaxNValue, getMinNvalue} from '../lib/index.svelte';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fetchDb, fetchedData } from '../lib/index.svelte';
 import * as dataModule from '../lib/data.svelte';
-import * as indexModule from '../lib/index.svelte';
 import { Mesh, BufferGeometry, Material } from 'three';
+
+vi.mock('$lib/index.svelte', async () => {
+  const actual = await vi.importActual('$lib/index.svelte');
+  return {
+    ...actual,
+    isFirstTextIntersected: vi.fn(),
+  };
+});
 
 describe('Index', () => {
     it("getValueFromId() return the correct value", () => {
@@ -57,7 +64,7 @@ describe('Index', () => {
     });
 
     it("filter initializes with default values", () => {
-        expect(filter.rangeValue).toEqual({ min: 0, max: 0 });
+        expect(filter.rangeValue).toEqual({ min: 1, max: 8 });
         expect(filter.colorSelection).toBe(2);
         expect(filter.avgFilter).toBe(0);
         expect(filter.avgEnabled).toBe(false);
@@ -67,6 +74,11 @@ describe('Index', () => {
         expect(filter.showRowAvgPlane).toBe(false);
         expect(filter.showColAvgPlane).toBe(false);
     });
+
+    it("filter resets to correct computed values", () => {
+      resetFilter();
+      expect(filter.rangeValue).toEqual({ min: 1, max: 8 });
+  });
     
     it("filter rangeValue is updated correctly", () => {
         filter.rangeValue = { min: 1, max: 10 };
@@ -122,14 +134,13 @@ describe('takeScreenshot', () => {
         setClearColor: vi.fn()
       };
   
-      mockScene = {}; // Non usato direttamente nella funzione, quindi può essere vuoto
+      mockScene = {}; 
       mockCamera = {
         current: {}
       };
 
       const mockClick = vi.fn();
   
-      // Mock globale per downloadImage
       vi.spyOn(document, 'createElement').mockImplementation(() => {
         let _download = '';
         let _href = '';
@@ -250,24 +261,14 @@ describe('takeScreenshot', () => {
           expect(filter.barFilterSelection).not.toBe(99);
         });
         it('chiama filter.selection.clear() se value è 0', () => {
-          // Spy su filter.selection.clear
           const clearSpy = vi.spyOn(filter.selection, 'clear');
-      
-          // Chiamata alla funzione con value = 0
           setBarFilterSelection(0);
-      
-          // Verifica che filter.selection.clear() sia stato chiamato
           expect(clearSpy).toHaveBeenCalled();
         });
       
         it('non chiama filter.selection.clear() se value non è 0', () => {
-          // Spy su filter.selection.clear
           const clearSpy = vi.spyOn(filter.selection, 'clear');
-      
-          // Chiamata alla funzione con value = 1 (o altri valori diversi da 0)
           setBarFilterSelection(1);
-      
-          // Verifica che filter.selection.clear() non sia stato chiamato
           expect(clearSpy).not.toHaveBeenCalled();
         });
       });
@@ -304,46 +305,50 @@ describe('takeScreenshot', () => {
   
       it('should return false if min and max are equal', () => {
           filter.rangeValue = { min: 5, max: 5 };
-          expect(isInRange(5)).toBe(true); // This should be true, as the height equals the range
+          expect(isInRange(5)).toBe(true); 
           expect(isInRange(6)).toBe(false);
       });
   });
 
   describe('passesBarFilter', () => {
     it('should return true if the bar passes the filter (avgFilter == 0)', () => {
-        filter.avgFilter = 0;
-        filter.barFilterSelection = 0;
-        expect(passesBarFilter('0-0', 2)).toBe(true);
+      filter.avgFilter = 0;
+      filter.barFilterSelection = 0;
+      filter.rangeValue.min = 0;
+      filter.rangeValue.max = 10;
+      expect(passesBarFilter('0-0', 2)).toBe(true);
     });
 
     it('should return false if the bar does not pass the filter (avgFilter == 1)', () => {
         filter.avgFilter = 1;
         filter.barFilterSelection = 0;
-        expect(passesBarFilter('0-0', 6)).toBe(false); // height > average
+        expect(passesBarFilter('0-0', 6)).toBe(false);
     });
 
     it('should return false if the bar does not pass the filter (avgFilter == 2)', () => {
         filter.avgFilter = 2;
         filter.barFilterSelection = 0;
-        expect(passesBarFilter('0-0', 1)).toBe(false); // height < average
+        expect(passesBarFilter('0-0', 1)).toBe(false);
     });
 
     it('should return false if the bar does not pass the filter (barFilterSelection == 2)', () => {
         filter.barFilterSelection = 2;
         filter.selection.add('0-0');
-        expect(passesBarFilter('0-0', 5)).toBe(false); // height <= lastValue
+        expect(passesBarFilter('0-0', 5)).toBe(false);
     });
 
     it('should return false if the bar does not pass the filter (barFilterSelection == 3)', () => {
         filter.barFilterSelection = 3;
         filter.selection.add('0-0');
-        expect(passesBarFilter('0-0', 5)).toBe(false); // height >= lastValue
+        expect(passesBarFilter('0-0', 5)).toBe(false);
     });
 
     it('should return true if no filters apply', () => {
-        filter.avgFilter = 0;
-        filter.barFilterSelection = 0;
-        expect(passesBarFilter('1-1', 3)).toBe(true); // default condition
+      filter.avgFilter = 0;
+      filter.barFilterSelection = 0;
+      filter.rangeValue.min = 0;
+      filter.rangeValue.max = 10;
+      expect(passesBarFilter('1-1', 3)).toBe(true);
     });
 });
 
@@ -403,59 +408,6 @@ describe('Raycasting functions', () => {
       expect(filterMock.selection.set).not.toHaveBeenCalled();
   });
 
-  /*it('chiama filter.selection.toggle se il click è singolo', () => {
-		// Mock delle dipendenze necessarie
-		const e = {
-			nativeEvent: { detail: 1 },
-			pointer: { x: 1, y: 1 },
-			camera: { position: { x: 1, y: 1, z: 1 } }
-		};
-		const filter = { selection: { toggle: vi.fn(), set: vi.fn() } };
-    const raycaster = {
-			setFromCamera: vi.fn(),
-			intersectObjects: vi.fn().mockReturnValue([]) // Nessun oggetto intersecato
-		} as unknown as Raycaster; // Cast per evitare l'errore di tipo
-		const text = {};
-		const scene = { children: [text] };
-		const id = '1';
-
-		// Mock per la funzione isFirstTextIntersected che restituisce true
-		vi.spyOn(indexModule, 'isFirstTextIntersected').mockReturnValue(true);
-
-		// Chiamata alla funzione
-		handleTextClick(e, id, filter, raycaster, text, scene);
-
-		// Verifica che filter.selection.toggle sia stato chiamato con l'id
-		expect(filter.selection.toggle).toHaveBeenCalledWith(id);
-		expect(filter.selection.set).not.toHaveBeenCalled();
-	});
-
-	it('chiama filter.selection.set se il click è doppio', () => {
-		// Mock delle dipendenze necessarie
-		const e = {
-			nativeEvent: { detail: 2 },
-			pointer: { x: 1, y: 1 },
-			camera: { position: { x: 1, y: 1, z: 1 } }
-		};
-		const filter = { selection: { toggle: vi.fn(), set: vi.fn() } };
-    const raycaster = {
-			setFromCamera: vi.fn(),
-			intersectObjects: vi.fn().mockReturnValue([]) // Nessun oggetto intersecato
-		} as unknown as Raycaster; // Cast per evitare l'errore di tipo
-		const text = {};
-		const scene = { children: [text] };
-		const id = '1';
-
-		// Mock per la funzione isFirstTextIntersected che restituisce true
-		vi.spyOn(indexModule, 'isFirstTextIntersected').mockReturnValue(true);
-
-		// Chiamata alla funzione
-		handleTextClick(e, id, filter, raycaster, text, scene);
-
-		
-		expect(filter.selection.toggle).not.toHaveBeenCalled();
-	});*/
-
 });
 
 describe('uploadFile', () => {
@@ -480,7 +432,6 @@ describe('uploadFile', () => {
   it('non modifica fetchedData se uploadCsvFile restituisce null', async () => {
     const file = new File(['a,b\n1,2'], 'test.csv', { type: 'text/csv' });
     
-    // Cloniamo solo i dati effettivi di fetchedData
     const originalValues = [...fetchedData.values];
     const originalXLabels = [...fetchedData.xLabels];
     const originalZLabels = [...fetchedData.zLabels];
@@ -489,7 +440,6 @@ describe('uploadFile', () => {
 
     await uploadFile(file);
 
-    // Verifica che i dati non siano cambiati
     expect(fetchedData.values).toEqual(originalValues);
     expect(fetchedData.xLabels).toEqual(originalXLabels);
     expect(fetchedData.zLabels).toEqual(originalZLabels);
@@ -498,18 +448,14 @@ describe('uploadFile', () => {
   it('deve chiamare console.error quando si verifica un errore durante il caricamento del file', async () => {
     const file = new File(['a,b\n1,2'], 'test.csv', { type: 'text/csv' });
 
-    // Mock della funzione uploadCsvFile che lancia un errore
     vi.spyOn(dataModule, 'uploadCsvFile').mockRejectedValue(new Error('Errore nel caricamento del file'));
 
-    // Spy su console.error
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await uploadFile(file);
 
-    // Verifica che console.error sia stato chiamato con l'errore giusto
     expect(consoleErrorSpy).toHaveBeenCalledWith('Error uploading file:', expect.any(Error));
 
-    // Ripristina il mock
     consoleErrorSpy.mockRestore();
   });
 
@@ -582,7 +528,6 @@ describe('sortDescData', () => {
 	});
 });
 
-// Test for fetchDb function
 describe('fetchDb', () => {
 	it('aggiorna fetchedData con i dati dal server se disponibili', async () => {
 		const mockData = {
@@ -643,59 +588,52 @@ describe('fetchExternal', () => {
 
 describe('isFirstIntersected', () => {
 	it('restituisce true se l\'oggetto è intersecato', () => {
-		// Crea un oggetto mesh mock con le proprietà necessarie
 		const mesh = new Mesh(new BufferGeometry(), new Material());
 
-		// Mock delle dipendenze necessarie
 		const e = {
 			pointer: { x: 1, y: 1 },
 			camera: { position: { x: 1, y: 1, z: 1 } }
 		};
 		
-		// Mock parziale di Raycaster
 		const raycaster = {
 			setFromCamera: vi.fn(),
 			intersectObjects: vi.fn().mockReturnValue([
-				{ object: mesh } // Restituisci il mesh come oggetto intersecato
+				{ object: mesh }
 			])
-		} as unknown as Raycaster; // Cast per evitare l'errore di tipo
+		} as unknown as Raycaster;
 
 		const scene = { children: [mesh] };
 
 		// Chiamata alla funzione
 		const result = isFirstIntersected(e, raycaster, mesh, scene);
 
-		// Verifica che la funzione restituisca true
 		expect(result).toBe(true);
 		expect(raycaster.setFromCamera).toHaveBeenCalledWith(e.pointer, e.camera);
 		expect(raycaster.intersectObjects).toHaveBeenCalledWith(scene.children, true);
 	});
 
 	it('restituisce false se l\'oggetto non è intersecato', () => {
-		// Crea un oggetto mesh mock con le proprietà necessarie
 		const mesh = new Mesh(new BufferGeometry(), new Material());
 
-		// Mock delle dipendenze necessarie
 		const e = {
 			pointer: { x: 1, y: 1 },
 			camera: { position: { x: 1, y: 1, z: 1 } }
 		};
 		
-		// Mock parziale di Raycaster
 		const raycaster = {
 			setFromCamera: vi.fn(),
-			intersectObjects: vi.fn().mockReturnValue([]) // Nessun oggetto intersecato
-		} as unknown as Raycaster; // Cast per evitare l'errore di tipo
+			intersectObjects: vi.fn().mockReturnValue([]) 
+		} as unknown as Raycaster; 
 
 		const scene = { children: [mesh] };
 
-		// Chiamata alla funzione
+		
 		const result = isFirstIntersected(e, raycaster, mesh, scene);
 
-		// Verifica che la funzione restituisca false
 		expect(result).toBe(false);
 		expect(raycaster.setFromCamera).toHaveBeenCalledWith(e.pointer, e.camera);
 		expect(raycaster.intersectObjects).toHaveBeenCalledWith(scene.children, true);
 	});
 });
+
 

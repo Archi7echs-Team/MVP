@@ -64,7 +64,7 @@ export async function uploadCsvFile(file: any) {
 }
 
 let externalData: any = null;
-let dbData: any = null;
+export let dbData: any = null;
 
 export const init = async () => {
 	try {
