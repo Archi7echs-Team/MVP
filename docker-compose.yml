@@ -4,9 +4,9 @@ services:
     image: postgres:17
     container_name: database
     environment:
-      - POSTGRES_USER=architechs
-      - POSTGRES_PASSWORD=password_super_sicura
-      - POSTGRES_DB=coordinateDB
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -23,12 +23,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock  # Concede accesso al daemon Docker
     working_dir: /app
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/coordinateDB
-      SPRING_DATASOURCE_USERNAME: architechs
-      SPRING_DATASOURCE_PASSWORD: password_super_sicura
-      TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
-
-
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      TESTCONTAINERS_HOST_OVERRIDE: ${TESTCONTAINERS_HOST_OVERRIDE:-}
     command: >
       sh -c "
         echo 'Running tests...';
@@ -48,9 +46,9 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/coordinateDB
-      SPRING_DATASOURCE_USERNAME: architechs
-      SPRING_DATASOURCE_PASSWORD: password_super_sicura
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
   frontend:
     build:
       context: ./app
