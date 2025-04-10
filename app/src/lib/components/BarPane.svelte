@@ -6,30 +6,14 @@
 		getSelectedBarInfo,
 		setBarFilterSelection,
 		resetBarSelection,
-		hideBarFilterPane
+		hideBarFilterPane,
+		createUtils
 	} from '$lib/index.svelte';
 
 	let selectedBarInfo = $derived(getSelectedBarInfo());
 	let data = $derived(fetchedData.values);
 
-	const utils = $derived({
-		average: data.flat().reduce((a, b) => a + b, 0) / data.flat().length,
-		averageRows: data.map((row) => row.reduce((a, b) => a + b, 0) / row.length),
-		averageCols: Array.from(
-			{ length: data[0].length },
-			(_, colIndex) => data.map((row) => row[colIndex]).reduce((a, b) => a + b, 0) / data.length
-		),
-		minmax: [Math.min(...data.flat()), Math.max(...data.flat())],
-		max: Math.max(...data.flat()),
-		min: Math.min(...data.flat()),
-		rows: data.length,
-		cols: data[0].length,
-		defaultTarget: [
-			(data.length * fetchedData.spacing) / 2 - fetchedData.spacing / 2,
-			(Math.max(...data.flat()) - 1) / 2,
-			(data[0].length * fetchedData.spacing) / 2 - fetchedData.spacing / 2
-		]
-	});
+	const utils = $derived(createUtils());
 </script>
 
 {#if filter.displayBarFilter}

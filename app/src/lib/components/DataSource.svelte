@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { Button, File, type FileValue  } from 'svelte-tweakpane-ui';
-	import { fetchDb, fetchExternal, uploadFile } from '$lib/index.svelte';
-	import { uploadCsvFile } from '$lib/data.svelte';
+	import { fetchDb, fetchExternal, uploadFile, cameraUtils } from '$lib/index.svelte';
+    import { useThrelte } from '@threlte/core';
+
+	const { camera } = useThrelte();
+
 	let { resetTarget } = $props();
 	let file: FileValue = $state(undefined);
 
@@ -12,7 +15,7 @@
 	title="Select API"
 	on:click={() => {
 		fetchExternal();
-		resetTarget();
+		cameraUtils.resetCamera(camera, resetTarget);
 	}}
 />
 
@@ -21,7 +24,7 @@
 	title="Select DB1"
 	on:click={() => {
 		fetchDb();
-		resetTarget();
+		cameraUtils.resetCamera(camera, resetTarget);
 	}}
 />
 
