@@ -247,6 +247,7 @@ export const isInRange = (height: number) => {
 
 // Funzione per applicare il filtro
 export const passesBarFilter = (id: string, height: number) => {
+	if (!isInRange(height)) return false;
 	const lv = filter.selection.lastValue();
 	const isSelected = filter.selection.check(id);
 
@@ -262,7 +263,13 @@ export const passesBarFilter = (id: string, height: number) => {
 	if (filter.barFilterSelection === 3) {
 		return height < lv && !isSelected;
 	}
+	if (filter.nValuemax != 0 && !getMaxNValue(height, filter.nValuemax)) {
+		return false;
+	}
 
+	if (filter.nValuemin != 0 && !getMinNvalue(height, filter.nValuemin)){
+		return false;
+	}
 	return true;
 };
 

@@ -4,13 +4,22 @@
 	import { Raycaster, Mesh } from 'three';
 	import { Tween } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
-	import { fetchedData, filter, isInRange, passesBarFilter, getBarColor, isFirstTextIntersected, isFirstIntersected, handleTextClick } from '$lib/index.svelte';
+	import {
+		fetchedData,
+		filter,
+		isInRange,
+		passesBarFilter,
+		getBarColor,
+		isFirstTextIntersected,
+		isFirstIntersected,
+		handleTextClick
+	} from '$lib/index.svelte';
 	import { Vector3 } from 'three';
 
 	let { id, coordinates, height, currentCameraQuaternionArray } = $props();
 
 	let data = $derived(fetchedData.values);
-	
+
 	const utils = $derived({
 		average: data.flat().reduce((a, b) => a + b, 0) / data.flat().length,
 		minmax: [Math.min(...data.flat()), Math.max(...data.flat())],
@@ -30,15 +39,12 @@
 	// Raycaster e variabili per il mouse
 	const raycaster = new Raycaster();
 
-	let inRange = $derived(isInRange(height));
-	let passesFilter = $derived.by(() => passesBarFilter(id, height));
+	let passesFilter = $derived(passesBarFilter(id, height));
 
 	// Controllo per opacizzazione
 	let opacity = $derived(
-        inRange && passesFilter 
-            ? (filter.selection.check(id) ? filter.selectedOpacity / 100 : 1) 
-            : 0.2
-    );
+		passesFilter ? (filter.selection.check(id) ? filter.selectedOpacity / 100 : 1) : 0.2
+	);
 	// Riferimento al mesh della barra
 	let mesh = $state<Mesh | undefined>(undefined);
 	let text = $state<any>(undefined);
@@ -50,8 +56,8 @@
 
 	interactivity();
 
-    const isIntersected = (e: any) => isFirstIntersected(e, raycaster, mesh, scene);
-    const isTextIntersected = (e: any) => isFirstTextIntersected(e, raycaster, text, scene);
+	const isIntersected = (e: any) => isFirstIntersected(e, raycaster, mesh, scene);
+	const isTextIntersected = (e: any) => isFirstTextIntersected(e, raycaster, text, scene);
 </script>
 
 <T.Mesh
