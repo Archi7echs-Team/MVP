@@ -11,7 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init-data.sql:/docker-entrypoint-initdb.d/init-data.sql
+      - ./backend/init-data.sql:/docker-entrypoint-initdb.d/init-data.sql
 
   test:
     image: maven:3.9.9-eclipse-temurin-23-alpine
@@ -19,7 +19,7 @@ services:
     depends_on:
       - db
     volumes:
-      - .:/app
+      - ./backend:/app
       - /var/run/docker.sock:/var/run/docker.sock  # Concede accesso al daemon Docker
     working_dir: /app
     environment:
@@ -39,7 +39,7 @@ services:
   # APPLICAZIONE (Spring Boot runtime)
   app:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: app-backend
     depends_on:
@@ -51,6 +51,16 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/coordinateDB
       SPRING_DATASOURCE_USERNAME: architechs
       SPRING_DATASOURCE_PASSWORD: password_super_sicura
-
+  frontend:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: app-frontend
+    ports:
+      - "5173:4173" 
+    depends_on:
+      - app
+    environment:
+      PORT: 4173
 volumes:
   postgres_data:
