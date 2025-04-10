@@ -24,10 +24,10 @@ describe('SettingsPane', () => {
   it('load all compotents', () => {
     const { getByText } = render(SettingsPane);
     expect(getByText('Settings')).toBeInTheDocument();
-    expect(getByText('Camera options')).toBeInTheDocument();
-    expect(getByText('Data source')).toBeInTheDocument();
-    expect(getByText('Data filter')).toBeInTheDocument();
-    expect(getByText('Color filter')).toBeInTheDocument();
+    expect(getByText('Camera')).toBeInTheDocument();
+    expect(getByText('Source')).toBeInTheDocument();
+    expect(getByText('Filter')).toBeInTheDocument();
+    expect(getByText('Color')).toBeInTheDocument();
     expect(getByText('Export')).toBeInTheDocument();
   });
 });

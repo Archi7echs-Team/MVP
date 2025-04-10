@@ -6,30 +6,14 @@
 		getSelectedBarInfo,
 		setBarFilterSelection,
 		resetBarSelection,
-		hideBarFilterPane
+		hideBarFilterPane,
+		createUtils
 	} from '$lib/index.svelte';
 
 	let selectedBarInfo = $derived(getSelectedBarInfo());
 	let data = $derived(fetchedData.values);
 
-	const utils = $derived({
-		average: data.flat().reduce((a, b) => a + b, 0) / data.flat().length,
-		averageRows: data.map((row) => row.reduce((a, b) => a + b, 0) / row.length),
-		averageCols: Array.from(
-			{ length: data[0].length },
-			(_, colIndex) => data.map((row) => row[colIndex]).reduce((a, b) => a + b, 0) / data.length
-		),
-		minmax: [Math.min(...data.flat()), Math.max(...data.flat())],
-		max: Math.max(...data.flat()),
-		min: Math.min(...data.flat()),
-		rows: data.length,
-		cols: data[0].length,
-		defaultTarget: [
-			(data.length * fetchedData.spacing) / 2 - fetchedData.spacing / 2,
-			(Math.max(...data.flat()) - 1) / 2,
-			(data[0].length * fetchedData.spacing) / 2 - fetchedData.spacing / 2
-		]
-	});
+	const utils = $derived(createUtils());
 </script>
 
 {#if filter.displayBarFilter}
@@ -62,21 +46,21 @@
 		</Folder>
 
 		<Folder title="Filter">
-			<Button on:click={() => setBarFilterSelection(1)} label="Only selected bar" title="Display" />
+			<Button on:click={() => setBarFilterSelection(1)} label="Only selected bars" title="Display" />
 
 			<Button
 				on:click={() => setBarFilterSelection(2)}
-				label="Values higher than the selected bar value"
-				title="Filter"
+				label="Values higher than the latest selected bar value"
+				title="Filter higher"
 			/>
 
 			<Button
 				on:click={() => setBarFilterSelection(3)}
-				label="Values lower than the selected bar value"
-				title="Filter"
+				label="Values lower than the latest selected bar value"
+				title="Filter lower"
 			/>
 
-			<Button on:click={() => setBarFilterSelection(0)} label="Filter reset" title="Reset" />
+			<Button on:click={() => setBarFilterSelection(0)} label="Filter reset" title="Reset filter" />
 
 			<Checkbox bind:value={filter.showRowAvgPlane} label="Show average row plane" />
 
@@ -91,7 +75,7 @@
 				format={(v) => `${v}%`}
 			/>
 
-			<Button on:click={() => resetBarSelection()} label="Reset selection" title="Reset" />
+			<Button on:click={() => resetBarSelection()} label="Selection reset" title="Reset selection" />
 		</Folder>
 
 		<Separator />

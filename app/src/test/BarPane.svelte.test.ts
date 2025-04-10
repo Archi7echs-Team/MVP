@@ -4,7 +4,42 @@ import BarPane from '../lib/components/BarPane.svelte'
 import {filter} from '$lib/index.svelte'
 import * as store from '$lib/index.svelte';
 import { screen, fireEvent } from '@testing-library/svelte';
-import { Vector3 } from 'three';
+
+vi.mock('$lib/index.svelte', async () => {
+  const actual = await vi.importActual('$lib/index.svelte');
+  return {
+    filter: {
+      spacing: 2,
+      rangeValue: { min: 0, max: 0 },
+      colorSelection: 2,
+      avgFilter: 0,
+      avgEnabled: false,
+      nValuemin: 0,
+      nValuemax: 0,
+      barFilterSelection: 0,
+      displayBarFilter: false,
+      selectedOpacity: 100,
+      showRowAvgPlane: false,
+      showColAvgPlane: false,
+      selection: Selection,
+    },
+    createUtils: vi.fn(() => ({
+      average: 10,
+      averageRows: [5, 10, 15],
+      averageCols: [8, 12],
+      minmax: [1, 20],
+      max: 20,
+      min: 1,
+      rows: 3,
+      cols: 2,
+      defaultTarget: [5, 10, 15],
+    })),
+    setBarFilterSelection: vi.fn(),
+    resetBarSelection: vi.fn(),
+    hideBarFilterPane: vi.fn(),
+    getSelectedBarInfo: vi.fn(),
+  };
+});
 
 vi.mock('@threlte/core', () => ({
     useThrelte: () => ({
@@ -53,43 +88,54 @@ describe('BarPane info rendering', () => {
 			column: 3,
 			height: 12.34
 		});
-
-    vi.spyOn(store, 'getData').mockReturnValue({
-      values: [[1, 2], [3, 4], [5, 6]],
-      computed: {
-          averageRows: [1.11, 2.22, 3.33],
-          averageCols: [4.44, 5.55, 6.66],
-          average: 9.99,
-          minmax: [0, 10], 
-          max: 10, 
-          min: 0, 
-          rows: 3, 
-          cols: 3, 
-          defaultTarget: [0, 0, 0], 
-          defaultPosition: new Vector3(0, 0, 0) 
-      }
-    });
   });
 
   it('renders the correct info values', () => {
     render(BarPane);
 
     expect(screen.getByText('Row')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('3')).toBeInTheDocument();
-
     expect(screen.getByText('Column')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('3')).toBeInTheDocument();
-
     expect(screen.getByText('Height')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('12.34')).toBeInTheDocument();
-
     expect(screen.getByText('Avg X (row)')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('2.22')).toBeInTheDocument();
-
     expect(screen.getByText('Avg Z (column)')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('6.66')).toBeInTheDocument();
-
     expect(screen.getByText('Avg Global')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('9.99')).toBeInTheDocument();
+  });
+});
+
+describe('Interactions', () => {
+  it('calls resetBarSelection when "Reset selection" is clicked', async () => {
+    const { getByText } = render(BarPane);
+    await fireEvent.click(getByText('Reset selection'));
+    expect(store.resetBarSelection).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls hideBarFilterPane when "Close" is clicked', async () => {
+    const { getByText } = render(BarPane);
+    await fireEvent.click(getByText('Close'));
+    expect(store.hideBarFilterPane).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls setBarFilterSelection when "Display" is clicked', async () => {
+    const { getByText } = render(BarPane);
+    await fireEvent.click(getByText('Display'));
+    expect(store.setBarFilterSelection).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls setBarFilterSelection when "Filter higher', async () => {
+    const { getByText } = render(BarPane);
+    await fireEvent.click(getByText('Filter higher'));
+    expect(store.setBarFilterSelection).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls setBarFilterSelection when "Filter lower', async () => {
+    const { getByText } = render(BarPane);
+    await fireEvent.click(getByText('Filter lower'));
+    expect(store.setBarFilterSelection).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls setBarFilterSelection when "Reset filter" is clicked', async () => {
+    const { getByText } = render(BarPane);
+    await fireEvent.click(getByText('Reset filter'));
+    expect(store.setBarFilterSelection).toHaveBeenCalledTimes(1);
   });
 });

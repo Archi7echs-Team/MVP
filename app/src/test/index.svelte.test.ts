@@ -1,17 +1,19 @@
 import { Object3D, PerspectiveCamera, Raycaster, Scene, Vector2, Vector3 } from 'three';
-import { getData, getValueFromId, filter, getSelectedBarInfo, truncateText, takeScreenshot, downloadImage, cameraUtils, setBarFilterSelection, resetBarSelection, hideBarFilterPane, resetTarget, isInRange, passesBarFilter, getBarColor, handleTextClick } from '../lib/index.svelte';
+import { getValueFromId, filter, getSelectedBarInfo, takeScreenshot, downloadImage, cameraUtils, setBarFilterSelection, resetBarSelection, hideBarFilterPane, isInRange, passesBarFilter, getBarColor, handleTextClick, fetchExternal, uploadFile, sortAscData,sortDescData, isFirstIntersected, isFirstTextIntersected, resetFilter, getMaxNValue, getMinNvalue} from '../lib/index.svelte';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { writable } from 'svelte/store';
+import { fetchDb, fetchedData } from '../lib/index.svelte';
+import * as dataModule from '../lib/data.svelte';
+import { Mesh, BufferGeometry, Material } from 'three';
+
+vi.mock('$lib/index.svelte', async () => {
+  const actual = await vi.importActual('$lib/index.svelte');
+  return {
+    ...actual,
+    isFirstTextIntersected: vi.fn(),
+  };
+});
 
 describe('Index', () => {
-    it("getData() return the correct data", () => { 
-        const data = getData();
-        expect(data.values.length).toBe(5);
-        expect(data.computed.rows).toBe(5);
-        expect(data.computed.cols).toBe(5);
-        expect(data.computed.average).toBeGreaterThan(0); 
-    });
-
     it("getValueFromId() return the correct value", () => {
         expect(getValueFromId('0-0')).toBe(2);
         expect(getValueFromId('2-2')).toBe(7);
@@ -62,7 +64,7 @@ describe('Index', () => {
     });
 
     it("filter initializes with default values", () => {
-        expect(filter.rangeValue).toEqual({ min: 0, max: 0 });
+        expect(filter.rangeValue).toEqual({ min: 1, max: 8 });
         expect(filter.colorSelection).toBe(2);
         expect(filter.avgFilter).toBe(0);
         expect(filter.avgEnabled).toBe(false);
@@ -72,6 +74,11 @@ describe('Index', () => {
         expect(filter.showRowAvgPlane).toBe(false);
         expect(filter.showColAvgPlane).toBe(false);
     });
+
+    it("filter resets to correct computed values", () => {
+      resetFilter();
+      expect(filter.rangeValue).toEqual({ min: 1, max: 8 });
+  });
     
     it("filter rangeValue is updated correctly", () => {
         filter.rangeValue = { min: 1, max: 10 };
@@ -109,31 +116,6 @@ describe('Index', () => {
             height: 4,
         });
     });
-
-    it('should truncate text longer than maxLength and append "..."', () => {
-        const result = truncateText('Questo è un testo molto lungo', 10);
-        expect(result).toBe('Questo è u...');
-      });
-    
-      it('should return the original text if it is shorter than maxLength', () => {
-        const result = truncateText('Testo corto', 20);
-        expect(result).toBe('Testo corto');
-      });
-    
-      it('should return the original text if it is exactly maxLength', () => {
-        const result = truncateText('1234567890', 10);
-        expect(result).toBe('1234567890');
-      });
-    
-      it('should use the default maxLength of 20 when not provided', () => {
-        const result = truncateText('Questo è un testo abbastanza lungo da essere troncato');
-        expect(result).toBe('Questo è un testo ab...');
-      });
-    
-      it('should handle empty string input', () => {
-        const result = truncateText('', 10);
-        expect(result).toBe('');
-      });
     
 });
 
@@ -152,14 +134,13 @@ describe('takeScreenshot', () => {
         setClearColor: vi.fn()
       };
   
-      mockScene = {}; // Non usato direttamente nella funzione, quindi può essere vuoto
+      mockScene = {}; 
       mockCamera = {
         current: {}
       };
 
       const mockClick = vi.fn();
   
-      // Mock globale per downloadImage
       vi.spyOn(document, 'createElement').mockImplementation(() => {
         let _download = '';
         let _href = '';
@@ -279,6 +260,17 @@ describe('takeScreenshot', () => {
           setBarFilterSelection(99);
           expect(filter.barFilterSelection).not.toBe(99);
         });
+        it('chiama filter.selection.clear() se value è 0', () => {
+          const clearSpy = vi.spyOn(filter.selection, 'clear');
+          setBarFilterSelection(0);
+          expect(clearSpy).toHaveBeenCalled();
+        });
+      
+        it('non chiama filter.selection.clear() se value non è 0', () => {
+          const clearSpy = vi.spyOn(filter.selection, 'clear');
+          setBarFilterSelection(1);
+          expect(clearSpy).not.toHaveBeenCalled();
+        });
       });
     
       describe('resetBarSelection', () => {
@@ -294,30 +286,6 @@ describe('takeScreenshot', () => {
           hideBarFilterPane();
           expect(filter.displayBarFilter).toBe(false);
         });
-      });
-    });
-
-    describe('resetTarget', () => {
-      it('dovrebbe impostare targetStore su defaultTarget', () => {
-        // Crea un store di esempio
-        const targetStore = writable<number[]>([1, 2, 3]);
-    
-        // Definisci un oggetto "utils" con un defaultTarget
-        const utils = {
-          defaultTarget: [10, 20, 30]
-        };
-    
-        // Esegui la funzione che deve essere testata
-        resetTarget(targetStore, utils);
-    
-        // Verifica che lo store sia stato aggiornato correttamente
-        let result: number[] | undefined;
-        targetStore.subscribe(value => {
-          result = value;
-        })();
-    
-        // Verifica che il valore dello store sia uguale a defaultTarget
-        expect(result).toEqual(utils.defaultTarget);
       });
     });
 
@@ -337,46 +305,50 @@ describe('takeScreenshot', () => {
   
       it('should return false if min and max are equal', () => {
           filter.rangeValue = { min: 5, max: 5 };
-          expect(isInRange(5)).toBe(true); // This should be true, as the height equals the range
+          expect(isInRange(5)).toBe(true); 
           expect(isInRange(6)).toBe(false);
       });
   });
 
   describe('passesBarFilter', () => {
     it('should return true if the bar passes the filter (avgFilter == 0)', () => {
-        filter.avgFilter = 0;
-        filter.barFilterSelection = 0;
-        expect(passesBarFilter('0-0', 2)).toBe(true);
+      filter.avgFilter = 0;
+      filter.barFilterSelection = 0;
+      filter.rangeValue.min = 0;
+      filter.rangeValue.max = 10;
+      expect(passesBarFilter('0-0', 2)).toBe(true);
     });
 
     it('should return false if the bar does not pass the filter (avgFilter == 1)', () => {
         filter.avgFilter = 1;
         filter.barFilterSelection = 0;
-        expect(passesBarFilter('0-0', 6)).toBe(false); // height > average
+        expect(passesBarFilter('0-0', 6)).toBe(false);
     });
 
     it('should return false if the bar does not pass the filter (avgFilter == 2)', () => {
         filter.avgFilter = 2;
         filter.barFilterSelection = 0;
-        expect(passesBarFilter('0-0', 1)).toBe(false); // height < average
+        expect(passesBarFilter('0-0', 1)).toBe(false);
     });
 
     it('should return false if the bar does not pass the filter (barFilterSelection == 2)', () => {
         filter.barFilterSelection = 2;
         filter.selection.add('0-0');
-        expect(passesBarFilter('0-0', 5)).toBe(false); // height <= lastValue
+        expect(passesBarFilter('0-0', 5)).toBe(false);
     });
 
     it('should return false if the bar does not pass the filter (barFilterSelection == 3)', () => {
         filter.barFilterSelection = 3;
         filter.selection.add('0-0');
-        expect(passesBarFilter('0-0', 5)).toBe(false); // height >= lastValue
+        expect(passesBarFilter('0-0', 5)).toBe(false);
     });
 
     it('should return true if no filters apply', () => {
-        filter.avgFilter = 0;
-        filter.barFilterSelection = 0;
-        expect(passesBarFilter('1-1', 3)).toBe(true); // default condition
+      filter.avgFilter = 0;
+      filter.barFilterSelection = 0;
+      filter.rangeValue.min = 0;
+      filter.rangeValue.max = 10;
+      expect(passesBarFilter('1-1', 3)).toBe(true);
     });
 });
 
@@ -435,4 +407,233 @@ describe('Raycasting functions', () => {
       expect(filterMock.selection.toggle).not.toHaveBeenCalled();
       expect(filterMock.selection.set).not.toHaveBeenCalled();
   });
+
 });
+
+describe('uploadFile', () => {
+	it('aggiorna fetchedData se uploadCsvFile restituisce dati validi', async () => {
+		const mockData = {
+			yValues: [[7, 8], [9, 10]],
+			xLabels: ['U', 'V'],
+			zLabels: ['10', '11']
+		};
+
+		const file = new File(['a,b\n1,2'], 'test.csv', { type: 'text/csv' });
+
+		vi.spyOn(dataModule, 'uploadCsvFile').mockResolvedValue(mockData);
+
+		await uploadFile(file);
+
+		expect(fetchedData.values).toEqual(mockData.yValues);
+		expect(fetchedData.xLabels).toEqual(mockData.xLabels);
+		expect(fetchedData.zLabels).toEqual(mockData.zLabels);
+	});
+
+  it('non modifica fetchedData se uploadCsvFile restituisce null', async () => {
+    const file = new File(['a,b\n1,2'], 'test.csv', { type: 'text/csv' });
+    
+    const originalValues = [...fetchedData.values];
+    const originalXLabels = [...fetchedData.xLabels];
+    const originalZLabels = [...fetchedData.zLabels];
+
+    vi.spyOn(dataModule, 'uploadCsvFile').mockResolvedValue(null);
+
+    await uploadFile(file);
+
+    expect(fetchedData.values).toEqual(originalValues);
+    expect(fetchedData.xLabels).toEqual(originalXLabels);
+    expect(fetchedData.zLabels).toEqual(originalZLabels);
+  });
+
+  it('deve chiamare console.error quando si verifica un errore durante il caricamento del file', async () => {
+    const file = new File(['a,b\n1,2'], 'test.csv', { type: 'text/csv' });
+
+    vi.spyOn(dataModule, 'uploadCsvFile').mockRejectedValue(new Error('Errore nel caricamento del file'));
+
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await uploadFile(file);
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error uploading file:', expect.any(Error));
+
+    consoleErrorSpy.mockRestore();
+  });
+
+
+});
+
+describe('sortAscData', () => {
+	it('ordina i dati e rimuove i duplicati', () => {
+		const data = [
+			[3, 5, 2],
+			[8, 7, 3],
+			[4, 6, 5]
+		];
+
+		const result = sortAscData(data);
+
+		expect(result).toEqual([2, 3, 4, 5, 6, 7, 8]);
+	});
+
+	it('restituisce un array vuoto se i dati sono vuoti', () => {
+		const data: number[][] = [];
+
+		const result = sortAscData(data);
+
+		expect(result).toEqual([]);
+	});
+
+	it('mantiene gli elementi unici', () => {
+		const data = [
+			[1, 2, 3],
+			[1, 3, 4]
+		];
+
+		const result = sortAscData(data);
+
+		expect(result).toEqual([1, 2, 3, 4]);
+	});
+});
+
+describe('sortDescData', () => {
+	it('ordina i dati in ordine decrescente e rimuove i duplicati', () => {
+		const data = [
+			[3, 5, 2],
+			[8, 7, 3],
+			[4, 6, 5]
+		];
+
+		const result = sortDescData(data);
+
+		expect(result).toEqual([8, 7, 6, 5, 4, 3, 2]);
+	});
+
+	it('restituisce un array vuoto se i dati sono vuoti', () => {
+		const data: number[][] = [];
+
+		const result = sortDescData(data);
+
+		expect(result).toEqual([]);
+	});
+
+	it('mantiene gli elementi unici', () => {
+		const data = [
+			[1, 2, 3],
+			[1, 3, 4]
+		];
+
+		const result = sortDescData(data);
+
+		expect(result).toEqual([4, 3, 2, 1]);
+	});
+});
+
+describe('fetchDb', () => {
+	it('aggiorna fetchedData con i dati dal server se disponibili', async () => {
+		const mockData = {
+			yValues: [[1, 2], [3, 4]],
+			xLabels: ['A', 'B'],
+			zLabels: ['1', '2']
+		};
+
+		vi.spyOn(dataModule, 'getDbData').mockResolvedValue(mockData);
+
+		await fetchDb();
+
+		expect(fetchedData.values).toEqual(mockData.yValues);
+		expect(fetchedData.xLabels).toEqual(mockData.xLabels);
+		expect(fetchedData.zLabels).toEqual(mockData.zLabels);
+	});
+
+	it('non aggiorna fetchedData se getDbData restituisce null', async () => {
+		const originalValues = [...fetchedData.values];
+    const originalXLabels = [...fetchedData.xLabels];
+    const originalZLabels = [...fetchedData.zLabels];
+		vi.spyOn(dataModule, 'getDbData').mockResolvedValue(null);
+
+		await fetchDb();
+
+		expect(fetchedData.values).toEqual(originalValues);
+    expect(fetchedData.xLabels).toEqual(originalXLabels);
+    expect(fetchedData.zLabels).toEqual(originalZLabels);
+	});
+});
+
+describe('fetchExternal', () => {
+	it('aggiorna fetchedData con i dati dal server se disponibili', async () => {
+		const mockData = {
+			yValues: [[1, 2], [3, 4]],
+			xLabels: ['A', 'B'],
+			zLabels: ['1', '2']
+		};
+    vi.spyOn(dataModule, 'getExternalData').mockResolvedValue(mockData);
+
+    await fetchExternal();
+
+    expect(fetchedData.values).toEqual(mockData.yValues);
+		expect(fetchedData.xLabels).toEqual(mockData.xLabels);
+		expect(fetchedData.zLabels).toEqual(mockData.zLabels);
+	});
+  it('non aggiorna fetchedData se getExternalData restituisce null', async () => {
+		const originalValues = [...fetchedData.values];
+		const originalXLabels = [...fetchedData.xLabels];
+		const originalZLabels = [...fetchedData.zLabels];
+    vi.spyOn(dataModule, 'getExternalData').mockResolvedValue(null);
+    await fetchExternal();
+    expect(fetchedData.values).toEqual(originalValues);
+		expect(fetchedData.xLabels).toEqual(originalXLabels);
+		expect(fetchedData.zLabels).toEqual(originalZLabels);
+	});
+});
+
+describe('isFirstIntersected', () => {
+	it('restituisce true se l\'oggetto è intersecato', () => {
+		const mesh = new Mesh(new BufferGeometry(), new Material());
+
+		const e = {
+			pointer: { x: 1, y: 1 },
+			camera: { position: { x: 1, y: 1, z: 1 } }
+		};
+		
+		const raycaster = {
+			setFromCamera: vi.fn(),
+			intersectObjects: vi.fn().mockReturnValue([
+				{ object: mesh }
+			])
+		} as unknown as Raycaster;
+
+		const scene = { children: [mesh] };
+
+		// Chiamata alla funzione
+		const result = isFirstIntersected(e, raycaster, mesh, scene);
+
+		expect(result).toBe(true);
+		expect(raycaster.setFromCamera).toHaveBeenCalledWith(e.pointer, e.camera);
+		expect(raycaster.intersectObjects).toHaveBeenCalledWith(scene.children, true);
+	});
+
+	it('restituisce false se l\'oggetto non è intersecato', () => {
+		const mesh = new Mesh(new BufferGeometry(), new Material());
+
+		const e = {
+			pointer: { x: 1, y: 1 },
+			camera: { position: { x: 1, y: 1, z: 1 } }
+		};
+		
+		const raycaster = {
+			setFromCamera: vi.fn(),
+			intersectObjects: vi.fn().mockReturnValue([]) 
+		} as unknown as Raycaster; 
+
+		const scene = { children: [mesh] };
+
+		
+		const result = isFirstIntersected(e, raycaster, mesh, scene);
+
+		expect(result).toBe(false);
+		expect(raycaster.setFromCamera).toHaveBeenCalledWith(e.pointer, e.camera);
+		expect(raycaster.intersectObjects).toHaveBeenCalledWith(scene.children, true);
+	});
+});
+
+

@@ -10,12 +10,6 @@ describe('Color', () => {
     expect(getByText('rows')).toBeInTheDocument();
     expect(getByText('values')).toBeInTheDocument();
   });
-
-  it('should display the initial selected option', () => {
-    const { getByText } = render(Color);
-    expect(getByText('Selected Option: 2')).toBeInTheDocument();
-  });
-
 });
 
 

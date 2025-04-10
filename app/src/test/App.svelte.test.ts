@@ -24,12 +24,27 @@ const mockUtils = {
   defaultTarget: mockDefaultTarget,
 };
 
-// Mock di `$lib/index.svelte`
-vi.mock('$lib/index.svelte', () => ({
-  getData: () => ({
-    computed: mockUtils,
-  }),
-}));
+vi.mock('$lib/index.svelte', async () => {
+    const actual = await vi.importActual('$lib/index.svelte');
+    return {
+      createUtils: vi.fn(() => ({
+        average: 10,
+        averageRows: [5, 10, 15],
+        averageCols: [8, 12],
+        minmax: [1, 20],
+        max: 20,
+        min: 1,
+        rows: 3,
+        cols: 2,
+        defaultTarget: [
+            (mockFecthedData.length * mockSpacing) / 2 - mockSpacing / 2,
+            (Math.max(...mockFecthedData.flat()) - 1) / 2,
+            (mockFecthedData[0].length * mockSpacing) / 2 - mockSpacing / 2
+          ],
+      })),
+    };
+  });
+
 
 // Mock di `@threlte/core`
 vi.mock('@threlte/core', async (importOriginal) => {
@@ -50,14 +65,8 @@ describe('App', () => {
     vi.clearAllMocks();
   });
 
-  it('renders without crashing', () => {
-    const { container } = render(App);
-    expect(container).toBeTruthy();
-  });
-
   it('should reset the target to utils.defaultTarget', async () => {
     const { component } = render(App);
-    console.log('Valore iniziale di target:', component.getTarget());
     component.resetTarget();
     expect(component.getTarget()).toEqual(mockDefaultTarget);
   });

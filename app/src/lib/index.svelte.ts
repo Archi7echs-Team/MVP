@@ -1,5 +1,4 @@
 import { Mesh, Raycaster, Vector3 } from 'three';
-import type { Writable } from 'svelte/store';
 
 import { getDbData, getExternalData, uploadCsvFile } from '$lib/data.svelte';
 
@@ -21,16 +20,24 @@ export let fetchedData = $state({
 });
 
 // set fetchedData to the data fetched from the server
-export const fetchDb = () => {
-	let tmp = getDbData();
+export const fetchDb = async () => {
+	let tmp = await getDbData();
+	if (!tmp) {
+		//alert('Error fetching data from the server');
+		return;
+	}
 	fetchedData.values = tmp.yValues;
 	fetchedData.xLabels = tmp.xLabels;
 	fetchedData.zLabels = tmp.zLabels;
 	resetFilter();
 };
 
-export const fetchExternal = () => {
-	let tmp = getExternalData();
+export const fetchExternal = async () => {
+	let tmp = await getExternalData();
+	if (!tmp) {
+		//alert('Error fetching data from the server');
+		return;
+	}
 	fetchedData.values = tmp.yValues;
 	fetchedData.xLabels = tmp.xLabels;
 	fetchedData.zLabels = tmp.zLabels;
@@ -70,30 +77,51 @@ const utils = $derived({
 	defaultPosition: new Vector3(15, 7.5, 15)
 });
 
+export const createUtils = () => {
+	return {
+		average: data.flat().reduce((a, b) => a + b, 0) / data.flat().length,
+		averageRows: data.map((row) => row.reduce((a, b) => a + b, 0) / row.length),
+		averageCols: Array.from(
+			{ length: data[0].length },
+			(_, colIndex) => data.map((row) => row[colIndex]).reduce((a, b) => a + b, 0) / data.length
+		),
+		minmax: [Math.min(...data.flat()), Math.max(...data.flat())],
+		max: Math.max(...data.flat()),
+		min: Math.min(...data.flat()),
+		rows: data.length,
+		cols: data[0].length,
+		defaultTarget: [
+			(data.length * fetchedData.spacing) / 2 - fetchedData.spacing / 2,
+			(Math.max(...data.flat()) - 1) / 2,
+			(data[0].length * fetchedData.spacing) / 2 - fetchedData.spacing / 2
+		]
+	};
+};
+
 // sort the data by value without repetition
-const sortAscData = (data: number[][]) => {
+export const sortAscData = (data: number[][]) => {
 	let sorted = data.flat().sort((a, b) => a - b);
 	let unique = [...new Set(sorted)];
 	return unique;
 };
 
-const sortDescData = (data: number[][]) => {
+export const sortDescData = (data: number[][]) => {
 	let sorted = data.flat().sort((a, b) => b - a);
 	let unique = [...new Set(sorted)];
 	return unique;
 };
 
-const sortedData = $derived({
+const sortecdData = $derived({
 	asc: sortAscData(data),
 	desc: sortDescData(data)
 });
 
-export const getLength = (data: number[][]) => {
+export const getLength = () => {
 	let unique = [...new Set(data.flat())];
 	return unique.length;
 };
 
-const length = $derived(getLength(data));
+const length = $derived(getLength());
 
 export const getMaxNValue = (value: number, n: number) => {
 	const num = length - n;
@@ -109,10 +137,6 @@ export const getMinNvalue = (value: number, n: number) => {
 
 export const getValueFromId = (id: string) => {
 	return data[parseInt(id.split('-')[0])][parseInt(id.split('-')[1])];
-};
-
-export function resetTarget(targetStore: Writable<number[]>, utils: { defaultTarget: number[] }) {
-	targetStore.set(utils.defaultTarget);
 };
 
 class Selection {
@@ -150,7 +174,7 @@ class Selection {
 	lastValue = () => {
 		return this.active() ? getValueFromId(selection.selected.at(-1)) : 0;
 	};
-};
+}
 
 let selection = new Selection();
 
@@ -180,24 +204,19 @@ export const getSelectedBarInfo = () => {
 	return { row: row + 1, column: col + 1, height: value };
 };
 
-//funzione per troncare il testo se troppo lungo
-export function truncateText(text: string, maxLength: number = 20) {
-	return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
-};
-
 export function takeScreenshot(renderer: any, scene: any, camera: any) {
 	renderer.render(scene, camera.current);
 	const dataUrl = renderer.domElement.toDataURL('image/png');
 	renderer.setClearColor('#0e1625');
 	downloadImage(dataUrl);
-};
+}
 
 export function downloadImage(dataUrl: string) {
 	const link = document.createElement('a');
 	link.download = `Screenshot_${new Date().toLocaleDateString()}.png`;
 	link.href = dataUrl;
 	link.click();
-};
+}
 
 export const cameraUtils = {
 	zoomStep: 2,
@@ -235,15 +254,15 @@ export function setBarFilterSelection(value: number) {
 	if (value === 0) {
 		filter.selection.clear();
 	}
-};
+}
 
 export function resetBarSelection() {
 	filter.selection.clear();
-};
+}
 
 export function hideBarFilterPane() {
 	filter.displayBarFilter = false;
-};
+}
 
 export const isInRange = (height: number) => {
 	return height >= filter.rangeValue.min && height <= filter.rangeValue.max;
@@ -251,10 +270,13 @@ export const isInRange = (height: number) => {
 
 // Funzione per applicare il filtro
 export const passesBarFilter = (id: string, height: number) => {
+	if (!isInRange(height)) return false;
+
 	const lv = filter.selection.lastValue();
 	const isSelected = filter.selection.check(id);
 
 	if (filter.avgFilter === 1 && height > utils.average) return false;
+
 	if (filter.avgFilter === 2 && height < utils.average) return false;
 
 	if (filter.barFilterSelection === 1 && !isSelected) return false;
@@ -266,7 +288,13 @@ export const passesBarFilter = (id: string, height: number) => {
 	if (filter.barFilterSelection === 3) {
 		return height < lv && !isSelected;
 	}
+	if (filter.nValuemax != 0 && !getMaxNValue(height, filter.nValuemax)) {
+		return false;
+	}
 
+	if (filter.nValuemin != 0 && !getMinNvalue(height, filter.nValuemin)) {
+		return false;
+	}
 	return true;
 };
 
@@ -325,7 +353,7 @@ export const handleTextClick = (
 };
 
 export const resetFilter = () => {
-	filter.rangeValue.min = 0;
+	filter.rangeValue.min = utils.min;
 	filter.rangeValue.max = utils.max;
 	filter.nValuemin = 0;
 	filter.nValuemax = 0;
@@ -339,3 +367,5 @@ export const resetFilter = () => {
 	filter.showColAvgPlane = false;
 	filter.selection.clear();
 };
+
+resetFilter();
