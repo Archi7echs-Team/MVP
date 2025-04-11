@@ -18,7 +18,7 @@ describe('fetchDbData', () => {
 			ok: true,
 			json: async () => mockData
 		});
-		const data = await dataModule['fetchDbData']();
+		const data = await dataModule['fetchDbData']('http://app:8080');
 		expect(data).toEqual(mockData);
 	});
 	it('lancia un errore se la risposta non è ok', async () => {
@@ -29,7 +29,7 @@ describe('fetchDbData', () => {
 		await expect(fetchDbData('http://app:8080')).rejects.toThrow('networkError');
 	});
 });
-
+	
 describe('fetchExternalData', () => {
 	it('returns data if fetch succeeds', async () => {
 		const mockData = { external: true };
@@ -37,7 +37,7 @@ describe('fetchExternalData', () => {
 			ok: true,
 			json: async () => mockData
 		});
-		const data = await dataModule['fetchExternalData']();
+		const data = await dataModule['fetchExternalData']('http://app:8080');
 		expect(data).toEqual(mockData);
 	});
 
