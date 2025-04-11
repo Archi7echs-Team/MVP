@@ -1,8 +1,14 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import * as dataModule from '../lib/data.svelte';
-import { fetchDbData, fetchExternalData, uploadCsvFile, init, getDbData, dbData } from '../lib/data.svelte';
+import {
+	fetchDbData,
+	fetchExternalData,
+	uploadCsvFile,
+	init,
+	getDbData,
+	dbData
+} from '../lib/data.svelte';
 import { waitFor } from '@testing-library/svelte';
-
 
 const mockFetch = vi.fn();
 
@@ -29,7 +35,7 @@ describe('fetchDbData', () => {
 		await expect(fetchDbData('http://app:8080')).rejects.toThrow('networkError');
 	});
 });
-	
+
 describe('fetchExternalData', () => {
 	it('returns data if fetch succeeds', async () => {
 		const mockData = { external: true };
@@ -108,11 +114,14 @@ describe('uploadCsvFile', () => {
 });
 
 describe('init', () => {
-	it('logga un errore se la fetch per l\'API esterna fallisce', async () => {
+	it("logga un errore se la fetch per l'API esterna fallisce", async () => {
 		vi.spyOn(global, 'fetch').mockRejectedValue(new Error('Failed to fetch'));
 		const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 		await init('http://app:8080');
-		expect(consoleErrorSpy).toHaveBeenCalledWith('Error init fetching external API: ', expect.any(Error));
+		expect(consoleErrorSpy).toHaveBeenCalledWith(
+			'Error init fetching external API: ',
+			expect.any(Error)
+		);
 		consoleErrorSpy.mockRestore();
 	});
 });
