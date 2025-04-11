@@ -12,7 +12,7 @@ export const fetchDbData = async (url: string = 'http://localhost:8080') => {
 // http://localhost:8080/api/external/data
 // fetch external data from the server
 export const fetchExternalData = async (url: string = 'http://localhost:8080') => {
-	const response = await fetch(url + '/api/data');
+	const response = await fetch(url + '/api/external/data');
 	if (!response.ok) {
 		const errorMessage = await response.text();
 		throw new Error(errorMessage);
