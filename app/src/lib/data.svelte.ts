@@ -1,8 +1,8 @@
 // fetch datas from the server
-import { type FileValue } from 'svelte-tweakpane-ui';
 
-export const fetchDbData = async () => {
-	const response = await fetch('http://localhost:8080/api/coordinates');
+export const fetchDbData = async (url: string = 'http://localhost:8080') => {
+	const completeURL = url + '/api/coordinates';
+	const response = await fetch(completeURL);
 	if (!response.ok) {
 		throw new Error('networkError');
 	}
@@ -12,8 +12,9 @@ export const fetchDbData = async () => {
 
 // http://localhost:8080/api/external/data
 // fetch external data from the server
-export const fetchExternalData = async () => {
-	const response = await fetch('http://localhost:8080/api/external/data');
+export const fetchExternalData = async (url: string = 'http://localhost:8080') => {
+	const completeURL = url + '/api/external/data';
+	const response = await fetch(completeURL);
 	if (!response.ok) {
 		const errorMessage = await response.text();
 		throw new Error(errorMessage);
@@ -22,7 +23,7 @@ export const fetchExternalData = async () => {
 	return data;
 };
 
-export async function uploadCsvFile(file: any) {
+export async function uploadCsvFile(file: any, url: string = 'http://localhost:8080') {
 	if (!file) {
 		alert('No file provided');
 		return;
@@ -39,9 +40,11 @@ export async function uploadCsvFile(file: any) {
 	}
 	const formData = new FormData();
 	formData.append('file', file); // Attach the file with the key "file"
-	
+
+	const completeURL = url + '/api/uploadCsv';
+
 	try {
-		const response = await fetch('http://localhost:8080/api/uploadCsv', {
+		const response = await fetch(completeURL, {
 			method: 'POST',
 			body: formData
 		});
@@ -65,21 +68,6 @@ export async function uploadCsvFile(file: any) {
 
 let externalData: any = null;
 export let dbData: any = null;
-
-export const init = async () => {
-	try {
-		externalData = await fetchExternalData();
-	} catch (error: any) {
-		console.error('Error init fetching external API: ', error);
-	}
-	try {
-		dbData = await fetchDbData();
-	} catch (error: any) {
-		console.error('Error init fetching DB: ', error);
-	}
-};
-
-init();
 
 export const getDbData = async () => {
 	if (!dbData) {

@@ -1,8 +1,13 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import * as dataModule from '../lib/data.svelte';
-import { fetchDbData, fetchExternalData, uploadCsvFile, init, getDbData, dbData } from '../lib/data.svelte';
+import {
+	fetchDbData,
+	fetchExternalData,
+	uploadCsvFile,
+	getDbData,
+	dbData
+} from '../lib/data.svelte';
 import { waitFor } from '@testing-library/svelte';
-
 
 const mockFetch = vi.fn();
 
@@ -18,7 +23,7 @@ describe('fetchDbData', () => {
 			ok: true,
 			json: async () => mockData
 		});
-		const data = await dataModule['fetchDbData']();
+		const data = await dataModule['fetchDbData']('http://app:8080');
 		expect(data).toEqual(mockData);
 	});
 	it('lancia un errore se la risposta non è ok', async () => {
@@ -26,7 +31,7 @@ describe('fetchDbData', () => {
 			ok: false,
 			statusText: 'Bad Request'
 		});
-		await expect(fetchDbData()).rejects.toThrow('networkError');
+		await expect(fetchDbData('http://app:8080')).rejects.toThrow('networkError');
 	});
 });
 
@@ -37,7 +42,7 @@ describe('fetchExternalData', () => {
 			ok: true,
 			json: async () => mockData
 		});
-		const data = await dataModule['fetchExternalData']();
+		const data = await dataModule['fetchExternalData']('http://app:8080');
 		expect(data).toEqual(mockData);
 	});
 
@@ -46,21 +51,21 @@ describe('fetchExternalData', () => {
 			ok: false,
 			text: vi.fn().mockResolvedValue('Error fetching data')
 		});
-		await expect(fetchExternalData()).rejects.toThrow('Error fetching data');
+		await expect(fetchExternalData('http://app:8080')).rejects.toThrow('Error fetching data');
 	});
 });
 
 describe('uploadCsvFile', () => {
 	it('alerts if no file is provided', async () => {
 		const alertSpy = vi.spyOn(global, 'alert').mockImplementation(() => {});
-		await dataModule.uploadCsvFile(null);
+		await dataModule.uploadCsvFile(null, 'http://app:8080');
 		expect(alertSpy).toHaveBeenCalledWith('No file provided');
 		alertSpy.mockRestore();
 	});
 	it('lancia un errore se il file non è un csv', async () => {
 		const file = new File(['a,b\n1,2'], 'test.txt', { type: 'text/plain' });
 		const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
-		await uploadCsvFile(file);
+		await uploadCsvFile(file, 'http://app:8080');
 		expect(alertSpy).toHaveBeenCalledWith('File is not a csv file');
 		alertSpy.mockRestore();
 	});
@@ -69,7 +74,7 @@ describe('uploadCsvFile', () => {
 		const file = new File(['a,b\n1,2'], 'test.csv', { type: 'text/csv' });
 		const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
 		Object.defineProperty(file, 'size', { value: 20 * 1024 * 1024 });
-		await uploadCsvFile(file);
+		await uploadCsvFile(file, 'http://app:8080');
 		expect(alertSpy).toHaveBeenCalledWith('File is too large');
 		alertSpy.mockRestore();
 	});
@@ -81,7 +86,7 @@ describe('uploadCsvFile', () => {
 			ok: false,
 			text: vi.fn().mockResolvedValue('Error uploading file')
 		});
-		await uploadCsvFile(file);
+		await uploadCsvFile(file, 'http://app:8080');
 		expect(alertSpy).toHaveBeenCalledWith(expect.stringContaining('Error uploading file'));
 		alertSpy.mockRestore();
 	});
@@ -93,7 +98,7 @@ describe('uploadCsvFile', () => {
 			ok: true,
 			json: vi.fn().mockResolvedValue(mockResponse)
 		});
-		const result = await uploadCsvFile(file);
+		const result = await uploadCsvFile(file, 'http://app:8080');
 		expect(result).toEqual(mockResponse);
 	});
 
@@ -101,18 +106,9 @@ describe('uploadCsvFile', () => {
 		const file = new File(['a,b\n1,2'], 'test.csv', { type: 'text/csv' });
 		const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
 		global.fetch = vi.fn().mockRejectedValue(new Error('Failed to fetch'));
-		await uploadCsvFile(file);
+		await uploadCsvFile(file, 'http://app:8080');
 		expect(alertSpy).toHaveBeenCalledWith('Failed to upload file:\nnet::ERR_CONNECTION_REFUSED');
 		alertSpy.mockRestore();
 	});
 });
 
-describe('init', () => {
-	it('logga un errore se la fetch per l\'API esterna fallisce', async () => {
-		vi.spyOn(global, 'fetch').mockRejectedValue(new Error('Failed to fetch'));
-		const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-		await init();
-		expect(consoleErrorSpy).toHaveBeenCalledWith('Error init fetching external API: ', expect.any(Error));
-		consoleErrorSpy.mockRestore();
-	});
-});
