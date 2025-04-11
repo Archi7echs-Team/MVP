@@ -85,7 +85,7 @@ export const init = async (url = 'http://localhost:8080') => {
 	}
 };
 
-init();
+//init();
 
 export const getDbData = async () => {
 	if (!dbData) {
