@@ -2,7 +2,7 @@
 import { type FileValue } from 'svelte-tweakpane-ui';
 
 export const fetchDbData = async () => {
-	const response = await fetch('http://localhost:8080/api/coordinates');
+	const response = await fetch('http://app:8080/api/coordinates');
 	if (!response.ok) {
 		throw new Error('networkError');
 	}
@@ -13,7 +13,7 @@ export const fetchDbData = async () => {
 // http://localhost:8080/api/external/data
 // fetch external data from the server
 export const fetchExternalData = async () => {
-	const response = await fetch('http://localhost:8080/api/external/data');
+	const response = await fetch('http://app:8080/api/external/data');
 	if (!response.ok) {
 		const errorMessage = await response.text();
 		throw new Error(errorMessage);
@@ -41,7 +41,7 @@ export async function uploadCsvFile(file: any) {
 	formData.append('file', file); // Attach the file with the key "file"
 	
 	try {
-		const response = await fetch('http://localhost:8080/api/uploadCsv', {
+		const response = await fetch('http://app:8080/api/uploadCsv', {
 			method: 'POST',
 			body: formData
 		});
