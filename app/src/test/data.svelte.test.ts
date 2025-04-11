@@ -4,7 +4,6 @@ import {
 	fetchDbData,
 	fetchExternalData,
 	uploadCsvFile,
-	init,
 	getDbData,
 	dbData
 } from '../lib/data.svelte';
@@ -113,15 +112,3 @@ describe('uploadCsvFile', () => {
 	});
 });
 
-describe('init', () => {
-	it("logga un errore se la fetch per l'API esterna fallisce", async () => {
-		vi.spyOn(global, 'fetch').mockRejectedValue(new Error('Failed to fetch'));
-		const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-		await init('http://app:8080');
-		expect(consoleErrorSpy).toHaveBeenCalledWith(
-			'Error init fetching external API: ',
-			expect.any(Error)
-		);
-		consoleErrorSpy.mockRestore();
-	});
-});

@@ -2,7 +2,6 @@
 
 export const fetchDbData = async (url: string = 'http://localhost:8080') => {
 	const completeURL = url + '/api/coordinates';
-	console.log('Fetching db data : ', completeURL);
 	const response = await fetch(completeURL);
 	if (!response.ok) {
 		throw new Error('networkError');
@@ -15,7 +14,6 @@ export const fetchDbData = async (url: string = 'http://localhost:8080') => {
 // fetch external data from the server
 export const fetchExternalData = async (url: string = 'http://localhost:8080') => {
 	const completeURL = url + '/api/external/data';
-	console.log('Fetching ext data : ', completeURL);
 	const response = await fetch(completeURL);
 	if (!response.ok) {
 		const errorMessage = await response.text();
@@ -44,7 +42,6 @@ export async function uploadCsvFile(file: any, url: string = 'http://localhost:8
 	formData.append('file', file); // Attach the file with the key "file"
 
 	const completeURL = url + '/api/uploadCsv';
-	console.log('Uploading file to : ', completeURL);
 
 	try {
 		const response = await fetch(completeURL, {
@@ -71,21 +68,6 @@ export async function uploadCsvFile(file: any, url: string = 'http://localhost:8
 
 let externalData: any = null;
 export let dbData: any = null;
-
-export const init = async (url = 'http://localhost:8080') => {
-	try {
-		externalData = await fetchExternalData(url);
-	} catch (error: any) {
-		console.error('Error init fetching external API: ', error);
-	}
-	try {
-		dbData = await fetchDbData(url);
-	} catch (error: any) {
-		console.error('Error init fetching DB: ', error);
-	}
-};
-
-//init();
 
 export const getDbData = async () => {
 	if (!dbData) {
