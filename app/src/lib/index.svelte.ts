@@ -111,7 +111,7 @@ export const sortDescData = (data: number[][]) => {
 	return unique;
 };
 
-const sortecdData = $derived({
+const sortedData = $derived({
 	asc: sortAscData(data),
 	desc: sortDescData(data)
 });
