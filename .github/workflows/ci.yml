@@ -90,8 +90,8 @@ jobs:
         with:
           name: frontend-coverage
           path: app/coverage/
-          
-    upload-coverage:
+
+  upload-coverage:
     runs-on: ubuntu-latest
     needs: [backend-tests, frontend-tests]
 
