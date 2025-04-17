@@ -39,7 +39,8 @@ export default defineConfig({
 		coverage: {
 			include: ['src/**/*.{js,ts,svelte}'],
 			exclude: ['**/+page.svelte', '**/+layout.svelte', '**/app.d.ts', '**/app.html', '**/app.ts'],
-			reporter: ['text', 'html'],
+			reporter: ['text', 'html', 'lcov'],
+			reportsDirectory: './coverage',
 			provider: 'v8',
 		  }
 	}
