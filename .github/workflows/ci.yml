@@ -110,7 +110,14 @@ jobs:
         with:
           name: frontend-coverage
           path: coverage/frontend
-
+      - name: Debug lista contenuti artifact coverage
+        run: |
+          echo "::group::Backend"
+          find coverage/backend
+          echo "::endgroup::"
+          echo "::group::Frontend"
+          find coverage/frontend
+          echo "::endgroup::"
       - name: Upload to Codecov
         uses: codecov/codecov-action@v4
         with:
