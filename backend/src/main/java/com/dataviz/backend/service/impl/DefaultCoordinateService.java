@@ -1,9 +1,9 @@
 package com.dataviz.backend.service.impl;
 
+import com.dataviz.backend.domain.port.out.CoordinateLoaderPort;
 import com.dataviz.backend.model.CoordinateEntity;
 import com.dataviz.backend.model.MatrixData;
 import com.dataviz.backend.model.impl.MatrixDataImpl;
-import com.dataviz.backend.repository.CoordinateRepository;
 import com.dataviz.backend.service.CoordinateService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,17 +17,17 @@ import java.util.Set;
 public class DefaultCoordinateService implements CoordinateService {
 
 
-    private final CoordinateRepository coordinateRepository;
+    private final CoordinateLoaderPort coordinateLoaderPort;
 
-    public DefaultCoordinateService(CoordinateRepository coordinateRepository) {
-        this.coordinateRepository = coordinateRepository;
+    public DefaultCoordinateService(CoordinateLoaderPort coordinateLoaderPort) {
+        this.coordinateLoaderPort = coordinateLoaderPort;
     }
 
     @Transactional(readOnly = true)
     @Override
     public MatrixData getCoordinates(String datasetType) {
         // Carica dal DB, ad esempio filtrando per datasetType
-        List<CoordinateEntity> rows = coordinateRepository.findAllByDatasetType(datasetType);
+        List<CoordinateEntity> rows = coordinateLoaderPort.loadCoordinatesByDatasetType(datasetType);
 
         // Estrazione delle etichette x e z
         Set<String> xLabelSet = new LinkedHashSet<>();
